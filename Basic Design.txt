@@ -1,3 +1,7 @@
+General Notes
+- Everything to be compatible with StarData
+- Placeholder API support
+
 ChatSpace
 - Parent to all other things
 - Has an ID
@@ -27,3 +31,4 @@ ChatRoom
   - Invite means that others have to be invited by those that can invite in the room
   - Private means that the chatroom cannot be joined any ore
   - Automatic means that a plugin handles automatic joining/leaving. EX: SG chat from Nexus Reborn SG
+- Default option to save logs, but this is disabled by default
