@@ -1,23 +1,31 @@
 package com.stardevllc.starchat;
 
 import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
+import org.bukkit.command.CommandSender;
 
 public abstract class ChatSpace {
     protected long id; //StarData compatibility
     protected String name, simplifiedName; //Name is the display name and the simplified name is how it is interacted with
-    protected String playerFormat, systemFormat; //Player Format is what it looks like when a player sends a message in this space. System format is when a non-player sends a message in this space
+    protected String senderFormat = "", systemFormat = ""; //Player Format is what it looks like when a player sends a message in this space. System format is when a non-player sends a message in this space
+    protected boolean affectedByPunishments = true; //If this space is affected by punishments.
     //Logging stuff
 
-    public ChatSpace(String name, String playerFormat, String systemFormat) {
+    public ChatSpace(String name) {
         this.name = name;
-        this.playerFormat = playerFormat;
-        this.systemFormat = systemFormat;
         this.simplifiedName = ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', name.toLowerCase().replace(" ", "_")));
     }
+
+    public ChatSpace(String name, String senderFormat, String systemFormat) {
+        this(name);
+        this.senderFormat = senderFormat;
+        this.systemFormat = systemFormat;
+    }
     
-    public abstract void sendMessage(Player player, String message);
-    public abstract void sendMessage(String message);
+    public abstract void sendMessage(CommandSender sender, String message);
+    
+    public void sendMessage(String message) {
+        sendMessage(null, message);
+    }
 
     public String getName() {
         return name;
@@ -27,11 +35,15 @@ public abstract class ChatSpace {
         return simplifiedName;
     }
 
-    public String getPlayerFormat() {
-        return playerFormat;
+    public String getSenderFormat() {
+        return senderFormat;
     }
 
     public String getSystemFormat() {
         return systemFormat;
+    }
+
+    public boolean isAffectedByPunishments() {
+        return affectedByPunishments;
     }
 }
