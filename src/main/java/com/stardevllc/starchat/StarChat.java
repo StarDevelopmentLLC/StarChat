@@ -3,12 +3,15 @@ package com.stardevllc.starchat;
 import com.stardevllc.starchat.channels.ChatChannel;
 import com.stardevllc.starchat.channels.GlobalChannel;
 import com.stardevllc.starchat.channels.StaffChannel;
+import com.stardevllc.starmclib.color.ColorUtils;
 import dev.dejvokep.boostedyaml.YamlDocument;
 import dev.dejvokep.boostedyaml.settings.dumper.DumperSettings;
 import dev.dejvokep.boostedyaml.settings.general.GeneralSettings;
 import dev.dejvokep.boostedyaml.settings.loader.LoaderSettings;
 import dev.dejvokep.boostedyaml.settings.updater.UpdaterSettings;
 import net.milkbowl.vault.chat.Chat;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -64,7 +67,7 @@ public class StarChat extends JavaPlugin implements Listener {
             getLogger().log(Level.SEVERE, "Error while saving config.yml", e);
         }
         
-        StarChat.consoleNameFormat = yamlConfig.getString("consolenameformat");
+        StarChat.consoleNameFormat = yamlConfig.getString("console-name-format");
         
         globalChannel = new GlobalChannel(new File(getDataFolder() + File.separator + "channels" + File.separator + "defaults", "global.yml"));
         this.chatSpaces.put(globalChannel.getSimplifiedName(), globalChannel);
@@ -89,6 +92,39 @@ public class StarChat extends JavaPlugin implements Listener {
         
         e.setCancelled(true);
         chatSpace.sendMessage(player, message);
+    }
+    
+    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+        if (cmd.getName().equalsIgnoreCase("chat")) {
+            if (!(sender instanceof Player player)) {
+                sender.sendMessage(ColorUtils.color("&cOnly players can use that command."));
+                return true;
+            }
+            
+            if (!(args.length > 0)) {
+                sender.sendMessage(ColorUtils.color("&cUsage: /" + label + " <channelName>"));
+                return true;
+            }
+            
+            String channelName = args[0].toLowerCase();
+            ChatSpace chatSpace = this.chatSpaces.get(channelName);
+            if (chatSpace == null) {
+                sender.sendMessage(ColorUtils.color("&cSorry, but &e" + channelName + " is not a registered chat space."));
+                return true;
+            }
+            
+            if (chatSpace instanceof ChatChannel chatChannel) {
+                String sendPermission = chatChannel.getSendPermission();
+                if (!sendPermission.isEmpty() && !player.hasPermission(sendPermission)) {
+                    sender.sendMessage(ColorUtils.color("&cYou do not have permission to send messages in " + chatSpace.getName() + "."));
+                    return true;
+                }
+            }
+            
+            this.setPlayerFocus(player, chatSpace);
+            sender.sendMessage(ColorUtils.color("&aSet your chat focus to &b" + chatSpace.getName()) + ".");
+        }
+        return true;
     }
 
     public ChatChannel getGlobalChannel() {

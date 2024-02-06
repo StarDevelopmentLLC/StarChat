@@ -120,4 +120,16 @@ public class ChatChannel extends ChatSpace {
             }
         }
     }
+
+    public String getViewPermission() {
+        return viewPermission;
+    }
+
+    public String getSendPermission() {
+        return sendPermission;
+    }
+
+    public String getPlayerDisplayNameFormat() {
+        return playerDisplayNameFormat;
+    }
 }
