@@ -93,7 +93,7 @@ public class ChatChannel extends ChatSpace {
         } else if (sender instanceof ConsoleCommandSender) {
             formattedMessage = senderFormat.replace("{displayname}", StarChat.consoleNameFormat);
         } else if (sender instanceof Player player) {
-            if (!player.hasPermission(sendPermission)) {
+            if (!sendPermission.isEmpty() && !player.hasPermission(sendPermission)) {
                 player.sendMessage(ColorUtils.color("&cYou do not have permission to send messages in " + getName()));
                 return;
             }
@@ -103,18 +103,19 @@ public class ChatChannel extends ChatSpace {
                 displayName = player.getDisplayName();
             } else {
                 displayName = this.playerDisplayNameFormat;
-                displayName.replace("{prefix}", StarChat.vaultChat.getPlayerPrefix(player));
-                displayName.replace("{name}", player.getName());
-                displayName.replace("{suffix}", StarChat.vaultChat.getPlayerSuffix(player));
+                displayName = displayName.replace("{prefix}", StarChat.vaultChat.getPlayerPrefix(player));
+                displayName = displayName.replace("{name}", player.getName());
+                displayName = displayName.replace("{suffix}", StarChat.vaultChat.getPlayerSuffix(player));
             }
             
             formattedMessage = senderFormat.replace("{displayname}", displayName);
         }
         
+        formattedMessage = formattedMessage.replace("{message}", message);
         formattedMessage = ColorUtils.color(formattedMessage);
 
         for (Player player : Bukkit.getOnlinePlayers()) {
-            if (player.hasPermission(viewPermission)) {
+            if (viewPermission.isEmpty() || player.hasPermission(viewPermission)) {
                 player.sendMessage(formattedMessage);
             }
         }

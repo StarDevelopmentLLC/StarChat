@@ -87,6 +87,7 @@ public class StarChat extends JavaPlugin implements Listener {
             }
         }
         
+        e.setCancelled(true);
         chatSpace.sendMessage(player, message);
     }
 
