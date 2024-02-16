@@ -23,8 +23,6 @@ public class ChatChannel extends ChatSpace {
     protected String viewPermission = ""; //Permission needed by players in order to view messages in this channel
     protected String sendPermission = ""; //Permission needed by players in order to send messages in this channel
     
-    protected String playerDisplayNameFormat = ""; //Format for player display names in this channel.
-    
     public ChatChannel(String name, File configFile) {
         super(name);
         try {
@@ -98,17 +96,7 @@ public class ChatChannel extends ChatSpace {
                 return;
             }
             
-            String displayName;
-            if (this.playerDisplayNameFormat == null || this.playerDisplayNameFormat.isEmpty()) {
-                displayName = player.getDisplayName();
-            } else {
-                displayName = this.playerDisplayNameFormat;
-                displayName = displayName.replace("{prefix}", StarChat.vaultChat.getPlayerPrefix(player));
-                displayName = displayName.replace("{name}", player.getName());
-                displayName = displayName.replace("{suffix}", StarChat.vaultChat.getPlayerSuffix(player));
-            }
-            
-            formattedMessage = senderFormat.replace("{displayname}", displayName);
+            formattedMessage = senderFormat.replace("{displayname}", formatPlayerDisplayName(player));
         }
         
         formattedMessage = formattedMessage.replace("{message}", message);
@@ -127,9 +115,5 @@ public class ChatChannel extends ChatSpace {
 
     public String getSendPermission() {
         return sendPermission;
-    }
-
-    public String getPlayerDisplayNameFormat() {
-        return playerDisplayNameFormat;
     }
 }

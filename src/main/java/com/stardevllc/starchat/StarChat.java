@@ -3,6 +3,8 @@ package com.stardevllc.starchat;
 import com.stardevllc.starchat.channels.ChatChannel;
 import com.stardevllc.starchat.channels.GlobalChannel;
 import com.stardevllc.starchat.channels.StaffChannel;
+import com.stardevllc.starchat.rooms.ChatRoom;
+import com.stardevllc.starlib.registry.StringRegistry;
 import com.stardevllc.starmclib.color.ColorUtils;
 import dev.dejvokep.boostedyaml.YamlDocument;
 import dev.dejvokep.boostedyaml.settings.dumper.DumperSettings;
@@ -29,11 +31,14 @@ import java.util.logging.Level;
 
 public class StarChat extends JavaPlugin implements Listener {
     public static String consoleNameFormat; //How the console name appears
-    public static Chat vaultChat;
-    private static YamlDocument yamlConfig;
-    private ChatChannel globalChannel, staffChannel;
-    private Map<UUID, String> playerChatSelection = new HashMap<>();
-    private Map<String, ChatSpace> chatSpaces = new HashMap<>();
+    public static UUID consoleUniqueId; //The uuid to use for the console
+    public static Chat vaultChat; //Vault chat hook
+    private static YamlDocument yamlConfig; //Main config
+    private ChatChannel globalChannel, staffChannel; //Default channels
+    private Map<UUID, String> playerChatSelection = new HashMap<>(); //Current player focus
+    
+    private StringRegistry<ChatChannel> channelRegistry = new StringRegistry<>(); //All channels
+    private StringRegistry<ChatRoom> roomRegistry = new StringRegistry<>(); //All rooms
 
     @Override
     public void onEnable() {
@@ -56,9 +61,9 @@ public class StarChat extends JavaPlugin implements Listener {
             yamlConfig.getBlock("console-name-format").addComment("The name that the console appears as in chat spaces");
         }
         
-        if (!yamlConfig.contains("ops-name-color")) {
-            yamlConfig.set("ops-name-color", "&4");
-            yamlConfig.getBlock("ops-name-color").addComment("The color that server operators will have in their name.");
+        if (!yamlConfig.contains("console-uuid")) {
+            yamlConfig.set("console-uuid", UUID.randomUUID().toString());
+            yamlConfig.getBlock("console-uuid").addComment("The Unique ID (UUID) to use for the Console throughout the plugin.");
         }
         
         try {
@@ -68,12 +73,24 @@ public class StarChat extends JavaPlugin implements Listener {
         }
         
         StarChat.consoleNameFormat = yamlConfig.getString("console-name-format");
+        try {
+            StarChat.consoleUniqueId = UUID.fromString(yamlConfig.getString("console-uuid"));
+        } catch (Exception e) {
+            getLogger().severe("Error while parsing console uuid from config, regenerating...");
+            StarChat.consoleUniqueId = UUID.randomUUID();
+            yamlConfig.set("console-uuid", StarChat.consoleUniqueId.toString());
+            try {
+                yamlConfig.save();
+            } catch (IOException ex) {
+                getLogger().log(Level.SEVERE, "Error while saving config.yml", ex);
+            }
+        }
         
         globalChannel = new GlobalChannel(new File(getDataFolder() + File.separator + "channels" + File.separator + "defaults", "global.yml"));
-        this.chatSpaces.put(globalChannel.getSimplifiedName(), globalChannel);
+        this.channelRegistry.register(globalChannel.getSimplifiedName(), globalChannel);
         
         staffChannel = new StaffChannel(new File(getDataFolder() + File.separator + "channels" + File.separator + "defaults", "staff.yml"));
-        this.chatSpaces.put(staffChannel.getSimplifiedName(), staffChannel);
+        this.channelRegistry.register(staffChannel.getSimplifiedName(), staffChannel);
         
         getServer().getPluginManager().registerEvents(this, this);
     }
@@ -107,7 +124,7 @@ public class StarChat extends JavaPlugin implements Listener {
             }
             
             String channelName = args[0].toLowerCase();
-            ChatSpace chatSpace = this.chatSpaces.get(channelName);
+            ChatSpace chatSpace = this.channelRegistry.get(channelName);
             if (chatSpace == null) {
                 sender.sendMessage(ColorUtils.color("&cSorry, but &e" + channelName + " is not a registered chat space."));
                 return true;
@@ -132,7 +149,13 @@ public class StarChat extends JavaPlugin implements Listener {
     }
     
     public ChatSpace getPlayerFocus(Player player) {
-        return chatSpaces.getOrDefault(playerChatSelection.get(player.getUniqueId()), globalChannel);
+        String playerSelection = playerChatSelection.get(player.getUniqueId());
+        ChatSpace space = this.channelRegistry.get(playerSelection);
+        if (space == null) {
+            space = this.roomRegistry.get(playerSelection);
+        }
+
+        return space;
     }
     
     public void setPlayerFocus(Player player, ChatSpace chatSpace) {

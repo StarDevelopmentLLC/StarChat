@@ -26,9 +26,8 @@ ChatRoom
   - Mod can kick and ban other participates
   - Trusted can invite other members
   - Members can just chat, can't do much else though
-- Can be open, invite, private or automatic
+- Can be open, invite or private
   - Open means it can be joined by anyone
   - Invite means that others have to be invited by those that can invite in the room
-  - Private means that the chatroom cannot be joined any ore
-  - Automatic means that a plugin handles automatic joining/leaving. EX: SG chat from Nexus Reborn SG
+  - Private means that the chatroom cannot be joined any one
 - Default option to save logs, but this is disabled by default
