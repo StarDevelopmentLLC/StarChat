@@ -3,6 +3,7 @@ package com.stardevllc.starchat.rooms;
 import com.stardevllc.starchat.ChatSpace;
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starmclib.actor.Actor;
+import com.stardevllc.starmclib.actor.ServerActor;
 import com.stardevllc.starmclib.color.ColorUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -109,7 +110,7 @@ public abstract class ChatRoom extends ChatSpace {
         } else if (actor instanceof JavaPlugin plugin) {
             actorValue = "plugin:" + plugin.getName();
         } else if (actor instanceof UUID uuid) {
-            if (uuid.equals(StarChat.consoleUniqueId)) {
+            if (uuid.equals(ServerActor.serverUUID)) {
                 actorValue = "console";
             } else {
                 actorValue = "player:" + uuid;

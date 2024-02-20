@@ -3,13 +3,14 @@ package com.stardevllc.starchat;
 import com.stardevllc.starchat.channels.ChatChannel;
 import com.stardevllc.starchat.channels.GlobalChannel;
 import com.stardevllc.starchat.channels.StaffChannel;
+import com.stardevllc.starchat.pm.PrivateMessage;
 import com.stardevllc.starchat.rooms.ChatRoom;
 import com.stardevllc.starcore.Config;
-import com.stardevllc.starcore.StarCore;
 import com.stardevllc.starlib.registry.StringRegistry;
+import com.stardevllc.starmclib.actor.Actor;
+import com.stardevllc.starmclib.actor.PlayerActor;
 import com.stardevllc.starmclib.color.ColorUtils;
 import net.milkbowl.vault.chat.Chat;
-import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -21,13 +22,11 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class StarChat extends JavaPlugin implements Listener {
     public static String consoleNameFormat; //How the console name appears
-    public static UUID consoleUniqueId; //The uuid to use for the console
+    public static String privateMessageFromat; //The format used for private messages
     public static Chat vaultChat; //Vault chat hook
     private Config mainConfig;
     private ChatChannel globalChannel, staffChannel; //Default channels
@@ -35,6 +34,8 @@ public class StarChat extends JavaPlugin implements Listener {
 
     private StringRegistry<ChatChannel> channelRegistry = new StringRegistry<>(); //All channels
     private StringRegistry<ChatRoom> roomRegistry = new StringRegistry<>(); //All rooms
+    private Set<PrivateMessage> privateMessages = new HashSet<>();
+    private Map<Actor, PrivateMessage> lastMessage = new HashMap<>();
 
     @Override
     public void onEnable() {
@@ -47,10 +48,10 @@ public class StarChat extends JavaPlugin implements Listener {
         }
         
         mainConfig.addDefault("console-name-format", "&4Console", "The name that the console appears as in chat spaces.");
+        mainConfig.addDefault("private-msg-format", "&6[&c{from} &6-> [&c{to}]&8: &f{message}", "The format used for private messaging.");
         mainConfig.save();
 
         StarChat.consoleNameFormat = mainConfig.getString("console-name-format");
-        StarChat.consoleUniqueId = ((StarCore) Bukkit.getPluginManager().getPlugin("StarCore")).getConsoleUnqiueId(); //Replace usages with this one
 
         globalChannel = new GlobalChannel(new File(getDataFolder() + File.separator + "channels" + File.separator + "defaults", "global.yml"));
         this.channelRegistry.register(globalChannel.getSimplifiedName(), globalChannel);
@@ -88,9 +89,41 @@ public class StarChat extends JavaPlugin implements Listener {
                 sender.sendMessage(ColorUtils.color("&cUsage: /" + label + " <channelName>"));
                 return true;
             }
-
+            
+            Actor senderActor = new PlayerActor(player);
             String channelName = args[0].toLowerCase();
-            ChatSpace chatSpace = this.channelRegistry.get(channelName);
+            
+            ChatSpace chatSpace;
+            String nameOverride = "";
+            if (channelName.equalsIgnoreCase("private")) {
+                if (args.length >= 2) {
+                    Actor targetActor = Actor.create(args[1]);
+                    if (targetActor == null) {
+                        sender.sendMessage(ColorUtils.color("&cInvalid target."));
+                        return true;
+                    }
+                    
+                    chatSpace = getPrivateMessage(senderActor, targetActor);
+                    if (chatSpace == null) {
+                        sender.sendMessage(ColorUtils.color("You do not have a private conversation with " + targetActor.getName()));
+                        return true;
+                    }
+                    nameOverride = "Private (" + targetActor.getName() + ")";
+                } else {
+                    PrivateMessage privateMessage = this.lastMessage.get(senderActor);
+                    chatSpace = privateMessage;
+                    if (chatSpace == null) {
+                        sender.sendMessage(ColorUtils.color("&cYou do not have a last conversation to use as a focus."));
+                        return true;
+                    }
+                   
+                    Actor other = privateMessage.getActor1().equals(senderActor) ? privateMessage.getActor2() : privateMessage.getActor1();
+                    nameOverride = "Private (" + other.getName() + ")";
+                }
+            } else {
+                chatSpace = this.channelRegistry.get(channelName);
+            }
+            
             if (chatSpace == null) {
                 sender.sendMessage(ColorUtils.color("&cSorry, but &e" + channelName + " is not a registered chat space."));
                 return true;
@@ -105,7 +138,75 @@ public class StarChat extends JavaPlugin implements Listener {
             }
 
             this.setPlayerFocus(player, chatSpace);
-            sender.sendMessage(ColorUtils.color("&aSet your chat focus to &b" + chatSpace.getName()) + ".");
+            String spaceName = chatSpace.getName();
+            if (!nameOverride.isEmpty()) {
+                spaceName = nameOverride;
+            }
+            sender.sendMessage(ColorUtils.color("&aSet your chat focus to &b" + spaceName + "."));
+        } else if (cmd.getName().equalsIgnoreCase("message")) {
+            if (!(args.length >= 2)) {
+                sender.sendMessage(ColorUtils.color("&cUsage: /" + label + " <target> <message>"));
+                return true;
+            }
+            
+            Actor senderActor = Actor.create(sender);
+            Actor targetActor = Actor.create(args[0]);
+            
+            if (targetActor == null) {
+                sender.sendMessage(ColorUtils.color("&cInvalid target. They must be online, or the console."));
+                return true;
+            }
+            
+            PrivateMessage privateMessage = getPrivateMessage(senderActor, targetActor);
+            if (privateMessage == null) {
+                privateMessage = new PrivateMessage(senderActor, targetActor, mainConfig.getString("private-msg-format"));
+                this.privateMessages.add(privateMessage);
+            }
+            
+            StringBuilder msgBuilder = new StringBuilder();
+            for (int i = 1; i < args.length; i++) {
+                msgBuilder.append(args[i]).append(" ");
+            }
+            
+            privateMessage.sendMessage(sender, msgBuilder.toString().trim());
+            this.lastMessage.put(senderActor, privateMessage);
+            this.lastMessage.put(targetActor, privateMessage);
+        } else if (cmd.getName().equalsIgnoreCase("reply")) {
+            if (args.length == 0) {
+                sender.sendMessage(ColorUtils.color("&cUsage: /" + label + " <message>"));
+                sender.sendMessage(ColorUtils.color("&cUsage: /" + label + " <target> <message>"));
+                return true;
+            }
+
+            Actor senderActor = Actor.create(sender);
+            Actor targetActor = Actor.create(args[0]);
+            
+            PrivateMessage privateMessage;
+            
+            int msgStart;
+            if (targetActor != null) {
+                privateMessage = getPrivateMessage(senderActor, targetActor);
+                if (privateMessage == null) {
+                    sender.sendMessage(ColorUtils.color("&cYou do not have a conversation open with " + targetActor.getName()));
+                    return true;
+                }
+                msgStart = 1;
+            } else {
+                privateMessage = this.lastMessage.get(senderActor);
+                msgStart = 0;
+            }
+            
+            if (privateMessage == null) {
+                sender.sendMessage(ColorUtils.color("&cYou do not have a message to reply to."));
+                return true;
+            }
+
+            StringBuilder msgBuilder = new StringBuilder();
+            for (int i = msgStart; i < args.length; i++) {
+                msgBuilder.append(args[i]).append(" ");
+            }
+
+            privateMessage.sendMessage(sender, msgBuilder.toString().trim());
         }
         return true;
     }
@@ -136,5 +237,36 @@ public class StarChat extends JavaPlugin implements Listener {
         RegisteredServiceProvider<Chat> rsp = getServer().getServicesManager().getRegistration(Chat.class);
         vaultChat = rsp.getProvider();
         return vaultChat != null;
+    }
+
+    public Set<PrivateMessage> getPrivateMessages() {
+        return privateMessages;
+    }
+    
+    public PrivateMessage getPrivateMessage(Actor actor1, Actor actor2) {
+        for (PrivateMessage privateMessage : this.privateMessages) {
+            boolean containsActor1 = privateMessage.getActor1().equals(actor1) || privateMessage.getActor2().equals(actor1);
+            boolean containsActor2 = privateMessage.getActor1().equals(actor1) || privateMessage.getActor2().equals(actor2);
+            if (containsActor2 && containsActor1) {
+                return privateMessage;
+            }
+        }
+        
+        return null;
+    }
+    
+    public List<PrivateMessage> getPrivateMessages(Actor actor) {
+        List<PrivateMessage> privateMessages = new ArrayList<>();
+        for (PrivateMessage privateMessage : this.privateMessages) {
+            if (privateMessage.getActor1().equals(actor) || privateMessage.getActor2().equals(actor)) {
+                privateMessages.add(privateMessage);
+            }
+        }
+        
+        return privateMessages;
+    }
+
+    public Config getMainConfig() {
+        return mainConfig;
     }
 }
