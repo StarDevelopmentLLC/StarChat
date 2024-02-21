@@ -9,6 +9,7 @@ import com.stardevllc.starcore.Config;
 import com.stardevllc.starlib.registry.StringRegistry;
 import com.stardevllc.starmclib.actor.Actor;
 import com.stardevllc.starmclib.actor.PlayerActor;
+import com.stardevllc.starmclib.actor.ServerActor;
 import com.stardevllc.starmclib.color.ColorUtils;
 import net.milkbowl.vault.chat.Chat;
 import org.bukkit.command.Command;
@@ -30,12 +31,13 @@ public class StarChat extends JavaPlugin implements Listener {
     public static Chat vaultChat; //Vault chat hook
     private Config mainConfig;
     private ChatChannel globalChannel, staffChannel; //Default channels
-    private Map<UUID, String> playerChatSelection = new HashMap<>(); //Current player focus
+    private Map<UUID, ChatSpace> playerChatSelection = new HashMap<>(); //Current player focus
 
     private StringRegistry<ChatChannel> channelRegistry = new StringRegistry<>(); //All channels
     private StringRegistry<ChatRoom> roomRegistry = new StringRegistry<>(); //All rooms
     private Set<PrivateMessage> privateMessages = new HashSet<>();
-    private Map<Actor, PrivateMessage> lastMessage = new HashMap<>();
+    private Map<UUID, PrivateMessage> lastMessage = new HashMap<>();
+    private PrivateMessage consoleLastMessage;
 
     @Override
     public void onEnable() {
@@ -110,7 +112,7 @@ public class StarChat extends JavaPlugin implements Listener {
                     }
                     nameOverride = "Private (" + targetActor.getName() + ")";
                 } else {
-                    PrivateMessage privateMessage = this.lastMessage.get(senderActor);
+                    PrivateMessage privateMessage = this.lastMessage.get(((Player) sender).getUniqueId());
                     chatSpace = privateMessage;
                     if (chatSpace == null) {
                         sender.sendMessage(ColorUtils.color("&cYou do not have a last conversation to use as a focus."));
@@ -122,10 +124,13 @@ public class StarChat extends JavaPlugin implements Listener {
                 }
             } else {
                 chatSpace = this.channelRegistry.get(channelName);
+                if (chatSpace == null) {
+                    chatSpace = this.roomRegistry.get(channelName);
+                }
             }
             
             if (chatSpace == null) {
-                sender.sendMessage(ColorUtils.color("&cSorry, but &e" + channelName + " is not a registered chat space."));
+                sender.sendMessage(ColorUtils.color("&cSorry, but &e" + channelName + "&c is not a registered chat space."));
                 return true;
             }
 
@@ -133,6 +138,11 @@ public class StarChat extends JavaPlugin implements Listener {
                 String sendPermission = chatChannel.getSendPermission();
                 if (!sendPermission.isEmpty() && !player.hasPermission(sendPermission)) {
                     sender.sendMessage(ColorUtils.color("&cYou do not have permission to send messages in " + chatSpace.getName() + "."));
+                    return true;
+                }
+            } else if (chatSpace instanceof ChatRoom chatRoom) {
+                if (!chatRoom.isMember(player.getUniqueId())) {
+                    sender.sendMessage(ColorUtils.color("&cYou are not a member of " + chatRoom.getName()));
                     return true;
                 }
             }
@@ -167,10 +177,9 @@ public class StarChat extends JavaPlugin implements Listener {
             for (int i = 1; i < args.length; i++) {
                 msgBuilder.append(args[i]).append(" ");
             }
-            
+
             privateMessage.sendMessage(sender, msgBuilder.toString().trim());
-            this.lastMessage.put(senderActor, privateMessage);
-            this.lastMessage.put(targetActor, privateMessage);
+            assignLastMessage(sender, msgBuilder, privateMessage, senderActor, targetActor);
         } else if (cmd.getName().equalsIgnoreCase("reply")) {
             if (args.length == 0) {
                 sender.sendMessage(ColorUtils.color("&cUsage: /" + label + " <message>"));
@@ -180,7 +189,7 @@ public class StarChat extends JavaPlugin implements Listener {
 
             Actor senderActor = Actor.create(sender);
             Actor targetActor = Actor.create(args[0]);
-            
+
             PrivateMessage privateMessage;
             
             int msgStart;
@@ -192,7 +201,18 @@ public class StarChat extends JavaPlugin implements Listener {
                 }
                 msgStart = 1;
             } else {
-                privateMessage = this.lastMessage.get(senderActor);
+                if (senderActor instanceof PlayerActor playerActor) {
+                    privateMessage = this.lastMessage.get(playerActor.getUniqueId());
+                } else {
+                    privateMessage = consoleLastMessage;
+                }
+                
+                if (privateMessage.getActor1().equals(senderActor)) {
+                    targetActor = privateMessage.getActor2();
+                } else {
+                    targetActor = privateMessage.getActor1();
+                }
+                
                 msgStart = 0;
             }
             
@@ -207,8 +227,23 @@ public class StarChat extends JavaPlugin implements Listener {
             }
 
             privateMessage.sendMessage(sender, msgBuilder.toString().trim());
+            assignLastMessage(sender, msgBuilder, privateMessage, senderActor, targetActor);
         }
         return true;
+    }
+    
+    private void assignLastMessage(CommandSender sender, StringBuilder msgBuilder, PrivateMessage privateMessage, Actor senderActor, Actor targetActor) {
+        if (senderActor instanceof PlayerActor senderPlayerActor) {
+            this.lastMessage.put(senderPlayerActor.getUniqueId(), privateMessage);
+        } else if (senderActor instanceof ServerActor){
+            this.consoleLastMessage = privateMessage;
+        }
+        
+        if (targetActor instanceof PlayerActor targetPlayerActor) {
+            this.lastMessage.put(targetPlayerActor.getUniqueId(), privateMessage);
+        } else if (targetActor instanceof ServerActor){
+            this.consoleLastMessage = privateMessage;
+        }
     }
 
     public ChatChannel getGlobalChannel() {
@@ -216,20 +251,10 @@ public class StarChat extends JavaPlugin implements Listener {
     }
 
     public ChatSpace getPlayerFocus(Player player) {
-        String playerSelection = playerChatSelection.get(player.getUniqueId());
-        ChatSpace space = this.channelRegistry.get(playerSelection);
-        if (space == null) {
-            space = this.roomRegistry.get(playerSelection);
-        }
-
-        return space;
+        return this.playerChatSelection.getOrDefault(player.getUniqueId(), globalChannel);
     }
 
     public void setPlayerFocus(Player player, ChatSpace chatSpace) {
-        setPlayerFocus(player, chatSpace.getSimplifiedName());
-    }
-
-    public void setPlayerFocus(Player player, String chatSpace) {
         this.playerChatSelection.put(player.getUniqueId(), chatSpace);
     }
 
@@ -246,7 +271,7 @@ public class StarChat extends JavaPlugin implements Listener {
     public PrivateMessage getPrivateMessage(Actor actor1, Actor actor2) {
         for (PrivateMessage privateMessage : this.privateMessages) {
             boolean containsActor1 = privateMessage.getActor1().equals(actor1) || privateMessage.getActor2().equals(actor1);
-            boolean containsActor2 = privateMessage.getActor1().equals(actor1) || privateMessage.getActor2().equals(actor2);
+            boolean containsActor2 = privateMessage.getActor1().equals(actor2) || privateMessage.getActor2().equals(actor2);
             if (containsActor2 && containsActor1) {
                 return privateMessage;
             }

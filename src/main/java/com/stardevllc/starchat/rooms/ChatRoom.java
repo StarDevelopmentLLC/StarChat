@@ -14,7 +14,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.*;
 
 @SuppressWarnings("EqualsBetweenInconvertibleTypes")
-public abstract class ChatRoom extends ChatSpace {
+public class ChatRoom extends ChatSpace {
     protected Actor owner;
     protected Map<UUID, RoomMember> members = new HashMap<>();
     protected Set<RoomInvite> invites = new HashSet<>();
