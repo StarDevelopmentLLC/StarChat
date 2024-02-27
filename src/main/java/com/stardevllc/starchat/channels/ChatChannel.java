@@ -29,7 +29,6 @@ public class ChatChannel extends ChatSpace {
         config.addDefault("permissions.view", viewPermission, "The permission that is required to have in order for a player to receive messages from this channel.");
         config.addDefault("permssions.send", sendPermission, "The permission that is required to have in order for a player to send messages in this channel.");
         config.addDefault("formats.playerdisplayname", playerDisplayNameFormat, "The format used for formatting a player's name for the {displayname} variable.", "You can have {prefix}, {suffix} and {name}");
-        config.addDefault("settings.affectedbypunishments", affectedByPunishments);
         config.addDefault("settings.affectedbypunishments", affectedByPunishments, "Control flag to allow messages to still be sent in this channel, even if the chat event is cancelled.");
         config.save();
     }
