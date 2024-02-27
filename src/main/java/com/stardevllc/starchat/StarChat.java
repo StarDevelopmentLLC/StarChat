@@ -30,9 +30,10 @@ import java.io.File;
 import java.util.*;
 
 public class StarChat extends JavaPlugin implements Listener {
-    public static String consoleNameFormat; //How the console name appears
-    public static String privateMessageFromat; //The format used for private messages
-    public static Chat vaultChat; //Vault chat hook
+    private static String consoleNameFormat; //How the console name appears
+    private static String privateMessageFormat; //The format used for private messages
+    private static boolean usePlaceholderAPI;
+    private static Chat vaultChat; //Vault chat hook
     private static PlayerPlaceholders playerPlaceholders;
     private Config mainConfig;
     private ChatChannel globalChannel, staffChannel; //Default channels
@@ -55,11 +56,12 @@ public class StarChat extends JavaPlugin implements Listener {
         }
         
         mainConfig.addDefault("console-name-format", "&4Console", "The name that the console appears as in chat spaces.");
-        mainConfig.addDefault("private-msg-format", "&6[&c{from} &6-> [&c{to}]&8: &f{message}", "The format used for private messaging.");
+        mainConfig.addDefault("private-msg-format", "&6[&c{from} &6-> &c{to}&6]&8: &f{message}", "The format used for private messaging.");
         mainConfig.addDefault("use-placeholderapi", true, "If the PlaceholderAPI plugin is supported by default.", "Note: Other plugins that use the systems of StarChat can override this setting", "This setting only applies to the default state of StarChat, and maybe other plugins if they decide to use this setting.");
         mainConfig.save();
 
         StarChat.consoleNameFormat = mainConfig.getString("console-name-format");
+        StarChat.privateMessageFormat = mainConfig.getString("private-msg-format");
         StarChat.usePlaceholderAPI = mainConfig.getBoolean("use-placeholder-api");
 
         globalChannel = new GlobalChannel(new File(getDataFolder() + File.separator + "channels" + File.separator + "defaults", "global.yml"));
@@ -307,9 +309,27 @@ public class StarChat extends JavaPlugin implements Listener {
     public Config getMainConfig() {
         return mainConfig;
     }
+
+    public static String getConsoleNameFormat() {
+        return consoleNameFormat;
+    }
+
+    public static String getPrivateMessageFormat() {
+        return privateMessageFormat;
+    }
+
     public static boolean isUsePlaceholderAPI() {
         return usePlaceholderAPI;
     }
+
+    public static Chat getVaultChat() {
+        return vaultChat;
+    }
+
+    public ChatChannel getStaffChannel() {
+        return staffChannel;
+    }
+
     public static PlayerPlaceholders getPlayerPlaceholders() {
         return playerPlaceholders;
     }
