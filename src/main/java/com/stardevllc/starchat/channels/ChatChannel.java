@@ -2,7 +2,7 @@ package com.stardevllc.starchat.channels;
 
 import com.stardevllc.starchat.ChatSpace;
 import com.stardevllc.starchat.StarChat;
-import com.stardevllc.starcore.Config;
+import com.stardevllc.starmclib.Config;
 import com.stardevllc.starmclib.color.ColorUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
