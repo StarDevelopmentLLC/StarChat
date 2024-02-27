@@ -1,6 +1,5 @@
 plugins {
     id 'java-library'
-    id 'com.github.johnrengelman.shadow' version '8.1.1'
 }
 
 repositories {
@@ -25,8 +24,7 @@ processResources {
     }
 }
 
-shadowJar {
-    archiveClassifier.set('')
+jar {
     destinationDirectory = file(System.getProperty("user.home") + File.separator + "Documents" + File.separator + "JarOutput")
     //destinationDirectory = file("$rootDir/../../../JarOutput")
 }
@@ -43,5 +41,3 @@ java {
         languageVersion = JavaLanguageVersion.of(17)
     }
 }
-
-tasks.jar.finalizedBy(shadowJar)
