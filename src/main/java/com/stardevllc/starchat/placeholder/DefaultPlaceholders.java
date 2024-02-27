@@ -14,9 +14,8 @@ public class DefaultPlaceholders implements PlayerPlaceholders {
     
     public String setPlaceholders(Player player, String text) {
         String replacement = text.replace("{prefix}", vaultChat.getPlayerPrefix(player));
-        replacement = replacement.replace("{name}", vaultChat.getPlayerSuffix(player));
+        replacement = replacement.replace("{name}", player.getName());
         replacement = replacement.replace("{suffix}", vaultChat.getPlayerSuffix(player));
-        replacement = replacement.replace("{displayyname}", player.getDisplayName());
         return replacement;
     }
 
@@ -30,7 +29,7 @@ public class DefaultPlaceholders implements PlayerPlaceholders {
 
     public String setPlaceholders(OfflinePlayer player, String text) {
         String replacement = text.replace("{prefix}", vaultChat.getPlayerPrefix(null, player));
-        replacement = replacement.replace("{name}", vaultChat.getPlayerSuffix(null, player));
+        replacement = replacement.replace("{name}", player.getName());
         replacement = replacement.replace("{suffix}", vaultChat.getPlayerSuffix(null, player));
         return replacement;
     }
