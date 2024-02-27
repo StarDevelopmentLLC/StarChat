@@ -3,6 +3,9 @@ package com.stardevllc.starchat;
 import com.stardevllc.starchat.channels.ChatChannel;
 import com.stardevllc.starchat.channels.GlobalChannel;
 import com.stardevllc.starchat.channels.StaffChannel;
+import com.stardevllc.starchat.placeholder.DefaultPlaceholders;
+import com.stardevllc.starchat.placeholder.PAPIPlaceholders;
+import com.stardevllc.starchat.placeholder.PlayerPlaceholders;
 import com.stardevllc.starchat.pm.PrivateMessage;
 import com.stardevllc.starchat.rooms.ChatRoom;
 import com.stardevllc.starcore.Config;
@@ -12,6 +15,7 @@ import com.stardevllc.starmclib.actor.PlayerActor;
 import com.stardevllc.starmclib.actor.ServerActor;
 import com.stardevllc.starmclib.color.ColorUtils;
 import net.milkbowl.vault.chat.Chat;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -29,6 +33,7 @@ public class StarChat extends JavaPlugin implements Listener {
     public static String consoleNameFormat; //How the console name appears
     public static String privateMessageFromat; //The format used for private messages
     public static Chat vaultChat; //Vault chat hook
+    private static PlayerPlaceholders playerPlaceholders;
     private Config mainConfig;
     private ChatChannel globalChannel, staffChannel; //Default channels
     private Map<UUID, ChatSpace> playerChatSelection = new HashMap<>(); //Current player focus
@@ -51,9 +56,11 @@ public class StarChat extends JavaPlugin implements Listener {
         
         mainConfig.addDefault("console-name-format", "&4Console", "The name that the console appears as in chat spaces.");
         mainConfig.addDefault("private-msg-format", "&6[&c{from} &6-> [&c{to}]&8: &f{message}", "The format used for private messaging.");
+        mainConfig.addDefault("use-placeholderapi", true, "If the PlaceholderAPI plugin is supported by default.", "Note: Other plugins that use the systems of StarChat can override this setting", "This setting only applies to the default state of StarChat, and maybe other plugins if they decide to use this setting.");
         mainConfig.save();
 
         StarChat.consoleNameFormat = mainConfig.getString("console-name-format");
+        StarChat.usePlaceholderAPI = mainConfig.getBoolean("use-placeholder-api");
 
         globalChannel = new GlobalChannel(new File(getDataFolder() + File.separator + "channels" + File.separator + "defaults", "global.yml"));
         this.channelRegistry.register(globalChannel.getSimplifiedName(), globalChannel);
@@ -62,6 +69,12 @@ public class StarChat extends JavaPlugin implements Listener {
         this.channelRegistry.register(staffChannel.getSimplifiedName(), staffChannel);
 
         getServer().getPluginManager().registerEvents(this, this);
+        
+        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            StarChat.playerPlaceholders = new PAPIPlaceholders();
+        } else {
+            StarChat.playerPlaceholders = new DefaultPlaceholders();
+        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -293,5 +306,11 @@ public class StarChat extends JavaPlugin implements Listener {
 
     public Config getMainConfig() {
         return mainConfig;
+    }
+    public static boolean isUsePlaceholderAPI() {
+        return usePlaceholderAPI;
+    }
+    public static PlayerPlaceholders getPlayerPlaceholders() {
+        return playerPlaceholders;
     }
 }

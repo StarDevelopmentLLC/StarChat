@@ -54,15 +54,10 @@ public abstract class ChatSpace {
     }
     
     protected String formatPlayerDisplayName(Player player) {
-        String displayName;
         if (this.playerDisplayNameFormat == null || this.playerDisplayNameFormat.isEmpty()) {
-            displayName = player.getDisplayName();
+            return player.getDisplayName();
         } else {
-            displayName = this.playerDisplayNameFormat;
-            displayName = displayName.replace("{prefix}", StarChat.vaultChat.getPlayerPrefix(player));
-            displayName = displayName.replace("{name}", player.getName());
-            displayName = displayName.replace("{suffix}", StarChat.vaultChat.getPlayerSuffix(player));
+            return StarChat.getPlayerPlaceholders().setPlaceholders(player, this.playerDisplayNameFormat);
         }
-        return displayName;
     }
 }

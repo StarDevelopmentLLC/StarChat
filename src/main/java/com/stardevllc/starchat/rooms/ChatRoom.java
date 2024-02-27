@@ -41,7 +41,7 @@ public class ChatRoom extends ChatSpace {
         if (sender == null) {
             formattedMessage = systemFormat;
         } else if (sender instanceof ConsoleCommandSender) {
-            formattedMessage = senderFormat.replace("{displayname}", StarChat.consoleNameFormat);
+            formattedMessage = senderFormat.replace("{displayname}", StarChat.getConsoleNameFormat());
         } else if (sender instanceof Player player) {
             if (!isMember(player.getUniqueId())) {
                 player.sendMessage(ColorUtils.color("&cYou are not a member of that room."));

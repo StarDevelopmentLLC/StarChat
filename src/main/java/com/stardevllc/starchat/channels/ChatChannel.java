@@ -10,7 +10,6 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
 import java.io.File;
-import java.util.List;
 
 public class ChatChannel extends ChatSpace {
     protected transient Config config; //Config to store information as channels are mainly config/command controlled, transient modifier allows StarData to ignore this field without having to depend on StarData directly
@@ -51,7 +50,7 @@ public class ChatChannel extends ChatSpace {
         if (sender == null) {
             formattedMessage = systemFormat;
         } else if (sender instanceof ConsoleCommandSender) {
-            formattedMessage = senderFormat.replace("{displayname}", StarChat.consoleNameFormat);
+            formattedMessage = senderFormat.replace("{displayname}", StarChat.getConsoleNameFormat());
         } else if (sender instanceof Player player) {
             if (!sendPermission.isEmpty() && !player.hasPermission(sendPermission)) {
                 player.sendMessage(ColorUtils.color("&cYou do not have permission to send messages in " + getName()));
