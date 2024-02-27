@@ -59,8 +59,8 @@ public class ChatChannel extends ChatSpace {
             formattedMessage = senderFormat.replace("{displayname}", formatPlayerDisplayName(player));
         }
 
-        formattedMessage = formattedMessage.replace("{message}", message);
         formattedMessage = ColorUtils.color(formattedMessage);
+        formattedMessage = formattedMessage.replace("{message}", ColorUtils.color(sender, message));
 
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (viewPermission.isEmpty() || player.hasPermission(viewPermission)) {

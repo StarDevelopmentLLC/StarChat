@@ -51,8 +51,8 @@ public class ChatRoom extends ChatSpace {
             formattedMessage = senderFormat.replace("{displayname}", formatPlayerDisplayName(player));
         }
 
-        formattedMessage = formattedMessage.replace("{message}", message);
         formattedMessage = ColorUtils.color(formattedMessage);
+        formattedMessage = formattedMessage.replace("{message}", ColorUtils.color(sender, message));
 
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (isMember(player.getUniqueId())) {
