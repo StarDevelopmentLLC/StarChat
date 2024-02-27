@@ -4,6 +4,7 @@ import com.stardevllc.starchat.channels.ChatChannel;
 import com.stardevllc.starchat.channels.GlobalChannel;
 import com.stardevllc.starchat.channels.StaffChannel;
 import com.stardevllc.starchat.placeholder.DefaultPlaceholders;
+import com.stardevllc.starchat.placeholder.PAPIExpansion;
 import com.stardevllc.starchat.placeholder.PAPIPlaceholders;
 import com.stardevllc.starchat.placeholder.PlayerPlaceholders;
 import com.stardevllc.starchat.pm.PrivateMessage;
@@ -74,6 +75,7 @@ public class StarChat extends JavaPlugin implements Listener {
         
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
             StarChat.playerPlaceholders = new PAPIPlaceholders();
+            new PAPIExpansion(this).register();
         } else {
             StarChat.playerPlaceholders = new DefaultPlaceholders();
         }
