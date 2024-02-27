@@ -58,7 +58,7 @@ public class StarChat extends JavaPlugin implements Listener {
         
         mainConfig.addDefault("console-name-format", "&4Console", "The name that the console appears as in chat spaces.");
         mainConfig.addDefault("private-msg-format", "&6[&c{from} &6-> &c{to}&6]&8: &f{message}", "The format used for private messaging.");
-        mainConfig.addDefault("use-placeholderapi", true, "If the PlaceholderAPI plugin is supported by default.", "Note: Other plugins that use the systems of StarChat can override this setting", "This setting only applies to the default state of StarChat, and maybe other plugins if they decide to use this setting.");
+        mainConfig.addDefault("use-placeholderapi", true, "If the PlaceholderAPI plugin is supported by default.", "If PlaceholderAPI is not installed, this setting is ignored.","Note: Other plugins that use the systems of StarChat can override this setting", "This setting only applies to the default state of StarChat, and maybe other plugins if they decide to use this setting.");
         mainConfig.save();
 
         StarChat.consoleNameFormat = mainConfig.getString("console-name-format");
