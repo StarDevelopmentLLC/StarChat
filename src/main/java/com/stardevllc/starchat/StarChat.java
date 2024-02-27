@@ -36,6 +36,7 @@ public class StarChat extends JavaPlugin implements Listener {
     private static boolean usePlaceholderAPI;
     private static Chat vaultChat; //Vault chat hook
     private static PlayerPlaceholders playerPlaceholders;
+    private static boolean useColorPermissions;
     private Config mainConfig;
     private ChatChannel globalChannel, staffChannel; //Default channels
     private Map<UUID, ChatSpace> playerChatSelection = new HashMap<>(); //Current player focus
@@ -59,11 +60,13 @@ public class StarChat extends JavaPlugin implements Listener {
         mainConfig.addDefault("console-name-format", "&4Console", "The name that the console appears as in chat spaces.");
         mainConfig.addDefault("private-msg-format", "&6[&c{from} &6-> &c{to}&6]&8: &f{message}", "The format used for private messaging.");
         mainConfig.addDefault("use-placeholderapi", true, "If the PlaceholderAPI plugin is supported by default.", "If PlaceholderAPI is not installed, this setting is ignored.","Note: Other plugins that use the systems of StarChat can override this setting", "This setting only applies to the default state of StarChat, and maybe other plugins if they decide to use this setting.");
+        mainConfig.addDefault("use-color-permissioins", false, "This allows you to control color usage by permissions.", "This is false by default and will just color all messages.", "Permissions for default colors follows the format: starmclib.color.spigot.<colorname>.", "Colors added by other plugins and via StarCore's color commands may or may not have permissions. Please see StarCore for how to list the colors and their information.");
         mainConfig.save();
 
         StarChat.consoleNameFormat = mainConfig.getString("console-name-format");
         StarChat.privateMessageFormat = mainConfig.getString("private-msg-format");
         StarChat.usePlaceholderAPI = mainConfig.getBoolean("use-placeholder-api");
+        StarChat.useColorPermissions = mainConfig.getBoolean("use-color-permissions");
 
         globalChannel = new GlobalChannel(new File(getDataFolder() + File.separator + "channels" + File.separator + "defaults", "global.yml"));
         this.channelRegistry.register(globalChannel.getSimplifiedName(), globalChannel);
@@ -334,5 +337,9 @@ public class StarChat extends JavaPlugin implements Listener {
 
     public static PlayerPlaceholders getPlayerPlaceholders() {
         return playerPlaceholders;
+    }
+
+    public static boolean isUseColorPermissions() {
+        return useColorPermissions;
     }
 }

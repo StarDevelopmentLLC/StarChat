@@ -52,7 +52,11 @@ public class ChatRoom extends ChatSpace {
         }
 
         formattedMessage = ColorUtils.color(formattedMessage);
-        formattedMessage = formattedMessage.replace("{message}", ColorUtils.color(sender, message));
+        if (StarChat.isUseColorPermissions()) {
+            formattedMessage = formattedMessage.replace("{message}", ColorUtils.color(sender, message));
+        } else {
+            formattedMessage = formattedMessage.replace("{message}", ColorUtils.color(message));
+        }
 
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (isMember(player.getUniqueId())) {
