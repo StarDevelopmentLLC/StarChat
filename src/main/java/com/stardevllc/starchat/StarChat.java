@@ -1,5 +1,6 @@
 package com.stardevllc.starchat;
 
+import com.stardevllc.starchat.ChatSelector.ChatSelection;
 import com.stardevllc.starchat.channels.ChatChannel;
 import com.stardevllc.starchat.channels.GlobalChannel;
 import com.stardevllc.starchat.channels.StaffChannel;
@@ -40,6 +41,7 @@ public class StarChat extends JavaPlugin implements Listener {
     private Config mainConfig;
     private ChatChannel globalChannel, staffChannel; //Default channels
     private Map<UUID, ChatSpace> playerChatSelection = new HashMap<>(); //Current player focus
+    private Map<String, ChatSelector> chatSelectors = new HashMap<>();
 
     private StringRegistry<ChatChannel> channelRegistry = new StringRegistry<>(); //All channels
     private StringRegistry<ChatRoom> roomRegistry = new StringRegistry<>(); //All rooms
@@ -150,6 +152,17 @@ public class StarChat extends JavaPlugin implements Listener {
             }
             
             if (chatSpace == null) {
+                ChatSelector selector = this.chatSelectors.get(channelName);
+                if (selector != null) {
+                    ChatSelection selection = selector.getSelection(player, args);
+                    if (selection != null) {
+                        chatSpace = selection.space();
+                        nameOverride = selection.nameOverride();
+                    }
+                }
+            }
+            
+            if (chatSpace == null) {
                 sender.sendMessage(ColorUtils.color("&cSorry, but &e" + channelName + "&c is not a registered chat space."));
                 return true;
             }
@@ -169,7 +182,7 @@ public class StarChat extends JavaPlugin implements Listener {
 
             this.setPlayerFocus(player, chatSpace);
             String spaceName = chatSpace.getName();
-            if (!nameOverride.isEmpty()) {
+            if (nameOverride != null && !nameOverride.isEmpty()) {
                 spaceName = nameOverride;
             }
             sender.sendMessage(ColorUtils.color("&aSet your chat focus to &b" + spaceName + "."));
@@ -313,6 +326,10 @@ public class StarChat extends JavaPlugin implements Listener {
 
     public Config getMainConfig() {
         return mainConfig;
+    }
+    
+    public void addSelector(ChatSelector selector) {
+        this.chatSelectors.put(selector.getType().toLowerCase(), selector);
     }
 
     public static String getConsoleNameFormat() {
