@@ -4,6 +4,7 @@ import com.stardevllc.starchat.ChatSpace;
 import com.stardevllc.starmclib.actor.Actor;
 import com.stardevllc.starmclib.color.ColorUtils;
 import org.bukkit.command.CommandSender;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Objects;
 
@@ -12,8 +13,8 @@ public class PrivateMessage extends ChatSpace {
 
     private Actor actor1, actor2;
 
-    public PrivateMessage(Actor actor1, Actor actor2, String format) {
-        super("pm-" + actor1.getName() + "-" + actor2.getName(), format, "");
+    public PrivateMessage(JavaPlugin plugin, Actor actor1, Actor actor2, String format) {
+        super(plugin, "pm-" + actor1.getName() + "-" + actor2.getName(), format, "");
         this.actor1 = actor1;
         this.actor2 = actor2;
     }

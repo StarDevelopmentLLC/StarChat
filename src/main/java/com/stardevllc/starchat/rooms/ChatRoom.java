@@ -21,13 +21,13 @@ public class ChatRoom extends ChatSpace {
     protected Privacy privacy = Privacy.PRIVATE;
     protected Set<RoomBan> bans = new HashSet<>();
 
-    public ChatRoom(String name, Actor owner) {
-        super(name);
+    public ChatRoom(JavaPlugin plugin, String name, Actor owner) {
+        super(plugin, name);
         this.owner = owner;
     }
 
-    public ChatRoom(String name, Actor owner, String senderFormat, String systemFormat) {
-        super(name, senderFormat, systemFormat);
+    public ChatRoom(JavaPlugin plugin, String name, Actor owner, String senderFormat, String systemFormat) {
+        super(plugin, name, senderFormat, systemFormat);
         this.owner = owner;
     }
 
@@ -111,8 +111,8 @@ public class ChatRoom extends ChatSpace {
             actorValue = "console";
         } else if (actor instanceof Player player) {
             actorValue = "player:" + player.getUniqueId();
-        } else if (actor instanceof JavaPlugin plugin) {
-            actorValue = "plugin:" + plugin.getName();
+        } else if (actor instanceof JavaPlugin javaPlugin) {
+            actorValue = "plugin:" + javaPlugin.getName();
         } else if (actor instanceof UUID uuid) {
             if (uuid.equals(ServerActor.serverUUID)) {
                 actorValue = "console";

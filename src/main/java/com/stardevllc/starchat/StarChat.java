@@ -70,10 +70,10 @@ public class StarChat extends JavaPlugin implements Listener {
         StarChat.usePlaceholderAPI = mainConfig.getBoolean("use-placeholder-api");
         StarChat.useColorPermissions = mainConfig.getBoolean("use-color-permissions");
 
-        globalChannel = new GlobalChannel(new File(getDataFolder() + File.separator + "channels" + File.separator + "defaults", "global.yml"));
+        globalChannel = new GlobalChannel(this, new File(getDataFolder() + File.separator + "channels" + File.separator + "defaults", "global.yml"));
         this.channelRegistry.register(globalChannel.getSimplifiedName(), globalChannel);
 
-        staffChannel = new StaffChannel(new File(getDataFolder() + File.separator + "channels" + File.separator + "defaults", "staff.yml"));
+        staffChannel = new StaffChannel(this, new File(getDataFolder() + File.separator + "channels" + File.separator + "defaults", "staff.yml"));
         this.channelRegistry.register(staffChannel.getSimplifiedName(), staffChannel);
 
         getServer().getPluginManager().registerEvents(this, this);
@@ -202,7 +202,7 @@ public class StarChat extends JavaPlugin implements Listener {
             
             PrivateMessage privateMessage = getPrivateMessage(senderActor, targetActor);
             if (privateMessage == null) {
-                privateMessage = new PrivateMessage(senderActor, targetActor, mainConfig.getString("private-msg-format"));
+                privateMessage = new PrivateMessage(this, senderActor, targetActor, mainConfig.getString("private-msg-format"));
                 this.privateMessages.add(privateMessage);
             }
             

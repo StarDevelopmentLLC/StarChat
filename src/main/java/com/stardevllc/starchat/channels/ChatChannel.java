@@ -8,6 +8,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 
@@ -17,8 +18,8 @@ public class ChatChannel extends ChatSpace {
     protected String viewPermission = ""; //Permission needed by players in order to view messages in this channel
     protected String sendPermission = ""; //Permission needed by players in order to send messages in this channel
 
-    public ChatChannel(String name, File configFile) {
-        super(name);
+    public ChatChannel(JavaPlugin plugin, String name, File configFile) {
+        super(plugin, name);
         config = new Config(configFile);
     }
 

@@ -3,22 +3,25 @@ package com.stardevllc.starchat;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 
 public abstract class ChatSpace {
     protected long id; //StarData compatibility
+    protected JavaPlugin plugin; //Plugin that owns the space
     protected String name, simplifiedName; //Name is the display name and the simplified name is how it is interacted with
     protected String senderFormat = "", systemFormat = ""; //Player Format is what it looks like when a player sends a message in this space. System format is when a non-player sends a message in this space
     protected String playerDisplayNameFormat = ""; //Format for player display names in this channel.
     protected boolean affectedByPunishments = true; //If this space is affected by punishments.
     //Logging stuff
 
-    public ChatSpace(String name) {
+    public ChatSpace(JavaPlugin plugin, String name) {
+        this.plugin = plugin;
         this.name = name;
         this.simplifiedName = ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', name.toLowerCase().replace(" ", "_")));
     }
 
-    public ChatSpace(String name, String senderFormat, String systemFormat) {
-        this(name);
+    public ChatSpace(JavaPlugin plugin, String name, String senderFormat, String systemFormat) {
+        this(plugin, name);
         this.senderFormat = senderFormat;
         this.systemFormat = systemFormat;
     }
@@ -27,6 +30,10 @@ public abstract class ChatSpace {
     
     public void sendMessage(String message) {
         sendMessage(null, message);
+    }
+
+    public JavaPlugin getPlugin() {
+        return plugin;
     }
 
     public String getName() {
