@@ -4,10 +4,7 @@ import com.stardevllc.starchat.ChatSelector;
 import com.stardevllc.starchat.ChatSpace;
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.channels.ChatChannel;
-import com.stardevllc.starchat.pm.PrivateMessage;
 import com.stardevllc.starchat.rooms.ChatRoom;
-import com.stardevllc.starmclib.actor.Actor;
-import com.stardevllc.starmclib.actor.PlayerActor;
 import com.stardevllc.starmclib.color.ColorUtils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -33,41 +30,14 @@ public class ChatCmd implements CommandExecutor {
             return true;
         }
 
-        Actor senderActor = new PlayerActor(player);
         String channelName = args[0].toLowerCase();
 
         ChatSpace chatSpace;
         String nameOverride = "";
-        if (channelName.equalsIgnoreCase("private")) {
-            if (args.length >= 2) {
-                Actor targetActor = Actor.create(args[1]);
-                if (targetActor == null) {
-                    sender.sendMessage(ColorUtils.color("&cInvalid target."));
-                    return true;
-                }
 
-                chatSpace = plugin.getPrivateMessage(senderActor, targetActor);
-                if (chatSpace == null) {
-                    sender.sendMessage(ColorUtils.color("You do not have a private conversation with " + targetActor.getName()));
-                    return true;
-                }
-                nameOverride = "Private (" + targetActor.getName() + ")";
-            } else {
-                PrivateMessage privateMessage = plugin.getLastMessage(((Player) sender).getUniqueId());
-                chatSpace = privateMessage;
-                if (chatSpace == null) {
-                    sender.sendMessage(ColorUtils.color("&cYou do not have a last conversation to use as a focus."));
-                    return true;
-                }
-
-                Actor other = privateMessage.getActor1().equals(senderActor) ? privateMessage.getActor2() : privateMessage.getActor1();
-                nameOverride = "Private (" + other.getName() + ")";
-            }
-        } else {
-            chatSpace = plugin.getChannelRegistry().get(channelName);
-            if (chatSpace == null) {
-                chatSpace = plugin.getRoomRegistry().get(channelName);
-            }
+        chatSpace = plugin.getChannelRegistry().get(channelName);
+        if (chatSpace == null) {
+            chatSpace = plugin.getRoomRegistry().get(channelName);
         }
 
         if (chatSpace == null) {

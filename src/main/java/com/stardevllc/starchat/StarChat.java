@@ -18,6 +18,7 @@ import com.stardevllc.starmclib.Config;
 import com.stardevllc.starmclib.actor.Actor;
 import com.stardevllc.starmclib.actor.PlayerActor;
 import com.stardevllc.starmclib.actor.ServerActor;
+import com.stardevllc.starmclib.color.ColorUtils;
 import net.milkbowl.vault.chat.Chat;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -90,6 +91,41 @@ public class StarChat extends JavaPlugin implements Listener {
         } else {
             StarChat.playerPlaceholders = new DefaultPlaceholders();
         }
+        
+        this.addSelector(new ChatSelector("private") {
+            @Override
+            public ChatSelection getSelection(Player player, String[] args) {
+                ChatSpace chatSpace;
+                String nameOverride;
+                Actor senderActor = new PlayerActor(player);
+                if (args.length >= 2) {
+                    Actor targetActor = Actor.create(args[1]);
+                    if (targetActor == null) {
+                        player.sendMessage(ColorUtils.color("&cInvalid target."));
+                        return null;
+                    }
+
+
+                    chatSpace = getPrivateMessage(senderActor, targetActor);
+                    if (chatSpace == null) {
+                        player.sendMessage(ColorUtils.color("You do not have a private conversation with " + targetActor.getName()));
+                        return null;
+                    }
+                    nameOverride = "Private (" + targetActor.getName() + ")";
+                } else {
+                    PrivateMessage privateMessage = getLastMessage(player.getUniqueId());
+                    chatSpace = privateMessage;
+                    if (chatSpace == null) {
+                        player.sendMessage(ColorUtils.color("&cYou do not have a last conversation to use as a focus."));
+                        return null;
+                    }
+
+                    Actor other = privateMessage.getActor1().equals(senderActor) ? privateMessage.getActor2() : privateMessage.getActor1();
+                    nameOverride = "Private (" + other.getName() + ")";
+                }
+                return new ChatSelection(chatSpace, nameOverride);
+            }
+        });
         
         getCommand("chat").setExecutor(new ChatCmd(this));
         getCommand("message").setExecutor(new MessageCmd(this));

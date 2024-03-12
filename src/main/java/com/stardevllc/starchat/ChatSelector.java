@@ -15,7 +15,8 @@ public abstract class ChatSelector {
 
     /**
      * This method is called when the {@code type} value is the same.  
-     * This has the lowest priority in terms of determining what chat space is used for the command.
+     * This has the lowest priority in terms of determining what chat space is used for the command.  
+     * The usage of the command is /chat [name] [other]
      * @param player The Player that used the /chat command
      * @param args The arguments of the command. This is the full arguments and not stripped down in any way.
      * @return The selection for the space
