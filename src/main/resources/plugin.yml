@@ -12,3 +12,4 @@ commands:
     aliases: [msg]
   reply:
     aliases: [r]
+  starchat:
