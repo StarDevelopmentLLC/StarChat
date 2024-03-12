@@ -7,11 +7,14 @@ import com.stardevllc.starchat.placeholder.PAPIExpansion;
 import com.stardevllc.starchat.placeholder.PAPIPlaceholders;
 import com.stardevllc.starchat.pm.PrivateMessage;
 import com.stardevllc.starchat.rooms.ChatRoom;
+import com.stardevllc.starmclib.actor.Actor;
+import com.stardevllc.starmclib.actor.PlayerActor;
 import com.stardevllc.starmclib.color.ColorUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 public class StarChatAdminCmd implements CommandExecutor {
@@ -213,6 +216,44 @@ public class StarChatAdminCmd implements CommandExecutor {
                 ColorUtils.coloredMessage(sender, "&aList of all conversations using StarChat.");
                 listConversations(sender);
             }
+        } else if (args[0].equalsIgnoreCase("setplayerchatfocus") || args[0].equalsIgnoreCase("setplayerfocus") || args[0].equalsIgnoreCase("setfocus")) {
+            if (!(sender.hasPermission("starchat.command.admin.setplayerchatfocus"))) {
+                ColorUtils.coloredMessage(sender, "&cYou do not have permission to use that command.");
+                return true;
+            }
+            
+            if (!(args.length > 2)) {
+                ColorUtils.coloredMessage(sender, "&cUsage: /" + label + " " + args[0] + " <player> <chatspace>");
+                return true;
+            }
+
+            Actor target = Actor.create(args[1]);
+            if (target == null) {
+                ColorUtils.coloredMessage(sender, "&cInvalid target, are they online?");
+                return true;
+            }
+            
+            if (!target.isPlayer()) {
+                ColorUtils.coloredMessage(sender, "&cTarget must be a player.");
+                return true;
+            }
+
+            if (!target.isOnline()) {
+                ColorUtils.coloredMessage(sender, "&cTarget must be online to set the chat focus.");
+                return true;
+            }
+            
+            Player targetPlayer = ((PlayerActor) target).getPlayer();
+
+            ChatChannel chatChannel = plugin.getChannelRegistry().get(args[2]);
+            if (chatChannel == null) {
+                ColorUtils.coloredMessage(sender, "&cThat is not a valid channel.");
+                return true;
+            }
+            
+            plugin.setPlayerFocus(targetPlayer, chatChannel);
+            ColorUtils.coloredMessage(sender, "&eYou set &b" + targetPlayer.getName() + "'s &echat focus to &d" + chatChannel.getName());
+            ColorUtils.coloredMessage(targetPlayer, "&eYour chat focus was changed to &d" + chatChannel.getName() + " &eby &b" + Actor.create(sender).getName());
         }
         return true;
     }
