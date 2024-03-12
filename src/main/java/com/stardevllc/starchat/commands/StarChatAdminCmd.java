@@ -1,9 +1,12 @@
 package com.stardevllc.starchat.commands;
 
 import com.stardevllc.starchat.StarChat;
+import com.stardevllc.starchat.channels.ChatChannel;
 import com.stardevllc.starchat.placeholder.DefaultPlaceholders;
 import com.stardevllc.starchat.placeholder.PAPIExpansion;
 import com.stardevllc.starchat.placeholder.PAPIPlaceholders;
+import com.stardevllc.starchat.pm.PrivateMessage;
+import com.stardevllc.starchat.rooms.ChatRoom;
 import com.stardevllc.starmclib.color.ColorUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -31,12 +34,24 @@ public class StarChatAdminCmd implements CommandExecutor {
         }
         
         if (args[0].equalsIgnoreCase("save")) {
+            if (!sender.hasPermission("starchat.command.admin.save")) {
+                ColorUtils.coloredMessage(sender, "&cYou do not have permission to use that command.");
+                return true;
+            }
             plugin.getMainConfig().save();
             ColorUtils.coloredMessage(sender, "&aSaved config.yml successfully.");
         } else if (args[0].equalsIgnoreCase("reload")) {
+            if (!sender.hasPermission("starchat.command.admin.reload")) {
+                ColorUtils.coloredMessage(sender, "&cYou do not have permission to use that command.");
+                return true;
+            }
             //TODO
-            ColorUtils.coloredMessage(sender, "&aReloaded config.yyml successfully.");
+            //ColorUtils.coloredMessage(sender, "&aReloaded config.yyml successfully.");
         } else if (args[0].equalsIgnoreCase("setconsolenameformat") || args[0].equalsIgnoreCase("setcnf")) {
+            if (!sender.hasPermission("starchat.command.admin.setconsolenameformat")) {
+                ColorUtils.coloredMessage(sender, "&cYou do not have permission to use that command.");
+                return true;
+            }
             if (!(args.length > 1)) {
                 ColorUtils.coloredMessage(sender, "&cYou must provide a new console name.");
                 return true;
@@ -51,6 +66,10 @@ public class StarChatAdminCmd implements CommandExecutor {
             StarChat.setConsoleNameFormat(consoleName);
             ColorUtils.coloredMessage(sender, "&aSet the new console name format to &r" + consoleName);
         } else if (args[0].equalsIgnoreCase("setprivatemessageformat") || args[0].equalsIgnoreCase("setpmf")) {
+            if (!sender.hasPermission("starchat.command.admin.setprivatemessageformat")) {
+                ColorUtils.coloredMessage(sender, "&cYou do not have permission to use that command.");
+                return true;
+            }
             if (!(args.length > 1)) {
                 ColorUtils.coloredMessage(sender, "&cYou must provide a new private message format.");
                 return true;
@@ -65,6 +84,10 @@ public class StarChatAdminCmd implements CommandExecutor {
             StarChat.setPrivateMessageFormat(privateMessageFormat);
             ColorUtils.coloredMessage(sender, "&aSet the new private message format to &r" + privateMessageFormat);
         } else if (args[0].equalsIgnoreCase("setuseplaceholderapi") || args[0].equalsIgnoreCase("setupapi")) {
+            if (!sender.hasPermission("starchat.command.admin.setuseplaceholderapi")) {
+                ColorUtils.coloredMessage(sender, "&cYou do not have permission to use that command.");
+                return true;
+            }
             if (!(args.length > 1)) {
                 ColorUtils.coloredMessage(sender, "&cYou must provide a value");
                 return true;
@@ -114,6 +137,10 @@ public class StarChatAdminCmd implements CommandExecutor {
                 return true;
             }
         } else if (args[0].equalsIgnoreCase("setusecolorpermissions") || args[0].equalsIgnoreCase("setucp")) {
+            if (!sender.hasPermission("starchat.command.admin.setusecolorpermissions")) {
+                ColorUtils.coloredMessage(sender, "&cYou do not have permission to use that command.");
+                return true;
+            }
             if (!(args.length > 1)) {
                 ColorUtils.coloredMessage(sender, "&cYou must provide a value");
                 return true;
@@ -137,8 +164,74 @@ public class StarChatAdminCmd implements CommandExecutor {
                 ColorUtils.coloredMessage(sender, "&cYou must provide true, yes, false, or no.");
                 return true;
             }
+        } else if (args[0].equalsIgnoreCase("list")) {
+            if (!sender.hasPermission("starchat.command.admin.list")) {
+                ColorUtils.coloredMessage(sender, "&cYou do not have permission to use that command.");
+                return true;
+            }
+            if (!(args.length > 1)) {
+                ColorUtils.coloredMessage(sender, "&cUsage: /" + label + " list <all|channels|rooms|conversations>");
+                return true;
+            }
+            
+            if (args[1].equalsIgnoreCase("all")) {
+                if (!sender.hasPermission("starchat.command.admin.list.all")) {
+                    ColorUtils.coloredMessage(sender, "&cYou do not have permission to use that command.");
+                    return true;
+                }
+                ColorUtils.coloredMessage(sender, "&aList of all chat spaces registered to StarChat.");
+                if (sender.hasPermission("starchat.command.admin.list.channels")) {
+                    listChannels(sender);
+                }
+                
+                if (sender.hasPermission("starchat.command.admin.list.rooms")) {
+                    listRooms(sender);
+                }
+                
+                if (sender.hasPermission("starchat.command.admin.list.conversations")) {
+                    listConversations(sender);
+                }
+            } else if (args[1].equalsIgnoreCase("channels")) {
+                if (!(sender.hasPermission("starchat.command.admin.list.channels") || sender.hasPermission("starchat.command.admin.list.all"))) {
+                    ColorUtils.coloredMessage(sender, "&cYou do not have permission to use that command.");
+                    return true;
+                }
+                ColorUtils.coloredMessage(sender, "&aList of all chat channels registered to StarChat.");
+                listChannels(sender);
+            } else if (args[1].equalsIgnoreCase("rooms")) {
+                if (!(sender.hasPermission("starchat.command.admin.list.rooms") || sender.hasPermission("starchat.command.admin.list.all"))) {
+                    ColorUtils.coloredMessage(sender, "&cYou do not have permission to use that command.");
+                    return true;
+                }
+                ColorUtils.coloredMessage(sender, "&aList of all chat rooms registered to StarChat.");
+                listRooms(sender);
+            } else if (args[1].equalsIgnoreCase("conversations")) {
+                if (!(sender.hasPermission("starchat.command.admin.list.conversations") || sender.hasPermission("starchat.command.admin.list.all"))) {
+                    ColorUtils.coloredMessage(sender, "&cYou do not have permission to use that command.");
+                    return true;
+                }
+                ColorUtils.coloredMessage(sender, "&aList of all conversations using StarChat.");
+                listConversations(sender);
+            }
         }
-        
         return true;
+    }
+    
+    private void listChannels(CommandSender sender) {
+        for (ChatChannel chatChannel : plugin.getChannelRegistry()) {
+            ColorUtils.coloredMessage(sender, " &8- &eChannel &b" + chatChannel.getSimplifiedName() + " &eowned by the plugin &d" + chatChannel.getPlugin().getName());
+        }
+    }
+
+    private void listRooms(CommandSender sender) {
+        for (ChatRoom chatRoom : plugin.getRoomRegistry()) {
+            ColorUtils.coloredMessage(sender, " &8- &eRoom &b" + chatRoom.getSimplifiedName() + " &eowned by the plugin &d" + chatRoom.getPlugin().getName());
+        }
+    }
+    
+    private void listConversations(CommandSender sender) {
+        for (PrivateMessage privateMessage : plugin.getPrivateMessages()) {
+            ColorUtils.coloredMessage(sender, " &8- &eConversation between &b" + privateMessage.getActor1().getName() + " &end &b" + privateMessage.getActor2().getName());
+        }
     }
 }
