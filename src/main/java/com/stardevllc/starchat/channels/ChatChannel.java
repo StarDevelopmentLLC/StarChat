@@ -52,7 +52,7 @@ public class ChatChannel extends ChatSpace {
         } else if (sender instanceof ConsoleCommandSender) {
             formattedMessage = senderFormat.replace("{displayname}", StarChat.getConsoleNameFormat());
         } else if (sender instanceof Player player) {
-            if (!sendPermission.isEmpty() && !player.hasPermission(sendPermission)) {
+            if (sendPermission != null && !sendPermission.isEmpty() && !player.hasPermission(sendPermission)) {
                 player.sendMessage(ColorUtils.color("&cYou do not have permission to send messages in " + getName()));
                 return;
             }
@@ -68,7 +68,7 @@ public class ChatChannel extends ChatSpace {
         }
 
         for (Player player : Bukkit.getOnlinePlayers()) {
-            if (viewPermission.isEmpty() || player.hasPermission(viewPermission)) {
+            if (viewPermission != null && viewPermission.isEmpty() || player.hasPermission(viewPermission)) {
                 player.sendMessage(formattedMessage);
             }
         }
