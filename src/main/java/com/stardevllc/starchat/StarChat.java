@@ -68,6 +68,7 @@ public class StarChat extends JavaPlugin implements Listener {
         generateDefaultConfigOptions();
         loadMainConfigValues();
         loadDefaultChannels();
+        loadChannels();
         determinePlaceholderHandler();
 
         getServer().getPluginManager().registerEvents(this, this);
@@ -126,6 +127,7 @@ public class StarChat extends JavaPlugin implements Listener {
         generateDefaultConfigOptions();
         loadMainConfigValues();
         loadDefaultChannels();
+        loadChannels();
         determinePlaceholderHandler();
     }
     
@@ -144,6 +146,24 @@ public class StarChat extends JavaPlugin implements Listener {
             this.papiExpansion.register();
         } else {
             StarChat.playerPlaceholders = new DefaultPlaceholders();
+        }
+    }
+    
+    private void loadChannels() {
+        File channelsDirectory = new File(getDataFolder(), "channels");
+        for (File file : channelsDirectory.listFiles()) {
+            if (file.isDirectory()) {
+                continue;
+            }
+            
+            if (!file.getName().endsWith(".yml")) {
+                continue;
+            }
+            
+            Config config = new Config(file);
+            String name = config.getString("name");
+            ChatChannel chatChannel = new ChatChannel(this, name, file);
+            this.channelRegistry.register(chatChannel.getSimplifiedName(), chatChannel);
         }
     }
 

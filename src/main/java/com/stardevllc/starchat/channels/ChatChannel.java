@@ -24,6 +24,12 @@ public class ChatChannel extends ChatSpace {
         config = new Config(configFile);
         this.file = configFile;
     }
+    
+    public ChatChannel(JavaPlugin plugin, String name, Config config) {
+        super(plugin, name);
+        this.config = config;
+        this.file = config.getFile();
+    }
 
     protected void createDefaults() {
         config.addDefault("name", this.name, "The name of the channel.", "It is recommended to not change this name in the file and instead use commands.");
