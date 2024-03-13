@@ -258,12 +258,22 @@ public class StarChatAdminCmd implements CommandExecutor {
             ColorUtils.coloredMessage(sender, "&eYou set &b" + targetPlayer.getName() + "'s &echat focus to &d" + chatChannel.getName());
             ColorUtils.coloredMessage(targetPlayer, "&eYour chat focus was changed to &d" + chatChannel.getName() + " &eby &b" + Actor.create(sender).getName());
         } else if (args[0].equalsIgnoreCase("channel")) {
+            if (!(sender.hasPermission("starchat.command.admin.channel"))) {
+                ColorUtils.coloredMessage(sender, "&cYou do not have permission to use that command.");
+                return true;
+            }
+            
             if (!(args.length > 2)) {
                 ColorUtils.coloredMessage(sender, "&cUsage: /" + label + " channel <[channelName]|create|delete> <args>");
                 return true;
             }
             
             if (args[1].equalsIgnoreCase("create")) {
+                if (!(sender.hasPermission("starchat.command.admin.channel.create"))) {
+                    ColorUtils.coloredMessage(sender, "&cYou do not have permission to use that command.");
+                    return true;
+                }
+                
                 StringBuilder sb = new StringBuilder();
                 for (int i = 2; i < args.length; i++) {
                     sb.append(args[i]).append(" ");
@@ -285,6 +295,11 @@ public class StarChatAdminCmd implements CommandExecutor {
             }
             
             if (args[1].equalsIgnoreCase("delete")) {
+                if (!(sender.hasPermission("starchat.command.admin.channel.delete"))) {
+                    ColorUtils.coloredMessage(sender, "&cYou do not have permission to use that command.");
+                    return true;
+                }
+                
                 if (!chatChannel.getPlugin().getName().equalsIgnoreCase(plugin.getName())) {
                     ColorUtils.coloredMessage(sender, "&cYou can only delete chat channels owned by StarChat.");
                     return true;
@@ -313,28 +328,56 @@ public class StarChatAdminCmd implements CommandExecutor {
             String value = sb.toString().trim();
             
             if (args[2].equalsIgnoreCase("setname")) {
+                if (!(sender.hasPermission("starchat.command.admin.channel.setname"))) {
+                    ColorUtils.coloredMessage(sender, "&cYou do not have permission to use that command.");
+                    return true;
+                }
                 String oldName = chatChannel.getName();
                 plugin.getChannelRegistry().deregister(chatChannel.getSimplifiedName());
                 chatChannel.setName(value);
                 plugin.getChannelRegistry().register(chatChannel.getSimplifiedName(), chatChannel);
                 ColorUtils.coloredMessage(sender, "&eSet &b" + oldName + "'s &enew name to &d" + chatChannel.getName());
             } else if (args[2].equalsIgnoreCase("setsenderformat")) {
+                if (!(sender.hasPermission("starchat.command.admin.channel.setsenderformat"))) {
+                    ColorUtils.coloredMessage(sender, "&cYou do not have permission to use that command.");
+                    return true;
+                }
                 chatChannel.setSenderFormat(value);
                 sender.sendMessage(ColorUtils.color("&eSet &b" + chatChannel.getSimplifiedName() + "'s &esender format to: &r") + chatChannel.getSenderFormat());
             } else if (args[2].equalsIgnoreCase("setsystemformat")) {
+                if (!(sender.hasPermission("starchat.command.admin.channel.setsystemformat"))) {
+                    ColorUtils.coloredMessage(sender, "&cYou do not have permission to use that command.");
+                    return true;
+                }
                 chatChannel.setSystemFormat(value);
                 sender.sendMessage(ColorUtils.color("&eSet &b" + chatChannel.getSimplifiedName() + "'s &esystem format to: &r") + chatChannel.getSystemFormat());
             } else if (args[2].equalsIgnoreCase("setdisplaynameformat")) {
+                if (!(sender.hasPermission("starchat.command.admin.channel.setdisplaynameformat"))) {
+                    ColorUtils.coloredMessage(sender, "&cYou do not have permission to use that command.");
+                    return true;
+                }
                 chatChannel.setPlayerDisplayNameFormat(value);
                 sender.sendMessage(ColorUtils.color("&eSet &b" + chatChannel.getSimplifiedName() + "'s &esystem format to: &r") + chatChannel.getPlayerDisplayNameFormat());
             } else if (args[2].equalsIgnoreCase("setaffectedbypunishments")) {
+                if (!(sender.hasPermission("starchat.command.admin.channel.setaffectedbypunishments"))) {
+                    ColorUtils.coloredMessage(sender, "&cYou do not have permission to use that command.");
+                    return true;
+                }
                 boolean abpValue = Boolean.parseBoolean(value);
                 chatChannel.setAffectedByPunishments(abpValue);
                 ColorUtils.coloredMessage(sender, "&eSet &b" + chatChannel.getSimplifiedName() + "'s &eaffected by punishments value to: &d" + chatChannel.isAffectedByPunishments());
             } else if (args[2].equalsIgnoreCase("setviewpermission")) {
+                if (!(sender.hasPermission("starchat.command.admin.channel.setviewpermission"))) {
+                    ColorUtils.coloredMessage(sender, "&cYou do not have permission to use that command.");
+                    return true;
+                }
                 chatChannel.setViewPermission(value);
                 ColorUtils.coloredMessage(sender, "&eSet &b" + chatChannel.getSimplifiedName() + "'s &eview permission to &d" + value);
             } else if (args[2].equalsIgnoreCase("setsendpermission")) {
+                if (!(sender.hasPermission("starchat.command.admin.channel.setsendpermission"))) {
+                    ColorUtils.coloredMessage(sender, "&cYou do not have permission to use that command.");
+                    return true;
+                }
                 chatChannel.setSendPermission(value);
                 ColorUtils.coloredMessage(sender, "&eSet &b" + chatChannel.getSimplifiedName() + "'s &esend permission to &d" + value);
             } else {
