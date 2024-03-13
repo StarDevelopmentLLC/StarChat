@@ -11,6 +11,7 @@ import com.stardevllc.starchat.placeholder.DefaultPlaceholders;
 import com.stardevllc.starchat.placeholder.PAPIExpansion;
 import com.stardevllc.starchat.placeholder.PAPIPlaceholders;
 import com.stardevllc.starchat.placeholder.PlayerPlaceholders;
+import com.stardevllc.starchat.pm.PrivateChatSelector;
 import com.stardevllc.starchat.pm.PrivateMessage;
 import com.stardevllc.starchat.rooms.ChatRoom;
 import com.stardevllc.starlib.registry.StringRegistry;
@@ -18,7 +19,6 @@ import com.stardevllc.starmclib.Config;
 import com.stardevllc.starmclib.actor.Actor;
 import com.stardevllc.starmclib.actor.PlayerActor;
 import com.stardevllc.starmclib.actor.ServerActor;
-import com.stardevllc.starmclib.color.ColorUtils;
 import net.milkbowl.vault.chat.Chat;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -73,40 +73,7 @@ public class StarChat extends JavaPlugin implements Listener {
 
         getServer().getPluginManager().registerEvents(this, this);
 
-        this.addSelector(new ChatSelector("private") {
-            @Override
-            public ChatSelection getSelection(Player player, String[] args) {
-                ChatSpace chatSpace;
-                String nameOverride;
-                Actor senderActor = new PlayerActor(player);
-                if (args.length >= 2) {
-                    Actor targetActor = Actor.create(args[1]);
-                    if (targetActor == null) {
-                        player.sendMessage(ColorUtils.color("&cInvalid target."));
-                        return null;
-                    }
-
-
-                    chatSpace = getPrivateMessage(senderActor, targetActor);
-                    if (chatSpace == null) {
-                        player.sendMessage(ColorUtils.color("You do not have a private conversation with " + targetActor.getName()));
-                        return null;
-                    }
-                    nameOverride = "Private (" + targetActor.getName() + ")";
-                } else {
-                    PrivateMessage privateMessage = getLastMessage(player.getUniqueId());
-                    chatSpace = privateMessage;
-                    if (chatSpace == null) {
-                        player.sendMessage(ColorUtils.color("&cYou do not have a last conversation to use as a focus."));
-                        return null;
-                    }
-
-                    Actor other = privateMessage.getActor1().equals(senderActor) ? privateMessage.getActor2() : privateMessage.getActor1();
-                    nameOverride = "Private (" + other.getName() + ")";
-                }
-                return new ChatSelection(chatSpace, nameOverride);
-            }
-        });
+        this.addSelector(new PrivateChatSelector());
 
         getCommand("chat").setExecutor(new ChatCmd(this));
         getCommand("message").setExecutor(new MessageCmd(this));
@@ -123,12 +90,22 @@ public class StarChat extends JavaPlugin implements Listener {
         }
 
         mainConfig = new Config(new File(getDataFolder(), "config.yml"));
+
+        Set<String> channelsToRemove = new HashSet<>();
+        for (ChatChannel channel : this.channelRegistry.getObjects().values()) {
+            if (channel.getPlugin().getName().equalsIgnoreCase(this.getName())) {
+                channelsToRemove.add(channel.getSimplifiedName());
+            }
+        }
+
+        channelsToRemove.forEach(c -> this.channelRegistry.deregister(c));
         
         generateDefaultConfigOptions();
         loadMainConfigValues();
         loadDefaultChannels();
         loadChannels();
         determinePlaceholderHandler();
+        this.addSelector(new PrivateChatSelector());
     }
     
     private void generateDefaultConfigOptions() {
