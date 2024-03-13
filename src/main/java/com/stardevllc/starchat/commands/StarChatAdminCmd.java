@@ -11,11 +11,14 @@ import com.stardevllc.starmclib.actor.Actor;
 import com.stardevllc.starmclib.actor.PlayerActor;
 import com.stardevllc.starmclib.color.ColorUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+
+import java.io.File;
 
 public class StarChatAdminCmd implements CommandExecutor {
     
@@ -254,6 +257,74 @@ public class StarChatAdminCmd implements CommandExecutor {
             plugin.setPlayerFocus(targetPlayer, chatChannel);
             ColorUtils.coloredMessage(sender, "&eYou set &b" + targetPlayer.getName() + "'s &echat focus to &d" + chatChannel.getName());
             ColorUtils.coloredMessage(targetPlayer, "&eYour chat focus was changed to &d" + chatChannel.getName() + " &eby &b" + Actor.create(sender).getName());
+        } else if (args[0].equalsIgnoreCase("channel")) {
+            if (!(args.length > 2)) {
+                ColorUtils.coloredMessage(sender, "&cUsage: /" + label + " channel <[channelName]|create> <args>");
+                return true;
+            }
+            
+            if (args[1].equalsIgnoreCase("create")) {
+                StringBuilder sb = new StringBuilder();
+                for (int i = 2; i < args.length; i++) {
+                    sb.append(args[i]).append(" ");
+                }
+                
+                String channelName = sb.toString().trim();
+
+                File file = new File(plugin.getDataFolder() + File.separator + "channels" + File.separator + ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', channelName)).toLowerCase().replace(" ", "_") + ".yml");
+                ChatChannel chatChannel = new ChatChannel(plugin, channelName, file);
+                plugin.getChannelRegistry().register(chatChannel.getSimplifiedName(), chatChannel);
+                ColorUtils.coloredMessage(sender, "&aCreated a new channel called " + channelName);
+                return true;
+            }
+            
+            ChatChannel chatChannel = plugin.getChannelRegistry().get(args[1]);
+            if (chatChannel == null) {
+                ColorUtils.coloredMessage(sender, "&cThat is not a registered chat channel.");
+                return true;
+            }
+            
+            if (!(args.length > 3)) {
+                ColorUtils.coloredMessage(sender, "&cUsage: /" + label + " " + args[0] + " " + args[1] + " <subcommand> <arguments>");
+                return true;
+            }
+
+            StringBuilder sb = new StringBuilder();
+            for (int i = 3; i < args.length; i++) {
+                sb.append(args[i]).append(" ");
+            }
+            
+            String value = sb.toString().trim();
+            
+            if (args[2].equalsIgnoreCase("setname")) {
+                String oldName = chatChannel.getName();
+                chatChannel.setName(value);
+                ColorUtils.coloredMessage(sender, "&eSet &b" + oldName + "'s &enew name to &d" + chatChannel.getName());
+            } else if (args[2].equalsIgnoreCase("setsenderformat")) {
+                chatChannel.setSenderFormat(value);
+                sender.sendMessage(ColorUtils.color("&eSet &b" + chatChannel.getSimplifiedName() + "'s &esender format to: &r") + chatChannel.getSenderFormat());
+            } else if (args[2].equalsIgnoreCase("setsystemformat")) {
+                chatChannel.setSystemFormat(value);
+                sender.sendMessage(ColorUtils.color("&eSet &b" + chatChannel.getSimplifiedName() + "'s &esystem format to: &r") + chatChannel.getSystemFormat());
+            } else if (args[2].equalsIgnoreCase("setdisplaynameformat")) {
+                chatChannel.setPlayerDisplayNameFormat(value);
+                sender.sendMessage(ColorUtils.color("&eSet &b" + chatChannel.getSimplifiedName() + "'s &esystem format to: &r") + chatChannel.getPlayerDisplayNameFormat());
+            } else if (args[2].equalsIgnoreCase("setaffectedbypunishments")) {
+                boolean abpValue = Boolean.parseBoolean(value);
+                chatChannel.setAffectedByPunishments(abpValue);
+                ColorUtils.coloredMessage(sender, "&eSet &b" + chatChannel.getSimplifiedName() + "'s &eaffected by punishments value to: &d" + chatChannel.isAffectedByPunishments());
+            } else if (args[2].equalsIgnoreCase("setviewpermission")) {
+                chatChannel.setViewPermission(value);
+                ColorUtils.coloredMessage(sender, "&eSet &b" + chatChannel.getSimplifiedName() + "'s &eview permission to &d" + value);
+            } else if (args[2].equalsIgnoreCase("setsendpermission")) {
+                chatChannel.setSendPermission(value);
+                ColorUtils.coloredMessage(sender, "&eSet &b" + chatChannel.getSimplifiedName() + "'s &esend permission to &d" + value);
+            } else {
+                ColorUtils.coloredMessage(sender, "&cInvalid subcommand.");
+                return true;
+            }
+            
+            chatChannel.saveConfig();
         }
         return true;
     }

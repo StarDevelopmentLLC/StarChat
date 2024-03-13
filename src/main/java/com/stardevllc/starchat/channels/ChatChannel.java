@@ -35,12 +35,61 @@ public class ChatChannel extends ChatSpace {
     }
 
     public void loadSettings() {
+        this.name = config.getString("name");
         this.senderFormat = config.getString("formats.sender");
         this.systemFormat = config.getString("formats.system");
         this.viewPermission = config.getString("permissions.view");
         this.sendPermission = config.getString("permissions.send");
         this.playerDisplayNameFormat = config.getString("formats.playerdisplayname");
         this.affectedByPunishments = config.getBoolean("settings.affectedbypunishments");
+    }
+
+    public Config getConfig() {
+        return config;
+    }
+    
+    public void saveConfig() {
+        config.save();
+    }
+
+    public void setViewPermission(String viewPermission) {
+        this.viewPermission = viewPermission;
+        this.config.set("permissions.view", viewPermission);
+    }
+
+    public void setSendPermission(String sendPermission) {
+        this.sendPermission = sendPermission;
+        this.config.set("permissions.send", sendPermission);
+    }
+
+    @Override
+    public void setName(String name) {
+        super.setName(name);
+        this.config.set("name", name);
+    }
+
+    @Override
+    public void setSenderFormat(String senderFormat) {
+        super.setSenderFormat(senderFormat);
+        this.config.set("formats.sender", senderFormat);
+    }
+
+    @Override
+    public void setSystemFormat(String systemFormat) {
+        super.setSystemFormat(systemFormat);
+        this.config.set("formats.system", systemFormat);
+    }
+
+    @Override
+    public void setPlayerDisplayNameFormat(String playerDisplayNameFormat) {
+        super.setPlayerDisplayNameFormat(playerDisplayNameFormat);
+        this.config.set("formats.playerdisplayname", playerDisplayNameFormat);
+    }
+
+    @Override
+    public void setAffectedByPunishments(boolean affectedByPunishments) {
+        super.setAffectedByPunishments(affectedByPunishments);
+        this.config.set("settings.affectedbypunishments", affectedByPunishments);
     }
 
     @Override

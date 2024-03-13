@@ -32,12 +32,33 @@ public abstract class ChatSpace {
         sendMessage(null, message);
     }
 
+    public void setSenderFormat(String senderFormat) {
+        this.senderFormat = senderFormat;
+    }
+
+    public void setSystemFormat(String systemFormat) {
+        this.systemFormat = systemFormat;
+    }
+
+    public void setPlayerDisplayNameFormat(String playerDisplayNameFormat) {
+        this.playerDisplayNameFormat = playerDisplayNameFormat;
+    }
+
+    public void setAffectedByPunishments(boolean affectedByPunishments) {
+        this.affectedByPunishments = affectedByPunishments;
+    }
+
     public JavaPlugin getPlugin() {
         return plugin;
     }
 
     public String getName() {
         return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+        this.simplifiedName = ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', name.toLowerCase().replace(" ", "_")));
     }
 
     public String getSimplifiedName() {
