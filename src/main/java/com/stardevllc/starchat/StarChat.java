@@ -45,7 +45,7 @@ public class StarChat extends JavaPlugin implements Listener {
     private Map<UUID, ChatSpace> playerChatSelection = new HashMap<>(); //Current player focus
     private Map<String, ChatSelector> chatSelectors = new HashMap<>();
     private PAPIExpansion papiExpansion;
-    
+
     private static StarChat instance;
 
     private StringRegistry<ChatChannel> channelRegistry = new StringRegistry<>(); //All channels
@@ -65,33 +65,13 @@ public class StarChat extends JavaPlugin implements Listener {
             return;
         }
 
-        mainConfig.addDefault("console-name-format", "&4Console", "The name that the console appears as in chat spaces.");
-        mainConfig.addDefault("private-msg-format", "&6[&c{from} &6-> &c{to}&6]&8: &f{message}", "The format used for private messaging.");
-        mainConfig.addDefault("use-placeholderapi", true, "If the PlaceholderAPI plugin is supported by default.", "If PlaceholderAPI is not installed, this setting is ignored.", "Note: Other plugins that use the systems of StarChat can override this setting", "This setting only applies to the default state of StarChat, and maybe other plugins if they decide to use this setting.");
-        mainConfig.addDefault("use-color-permissioins", false, "This allows you to control color usage by permissions.", "This is false by default and will just color all messages.", "Permissions for default colors follows the format: starmclib.color.spigot.<colorname>.", "Colors added by other plugins and via StarCore's color commands may or may not have permissions. Please see StarCore for how to list the colors and their information.");
-        mainConfig.save();
-
-        StarChat.consoleNameFormat = mainConfig.getString("console-name-format");
-        StarChat.privateMessageFormat = mainConfig.getString("private-msg-format");
-        StarChat.usePlaceholderAPI = mainConfig.getBoolean("use-placeholder-api");
-        StarChat.useColorPermissions = mainConfig.getBoolean("use-color-permissions");
-
-        globalChannel = new GlobalChannel(this, new File(getDataFolder() + File.separator + "channels" + File.separator + "defaults", "global.yml"));
-        this.channelRegistry.register(globalChannel.getSimplifiedName(), globalChannel);
-
-        staffChannel = new StaffChannel(this, new File(getDataFolder() + File.separator + "channels" + File.separator + "defaults", "staff.yml"));
-        this.channelRegistry.register(staffChannel.getSimplifiedName(), staffChannel);
+        generateDefaultConfigOptions();
+        loadMainConfigValues();
+        loadDefaultChannels();
+        determinePlaceholderHandler();
 
         getServer().getPluginManager().registerEvents(this, this);
 
-        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
-            StarChat.playerPlaceholders = new PAPIPlaceholders();
-            this.papiExpansion = new PAPIExpansion(this);
-            this.papiExpansion.register();
-        } else {
-            StarChat.playerPlaceholders = new DefaultPlaceholders();
-        }
-        
         this.addSelector(new ChatSelector("private") {
             @Override
             public ChatSelection getSelection(Player player, String[] args) {
@@ -126,11 +106,60 @@ public class StarChat extends JavaPlugin implements Listener {
                 return new ChatSelection(chatSpace, nameOverride);
             }
         });
-        
+
         getCommand("chat").setExecutor(new ChatCmd(this));
         getCommand("message").setExecutor(new MessageCmd(this));
         getCommand("reply").setExecutor(new ReplyCmd(this));
         getCommand("starchat").setExecutor(new StarChatAdminCmd(this));
+    }
+
+    public void reload(boolean save) {
+        if (save) {
+            mainConfig.save();
+            for (ChatChannel channel : this.channelRegistry.getObjects().values()) {
+                channel.getConfig().save();
+            }
+        }
+
+        mainConfig = new Config(new File(getDataFolder(), "config.yml"));
+        
+        generateDefaultConfigOptions();
+        loadMainConfigValues();
+        loadDefaultChannels();
+        determinePlaceholderHandler();
+    }
+    
+    private void generateDefaultConfigOptions() {
+        mainConfig.addDefault("console-name-format", "&4Console", "The name that the console appears as in chat spaces.");
+        mainConfig.addDefault("private-msg-format", "&6[&c{from} &6-> &c{to}&6]&8: &f{message}", "The format used for private messaging.");
+        mainConfig.addDefault("use-placeholderapi", true, "If the PlaceholderAPI plugin is supported by default.", "If PlaceholderAPI is not installed, this setting is ignored.", "Note: Other plugins that use the systems of StarChat can override this setting", "This setting only applies to the default state of StarChat, and maybe other plugins if they decide to use this setting.");
+        mainConfig.addDefault("use-color-permissioins", false, "This allows you to control color usage by permissions.", "This is false by default and will just color all messages.", "Permissions for default colors follows the format: starmclib.color.spigot.<colorname>.", "Colors added by other plugins and via StarCore's color commands may or may not have permissions. Please see StarCore for how to list the colors and their information.");
+        mainConfig.save();
+    }
+    
+    private void determinePlaceholderHandler() {
+        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null && StarChat.usePlaceholderAPI) {
+            StarChat.playerPlaceholders = new PAPIPlaceholders();
+            this.papiExpansion = new PAPIExpansion(this);
+            this.papiExpansion.register();
+        } else {
+            StarChat.playerPlaceholders = new DefaultPlaceholders();
+        }
+    }
+
+    private void loadMainConfigValues() {
+        StarChat.consoleNameFormat = mainConfig.getString("console-name-format");
+        StarChat.privateMessageFormat = mainConfig.getString("private-msg-format");
+        StarChat.usePlaceholderAPI = mainConfig.getBoolean("use-placeholder-api");
+        StarChat.useColorPermissions = mainConfig.getBoolean("use-color-permissions");
+    }
+
+    private void loadDefaultChannels() {
+        globalChannel = new GlobalChannel(this, new File(getDataFolder() + File.separator + "channels" + File.separator + "defaults", "global.yml"));
+        this.channelRegistry.register(globalChannel.getSimplifiedName(), globalChannel);
+
+        staffChannel = new StaffChannel(this, new File(getDataFolder() + File.separator + "channels" + File.separator + "defaults", "staff.yml"));
+        this.channelRegistry.register(staffChannel.getSimplifiedName(), staffChannel);
     }
 
     @EventHandler(priority = EventPriority.MONITOR)

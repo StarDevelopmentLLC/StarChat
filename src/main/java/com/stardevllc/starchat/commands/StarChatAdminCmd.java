@@ -51,8 +51,9 @@ public class StarChatAdminCmd implements CommandExecutor {
                 ColorUtils.coloredMessage(sender, "&cYou do not have permission to use that command.");
                 return true;
             }
-            //TODO
-            //ColorUtils.coloredMessage(sender, "&aReloaded config.yml successfully.");
+            
+            plugin.reload(false);
+            ColorUtils.coloredMessage(sender, "&aReloaded successfully.");
         } else if (args[0].equalsIgnoreCase("setconsolenameformat") || args[0].equalsIgnoreCase("setcnf")) {
             if (!sender.hasPermission("starchat.command.admin.setconsolenameformat")) {
                 ColorUtils.coloredMessage(sender, "&cYou do not have permission to use that command.");
