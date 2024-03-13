@@ -13,6 +13,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
 
 public class ChatChannel extends ChatSpace {
+    protected transient File file; //The main file for the config.
     protected transient Config config; //Config to store information as channels are mainly config/command controlled, transient modifier allows StarData to ignore this field without having to depend on StarData directly
 
     protected String viewPermission = ""; //Permission needed by players in order to view messages in this channel
@@ -21,6 +22,7 @@ public class ChatChannel extends ChatSpace {
     public ChatChannel(JavaPlugin plugin, String name, File configFile) {
         super(plugin, name);
         config = new Config(configFile);
+        this.file = configFile;
     }
 
     protected void createDefaults() {
@@ -47,7 +49,11 @@ public class ChatChannel extends ChatSpace {
     public Config getConfig() {
         return config;
     }
-    
+
+    public File getFile() {
+        return file;
+    }
+
     public void saveConfig() {
         config.save();
     }

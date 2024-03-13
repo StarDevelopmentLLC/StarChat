@@ -52,7 +52,7 @@ public class StarChatAdminCmd implements CommandExecutor {
                 return true;
             }
             //TODO
-            //ColorUtils.coloredMessage(sender, "&aReloaded config.yyml successfully.");
+            //ColorUtils.coloredMessage(sender, "&aReloaded config.yml successfully.");
         } else if (args[0].equalsIgnoreCase("setconsolenameformat") || args[0].equalsIgnoreCase("setcnf")) {
             if (!sender.hasPermission("starchat.command.admin.setconsolenameformat")) {
                 ColorUtils.coloredMessage(sender, "&cYou do not have permission to use that command.");
@@ -259,7 +259,7 @@ public class StarChatAdminCmd implements CommandExecutor {
             ColorUtils.coloredMessage(targetPlayer, "&eYour chat focus was changed to &d" + chatChannel.getName() + " &eby &b" + Actor.create(sender).getName());
         } else if (args[0].equalsIgnoreCase("channel")) {
             if (!(args.length > 2)) {
-                ColorUtils.coloredMessage(sender, "&cUsage: /" + label + " channel <[channelName]|create> <args>");
+                ColorUtils.coloredMessage(sender, "&cUsage: /" + label + " channel <[channelName]|create|delete> <args>");
                 return true;
             }
             
@@ -284,6 +284,22 @@ public class StarChatAdminCmd implements CommandExecutor {
                 return true;
             }
             
+            if (args[1].equalsIgnoreCase("delete")) {
+                if (!chatChannel.getPlugin().getName().equalsIgnoreCase(plugin.getName())) {
+                    ColorUtils.coloredMessage(sender, "&cYou can only delete chat channels owned by StarChat.");
+                    return true;
+                }
+                
+                chatChannel.getFile().delete();
+                plugin.getChannelRegistry().deregister(chatChannel.getSimplifiedName());
+                ColorUtils.coloredMessage(sender, "&eYou deleted the chat channel &b" + chatChannel.getName());
+            }
+
+            if (!chatChannel.getPlugin().getName().equalsIgnoreCase(plugin.getName())) {
+                ColorUtils.coloredMessage(sender, "&cYou can only modify chat channels owned by StarChat.");
+                return true;
+            }
+            
             if (!(args.length > 3)) {
                 ColorUtils.coloredMessage(sender, "&cUsage: /" + label + " " + args[0] + " " + args[1] + " <subcommand> <arguments>");
                 return true;
@@ -298,7 +314,9 @@ public class StarChatAdminCmd implements CommandExecutor {
             
             if (args[2].equalsIgnoreCase("setname")) {
                 String oldName = chatChannel.getName();
+                plugin.getChannelRegistry().deregister(chatChannel.getSimplifiedName());
                 chatChannel.setName(value);
+                plugin.getChannelRegistry().register(chatChannel.getSimplifiedName(), chatChannel);
                 ColorUtils.coloredMessage(sender, "&eSet &b" + oldName + "'s &enew name to &d" + chatChannel.getName());
             } else if (args[2].equalsIgnoreCase("setsenderformat")) {
                 chatChannel.setSenderFormat(value);
