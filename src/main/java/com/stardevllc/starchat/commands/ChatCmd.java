@@ -23,6 +23,11 @@ public class ChatCmd implements CommandExecutor {
     }
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+        if (!(sender.hasPermission("starchat.command.chat"))) {
+            ColorUtils.coloredMessage(sender, plugin.getMainConfig().getString("messages.command.nopermission"));
+            return true;
+        }
+        
         if (!(sender instanceof Player player)) {
             sender.sendMessage(ColorUtils.color(pluginConfig.getString("messages.command.onlyplayers")));
             return true;

@@ -2,6 +2,7 @@ package com.stardevllc.starchat.commands;
 
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.pm.PrivateMessage;
+import com.stardevllc.starmclib.Config;
 import com.stardevllc.starmclib.actor.Actor;
 import com.stardevllc.starmclib.color.ColorUtils;
 import org.bukkit.command.Command;
@@ -17,6 +18,11 @@ public class MessageCmd implements CommandExecutor {
     }
     
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+        if (!(sender.hasPermission("starchat.command.message"))) {
+            ColorUtils.coloredMessage(sender, plugin.getMainConfig().getString("messages.command.nopermission"));
+            return true;
+        }
+        
         if (!(args.length >= 2)) {
             sender.sendMessage(ColorUtils.color("&cUsage: /" + label + " <target> <message>"));
             return true;

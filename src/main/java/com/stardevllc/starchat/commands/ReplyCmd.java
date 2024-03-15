@@ -18,6 +18,11 @@ public class ReplyCmd implements CommandExecutor {
     }
     
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+        if (!(sender.hasPermission("starchat.command.reply"))) {
+            ColorUtils.coloredMessage(sender, plugin.getMainConfig().getString("messages.command.nopermission"));
+            return true;
+        }
+        
         if (args.length == 0) {
             sender.sendMessage(ColorUtils.color("&cUsage: /" + label + " <message>"));
             sender.sendMessage(ColorUtils.color("&cUsage: /" + label + " <target> <message>"));
