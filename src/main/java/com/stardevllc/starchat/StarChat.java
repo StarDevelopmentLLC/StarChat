@@ -113,6 +113,15 @@ public class StarChat extends JavaPlugin implements Listener {
         mainConfig.addDefault("private-msg-format", "&6[&c{from} &6-> &c{to}&6]&8: &f{message}", "The format used for private messaging.");
         mainConfig.addDefault("use-placeholderapi", true, "If the PlaceholderAPI plugin is supported by default.", "If PlaceholderAPI is not installed, this setting is ignored.", "Note: Other plugins that use the systems of StarChat can override this setting", "This setting only applies to the default state of StarChat, and maybe other plugins if they decide to use this setting.");
         mainConfig.addDefault("use-color-permissioins", false, "This allows you to control color usage by permissions.", "This is false by default and will just color all messages.", "Permissions for default colors follows the format: starmclib.color.spigot.<colorname>.", "Colors added by other plugins and via StarCore's color commands may or may not have permissions. Please see StarCore for how to list the colors and their information.");
+        
+        mainConfig.addDefault("messages.command.nopermission", "&cYou do not have permission to use that command.");
+        mainConfig.addDefault("messages.command.onlyplayers", "&cOnly players can use that command.");
+        mainConfig.addDefault("messages.chatspace.notexist", "&cSorry but {PROVIDED} is not a valid chat space.");
+        mainConfig.addDefault("messages.channel.nosendpermission", "&cYou do not have permission to send messages in {CHANNEL}.");
+        mainConfig.addDefault("messages.room.notamember", "&cYou are not a member of {ROOM}");
+        mainConfig.addDefault("messages.command.chat.setfocus", "&aSet your chat focus to &b{SPACE}.");
+        
+        
         mainConfig.save();
     }
     

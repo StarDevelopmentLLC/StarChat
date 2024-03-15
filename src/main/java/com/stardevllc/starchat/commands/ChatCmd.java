@@ -5,6 +5,7 @@ import com.stardevllc.starchat.ChatSpace;
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.channels.ChatChannel;
 import com.stardevllc.starchat.rooms.ChatRoom;
+import com.stardevllc.starmclib.Config;
 import com.stardevllc.starmclib.color.ColorUtils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -14,14 +15,16 @@ import org.bukkit.entity.Player;
 public class ChatCmd implements CommandExecutor {
 
     private StarChat plugin;
+    private Config pluginConfig;
 
     public ChatCmd(StarChat plugin) {
         this.plugin = plugin;
+        this.pluginConfig = plugin.getMainConfig();
     }
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (!(sender instanceof Player player)) {
-            sender.sendMessage(ColorUtils.color("&cOnly players can use that command."));
+            sender.sendMessage(ColorUtils.color(pluginConfig.getString("messages.command.onlyplayers")));
             return true;
         }
 
@@ -52,19 +55,19 @@ public class ChatCmd implements CommandExecutor {
         }
 
         if (chatSpace == null) {
-            sender.sendMessage(ColorUtils.color("&cSorry, but &e" + channelName + "&c is not a registered chat space."));
+            sender.sendMessage(ColorUtils.color(pluginConfig.getString("messages.chatspace.notexist").replace("{PROVIDED}", channelName)));
             return true;
         }
 
         if (chatSpace instanceof ChatChannel chatChannel) {
             String sendPermission = chatChannel.getSendPermission();
             if (!sendPermission.isEmpty() && !player.hasPermission(sendPermission)) {
-                sender.sendMessage(ColorUtils.color("&cYou do not have permission to send messages in " + chatSpace.getName() + "."));
+                sender.sendMessage(ColorUtils.color(pluginConfig.getString("messages.channel.nosendpermission").replace("{CHANNEL}", chatChannel.getName())));
                 return true;
             }
         } else if (chatSpace instanceof ChatRoom chatRoom) {
             if (!chatRoom.isMember(player.getUniqueId())) {
-                sender.sendMessage(ColorUtils.color("&cYou are not a member of " + chatRoom.getName()));
+                sender.sendMessage(ColorUtils.color(pluginConfig.getString("messages.room.notamember").replace("{ROOM}", chatRoom.getName())));
                 return true;
             }
         }
@@ -74,7 +77,7 @@ public class ChatCmd implements CommandExecutor {
         if (nameOverride != null && !nameOverride.isEmpty()) {
             spaceName = nameOverride;
         }
-        sender.sendMessage(ColorUtils.color("&aSet your chat focus to &b" + spaceName + "."));
+        sender.sendMessage(ColorUtils.color(pluginConfig.getString("messages.command.chat.setfocus").replace("{SPACE}", spaceName)));
         return true;
     }
 }
