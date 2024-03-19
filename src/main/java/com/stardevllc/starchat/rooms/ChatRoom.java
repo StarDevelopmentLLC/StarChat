@@ -10,14 +10,12 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @SuppressWarnings("EqualsBetweenInconvertibleTypes")
 public class ChatRoom extends ChatSpace {
     protected Actor owner;
-    protected Set<UUID> members = new HashSet<>();
+    protected Map<UUID, RoomMember> members = new HashMap<>();
 
     public ChatRoom(JavaPlugin plugin, String name, Actor owner) {
         super(plugin, name);
@@ -46,6 +44,12 @@ public class ChatRoom extends ChatSpace {
                 return;
             }
 
+            RoomMember member = this.members.get(player.getUniqueId());
+            if (!member.hasPermission(DefaultPermissions.SEND_MESSAGES) && !isOwner(player.getUniqueId())) {
+                ColorUtils.coloredMessage(player, "&cYou do not have permission to send messages in that room.");
+                return;
+            }
+
             formattedMessage = senderFormat.replace("{displayname}", formatPlayerDisplayName(player));
         }
 
@@ -58,31 +62,40 @@ public class ChatRoom extends ChatSpace {
 
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (isMember(player.getUniqueId())) {
-                player.sendMessage(formattedMessage);
+                RoomMember member = this.members.get(player.getUniqueId());
+                if (member.hasPermission(DefaultPermissions.VIEW_MESSAGES) || isOwner(player.getUniqueId())) {
+                    player.sendMessage(formattedMessage);
+                }
             }
         }
     }
-
-    public boolean isMember(UUID uuid) {
+    
+    public boolean isOwner(UUID uuid) {
         if (owner.isPlayer()) {
-            if (owner.equals(uuid)) {
-                return true;
-            }
+            return owner.equals(uuid);
         }
-        return members.contains(uuid);
+        
+        return false;
+    }
+    
+    public boolean isMember(UUID uuid) {
+        if (isOwner(uuid)) {
+            return true;
+        }
+        return members.containsKey(uuid);
     }
 
     public void changeOwner(Actor newOwner) {
         this.owner = newOwner;
     }
 
-    public boolean addMember(UUID member) {
-        this.members.add(member);
-        return true;
+    public RoomMember addMember(UUID uniqueId, RoomPermission... permissions) {
+        RoomMember member = new RoomMember(uniqueId, permissions);
+        this.members.put(uniqueId, member);
+        return member;
     }
 
-    public boolean removeMember(UUID member) {
+    public void removeMember(UUID member) {
         this.members.remove(member);
-        return true;
     }
 }
