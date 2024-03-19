@@ -16,6 +16,14 @@ repositories {
     }
 }
 
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+        }
+    }
+}
+
 group 'com.stardevllc'
 version '1.0.0-alpha.1'
 
@@ -43,3 +51,4 @@ java {
 }
 
 tasks.compileJava.dependsOn(clean)
+tasks.build.finalizedBy(publishToMavenLocal)
