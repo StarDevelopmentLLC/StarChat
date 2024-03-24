@@ -88,4 +88,9 @@ public abstract class ChatSpace {
             return StarChat.getPlayerPlaceholders().setPlaceholders(player, this.playerDisplayNameFormat);
         }
     }
+
+    @Override
+    public String toString() {
+        return getSimplifiedName();
+    }
 }
