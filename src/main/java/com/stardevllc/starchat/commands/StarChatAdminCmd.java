@@ -126,6 +126,7 @@ public class StarChatAdminCmd implements CommandExecutor {
                         plugin.getPapiExpansion().register();
                         StarChat.setPlayerPlaceholders(new PAPIPlaceholders());
                         plugin.getMainConfig().set("use-placeholderapi", true);
+                        StarChat.setUsePlaceholderAPI(true);
                         ColorUtils.coloredMessage(sender, pluginConfig.getString("messages.command.admin.setusepapi.detectedandenabled"));
                     } else {
                         ColorUtils.coloredMessage(sender, pluginConfig.getString("messages.command.admin.setusepapi.notdetectednotenabled"));

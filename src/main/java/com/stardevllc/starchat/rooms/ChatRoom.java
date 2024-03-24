@@ -53,6 +53,10 @@ public class ChatRoom extends ChatSpace {
             formattedMessage = senderFormat.replace("{displayname}", formatPlayerDisplayName(player));
         }
 
+        if (StarChat.isUsePlaceholderAPI() && sender instanceof Player player) {
+            formattedMessage = StarChat.getPlayerPlaceholders().setPlaceholders(player, formattedMessage);
+        }
+
         formattedMessage = ColorUtils.color(formattedMessage);
         if (StarChat.isUseColorPermissions()) {
             formattedMessage = formattedMessage.replace("{message}", ColorUtils.color(sender, message));

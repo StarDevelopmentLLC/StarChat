@@ -143,6 +143,7 @@ public class StarChat extends JavaPlugin implements Listener {
     }
     
     private void determinePlaceholderHandler() {
+        StarChat.setUsePlaceholderAPI(getMainConfig().getBoolean("use-placeholderapi"));
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null && StarChat.usePlaceholderAPI) {
             StarChat.playerPlaceholders = new PAPIPlaceholders();
             this.papiExpansion = new PAPIExpansion(this);
@@ -196,7 +197,7 @@ public class StarChat extends JavaPlugin implements Listener {
                 return; //Muted message should be handled by the punishments plugin.
             }
         }
-
+        
         e.setCancelled(true);
         chatSpace.sendMessage(player, message);
     }
@@ -248,6 +249,8 @@ public class StarChat extends JavaPlugin implements Listener {
     }
 
     public void setPlayerFocus(Player player, ChatSpace chatSpace) {
+//        ChatSpace old = this.playerChatSelection.put(player.getUniqueId(), chatSpace);
+//        getLogger().info("Set " + player.getName() + "'s chat focus to " + chatSpace + ", old focus: " + old);
         this.playerChatSelection.put(player.getUniqueId(), chatSpace);
     }
 
@@ -302,6 +305,10 @@ public class StarChat extends JavaPlugin implements Listener {
 
     public static boolean isUsePlaceholderAPI() {
         return usePlaceholderAPI;
+    }
+
+    public static void setUsePlaceholderAPI(boolean usePlaceholderAPI) {
+        StarChat.usePlaceholderAPI = usePlaceholderAPI;
     }
 
     public static Chat getVaultChat() {
