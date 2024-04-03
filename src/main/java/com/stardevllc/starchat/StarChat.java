@@ -13,8 +13,9 @@ import com.stardevllc.starchat.placeholder.PAPIPlaceholders;
 import com.stardevllc.starchat.placeholder.PlayerPlaceholders;
 import com.stardevllc.starchat.pm.PrivateChatSelector;
 import com.stardevllc.starchat.pm.PrivateMessage;
-import com.stardevllc.starchat.rooms.ChatRoom;
-import com.stardevllc.starlib.registry.StringRegistry;
+import com.stardevllc.starchat.registry.ChannelRegistry;
+import com.stardevllc.starchat.registry.FocusRegistry;
+import com.stardevllc.starchat.registry.RoomRegistry;
 import com.stardevllc.starmclib.Config;
 import com.stardevllc.starmclib.actor.Actor;
 import com.stardevllc.starmclib.actor.PlayerActor;
@@ -28,6 +29,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.plugin.RegisteredServiceProvider;
+import org.bukkit.plugin.ServicePriority;
+import org.bukkit.plugin.ServicesManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -42,14 +45,14 @@ public class StarChat extends JavaPlugin implements Listener {
     private static boolean useColorPermissions;
     private Config mainConfig;
     private ChatChannel globalChannel, staffChannel; //Default channels
-    private Map<UUID, ChatSpace> playerChatSelection = new HashMap<>(); //Current player focus
+    private FocusRegistry playerChatSelection = new FocusRegistry(); //Current player focus
     private Map<String, ChatSelector> chatSelectors = new HashMap<>();
     private PAPIExpansion papiExpansion;
 
     private static StarChat instance;
 
-    private StringRegistry<ChatChannel> channelRegistry = new StringRegistry<>(); //All channels
-    private StringRegistry<ChatRoom> roomRegistry = new StringRegistry<>(); //All rooms
+    private ChannelRegistry channelRegistry = new ChannelRegistry(); //All channels
+    private RoomRegistry roomRegistry = new RoomRegistry(); //All rooms
     private Set<PrivateMessage> privateMessages = new HashSet<>();
     private Map<UUID, PrivateMessage> lastMessage = new HashMap<>();
     private PrivateMessage consoleLastMessage;
@@ -70,6 +73,11 @@ public class StarChat extends JavaPlugin implements Listener {
         loadDefaultChannels();
         loadChannels();
         determinePlaceholderHandler();
+
+        ServicesManager servicesManager = getServer().getServicesManager();
+        servicesManager.register(FocusRegistry.class, playerChatSelection, this, ServicePriority.Highest);
+        servicesManager.register(ChannelRegistry.class, channelRegistry, this, ServicePriority.Highest);
+        servicesManager.register(RoomRegistry.class, roomRegistry, this, ServicePriority.Highest);
 
         getServer().getPluginManager().registerEvents(this, this);
 
@@ -214,11 +222,11 @@ public class StarChat extends JavaPlugin implements Listener {
         return this.lastMessage.get(uuid);
     }
 
-    public StringRegistry<ChatChannel> getChannelRegistry() {
+    public ChannelRegistry getChannelRegistry() {
         return channelRegistry;
     }
 
-    public StringRegistry<ChatRoom> getRoomRegistry() {
+    public RoomRegistry getRoomRegistry() {
         return roomRegistry;
     }
 
@@ -245,13 +253,13 @@ public class StarChat extends JavaPlugin implements Listener {
     }
 
     public ChatSpace getPlayerFocus(Player player) {
-        return this.playerChatSelection.getOrDefault(player.getUniqueId(), globalChannel);
+        return this.playerChatSelection.getPlayerFocus(player);
     }
 
     public void setPlayerFocus(Player player, ChatSpace chatSpace) {
 //        ChatSpace old = this.playerChatSelection.put(player.getUniqueId(), chatSpace);
 //        getLogger().info("Set " + player.getName() + "'s chat focus to " + chatSpace + ", old focus: " + old);
-        this.playerChatSelection.put(player.getUniqueId(), chatSpace);
+        this.playerChatSelection.setPlayerFocus(player.getUniqueId(), chatSpace);
     }
 
     private boolean setupChat() {
