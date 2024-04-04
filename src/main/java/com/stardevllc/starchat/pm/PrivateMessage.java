@@ -1,8 +1,8 @@
 package com.stardevllc.starchat.pm;
 
 import com.stardevllc.starchat.ChatSpace;
-import com.stardevllc.starmclib.actor.Actor;
-import com.stardevllc.starmclib.color.ColorUtils;
+import com.stardevllc.starcore.utils.actor.Actor;
+import com.stardevllc.starcore.utils.color.ColorUtils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 

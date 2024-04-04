@@ -3,9 +3,9 @@ package com.stardevllc.starchat.pm;
 import com.stardevllc.starchat.ChatSelector;
 import com.stardevllc.starchat.ChatSpace;
 import com.stardevllc.starchat.StarChat;
-import com.stardevllc.starmclib.actor.Actor;
-import com.stardevllc.starmclib.actor.PlayerActor;
-import com.stardevllc.starmclib.color.ColorUtils;
+import com.stardevllc.starcore.utils.actor.Actor;
+import com.stardevllc.starcore.utils.actor.PlayerActor;
+import com.stardevllc.starcore.utils.color.ColorUtils;
 import org.bukkit.entity.Player;
 
 public class PrivateChatSelector extends ChatSelector {

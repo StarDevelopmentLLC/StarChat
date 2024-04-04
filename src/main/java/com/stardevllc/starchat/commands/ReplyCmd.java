@@ -2,9 +2,9 @@ package com.stardevllc.starchat.commands;
 
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.pm.PrivateMessage;
-import com.stardevllc.starmclib.actor.Actor;
-import com.stardevllc.starmclib.actor.PlayerActor;
-import com.stardevllc.starmclib.color.ColorUtils;
+import com.stardevllc.starcore.utils.actor.Actor;
+import com.stardevllc.starcore.utils.actor.PlayerActor;
+import com.stardevllc.starcore.utils.color.ColorUtils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
