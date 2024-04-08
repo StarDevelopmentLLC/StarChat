@@ -72,7 +72,7 @@ public class ChatChannel implements ChatSpace {
         config.addDefault("formats.sender", "", "The format used when a Player or the Console sends a chat message in this channel.");
         config.addDefault("formats.system", "", "The format used when a message is sent to this channel without a sender.");
         config.addDefault("permissions.view", "", "The permission that is required to have in order for a player to receive messages from this channel.");
-        config.addDefault("permssions.send", "", "The permission that is required to have in order for a player to send messages in this channel.");
+        config.addDefault("permissions.send", "", "The permission that is required to have in order for a player to send messages in this channel.");
         config.addDefault("settings.usecolorpermissions", false, "Whether or not to use fine-controlled color permissions from StarCore.");
         config.save();
     }
