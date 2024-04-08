@@ -17,7 +17,7 @@ public class PAPIExpansion extends PlaceholderExpansion {
     @Override
     public String onPlaceholderRequest(Player player, String params) {
         if (params.equalsIgnoreCase("space")) {
-            return plugin.getPlayerFocus(player).getSimplifiedName();
+            return plugin.getPlayerFocus(player).getName().toLowerCase().replace(" ", "_");
         } else if (params.equalsIgnoreCase("space_display")) {
             return plugin.getPlayerFocus(player).getName();
         }

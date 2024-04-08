@@ -1,7 +1,7 @@
 package com.stardevllc.starchat.registry;
 
-import com.stardevllc.starchat.ChatSpace;
 import com.stardevllc.starchat.StarChat;
+import com.stardevllc.starchat.space.ChatSpace;
 import com.stardevllc.starlib.registry.UUIDRegistry;
 import org.bukkit.entity.Player;
 

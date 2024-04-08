@@ -1,5 +1,6 @@
 package com.stardevllc.starchat;
 
+import com.stardevllc.starchat.space.ChatSpace;
 import org.bukkit.entity.Player;
 
 public abstract class ChatSelector {

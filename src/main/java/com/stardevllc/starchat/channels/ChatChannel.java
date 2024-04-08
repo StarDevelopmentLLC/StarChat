@@ -1,9 +1,13 @@
 package com.stardevllc.starchat.channels;
 
-import com.stardevllc.starchat.ChatSpace;
 import com.stardevllc.starchat.StarChat;
+import com.stardevllc.starchat.context.ChatContext;
+import com.stardevllc.starchat.space.ChatSpace;
 import com.stardevllc.starcore.utils.Config;
 import com.stardevllc.starcore.utils.color.ColorUtils;
+import com.stardevllc.starlib.observable.property.BooleanProperty;
+import com.stardevllc.starlib.observable.property.LongProperty;
+import com.stardevllc.starlib.observable.property.StringProperty;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
@@ -11,45 +15,66 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.Objects;
+import java.util.function.Function;
 
-public class ChatChannel extends ChatSpace {
+public class ChatChannel implements ChatSpace {
     protected transient File file; //The main file for the config.
     protected transient Config config; //Config to store information as channels are mainly config/command controlled, transient modifier allows StarData to ignore this field without having to depend on StarData directly
 
-    protected String viewPermission = ""; //Permission needed by players in order to view messages in this channel
-    protected String sendPermission = ""; //Permission needed by players in order to send messages in this channel
+    protected final LongProperty id;
+    protected final JavaPlugin plugin;
 
-    public ChatChannel(JavaPlugin plugin, String name, File configFile) {
-        super(plugin, name);
-        config = new Config(configFile);
-        this.file = configFile;
-    }
-    
-    public ChatChannel(JavaPlugin plugin, String name, Config config) {
-        super(plugin, name);
-        this.config = config;
-        this.file = config.getFile();
+    protected final StringProperty name;
+    protected final StringProperty viewPermission;
+    protected final StringProperty sendPermission;
+    protected final StringProperty senderFormat;
+    protected final StringProperty systemFormat;
+    protected final BooleanProperty useColorPermissions;
+
+    protected Function<Player, String> displayNameHandler;
+
+    public ChatChannel(JavaPlugin plugin, String name, Path filePath) {
+        this.plugin = plugin;
+        this.file = new File(filePath.toFile().getAbsolutePath());
+
+        if (!this.file.exists()) {
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+            }
+        }
+
+        this.config = new Config(file);
+
+        this.id = new LongProperty(this, "id");
+        this.name = new StringProperty(this, "name", name);
+
+        createDefaults();
+
+        this.name.addListener((observableValue, oldValue, newValue) -> config.set("name", newValue));
+        this.viewPermission = new StringProperty(this, "viewPermission", this.config.getString("permissions.view"));
+        this.viewPermission.addListener((observableValue, oldValue, newValue) -> config.set("permissions.view", newValue));
+        this.sendPermission = new StringProperty(this, "sendPermission", this.config.getString("permissions.send"));
+        this.sendPermission.addListener((observableValue, oldValue, newValue) -> config.set("permissions.send", newValue));
+        this.senderFormat = new StringProperty(this, "senderFormat", this.config.getString("formats.sender"));
+        this.sendPermission.addListener((observableValue, oldValue, newValue) -> config.set("formats.sender", newValue));
+        this.systemFormat = new StringProperty(this, "systemFormat", this.config.getString("formats.system"));
+        this.systemFormat.addListener((observableValue, oldValue, newValue) -> config.set("formats.system", newValue));
+        this.useColorPermissions = new BooleanProperty(this, "useColorPermissions", config.getBoolean("settings.usecolorpermissions"));
+        this.useColorPermissions.addListener((observableValue, oldValue, newValue) -> config.set("settings.usecolorpermissions", newValue));
     }
 
     protected void createDefaults() {
-        config.addDefault("name", this.name, "The name of the channel.", "It is recommended to not change this name in the file and instead use commands.");
-        config.addDefault("formats.sender", senderFormat, "The format used when a Player or the Console sends a chat message in this channel.");
-        config.addDefault("formats.system", systemFormat, "The format used when channel related messages are sent.");
-        config.addDefault("permissions.view", viewPermission, "The permission that is required to have in order for a player to receive messages from this channel.");
-        config.addDefault("permssions.send", sendPermission, "The permission that is required to have in order for a player to send messages in this channel.");
-        config.addDefault("formats.playerdisplayname", playerDisplayNameFormat, "The format used for formatting a player's name for the {displayname} variable.", "You can have {prefix}, {suffix} and {name}");
-        config.addDefault("settings.affectedbypunishments", affectedByPunishments, "Control flag to allow messages to still be sent in this channel, even if the chat event is cancelled.");
+        config.addDefault("name", this.name.get(), "The name of the channel.", "It is recommended to not change this name in the file and instead use commands.");
+        config.addDefault("formats.sender", "", "The format used when a Player or the Console sends a chat message in this channel.");
+        config.addDefault("formats.system", "", "The format used when a message is sent to this channel without a sender.");
+        config.addDefault("permissions.view", "", "The permission that is required to have in order for a player to receive messages from this channel.");
+        config.addDefault("permssions.send", "", "The permission that is required to have in order for a player to send messages in this channel.");
+        config.addDefault("settings.usecolorpermissions", false, "Whether or not to use fine-controlled color permissions from StarCore.");
         config.save();
-    }
-
-    public void loadSettings() {
-        this.name = config.getString("name");
-        this.senderFormat = config.getString("formats.sender");
-        this.systemFormat = config.getString("formats.system");
-        this.viewPermission = config.getString("permissions.view");
-        this.sendPermission = config.getString("permissions.send");
-        this.playerDisplayNameFormat = config.getString("formats.playerdisplayname");
-        this.affectedByPunishments = config.getBoolean("settings.affectedbypunishments");
     }
 
     public Config getConfig() {
@@ -64,86 +89,140 @@ public class ChatChannel extends ChatSpace {
         config.save();
     }
 
-    public void setViewPermission(String viewPermission) {
-        this.viewPermission = viewPermission;
-        this.config.set("permissions.view", viewPermission);
-    }
-
-    public void setSendPermission(String sendPermission) {
-        this.sendPermission = sendPermission;
-        this.config.set("permissions.send", sendPermission);
-    }
-
-    @Override
-    public void setName(String name) {
-        super.setName(name);
-        this.config.set("name", name);
-    }
-
-    @Override
-    public void setSenderFormat(String senderFormat) {
-        super.setSenderFormat(senderFormat);
-        this.config.set("formats.sender", senderFormat);
-    }
-
-    @Override
-    public void setSystemFormat(String systemFormat) {
-        super.setSystemFormat(systemFormat);
-        this.config.set("formats.system", systemFormat);
-    }
-
-    @Override
-    public void setPlayerDisplayNameFormat(String playerDisplayNameFormat) {
-        super.setPlayerDisplayNameFormat(playerDisplayNameFormat);
-        this.config.set("formats.playerdisplayname", playerDisplayNameFormat);
-    }
-
-    @Override
-    public void setAffectedByPunishments(boolean affectedByPunishments) {
-        super.setAffectedByPunishments(affectedByPunishments);
-        this.config.set("settings.affectedbypunishments", affectedByPunishments);
-    }
-
-    @Override
-    public void sendMessage(CommandSender sender, String message) {
-        String formattedMessage = "";
-
-        if (sender == null) {
-            formattedMessage = systemFormat;
-        } else if (sender instanceof ConsoleCommandSender) {
-            formattedMessage = senderFormat.replace("{displayname}", StarChat.getConsoleNameFormat());
-        } else if (sender instanceof Player player) {
-            if (sendPermission != null && !sendPermission.isEmpty() && !player.hasPermission(sendPermission)) {
-                player.sendMessage(ColorUtils.color("&cYou do not have permission to send messages in " + getName()));
-                return;
-            }
-
-            formattedMessage = senderFormat.replace("{displayname}", formatPlayerDisplayName(player));
-        }
-
-        if (StarChat.isUsePlaceholderAPI() && sender instanceof Player player) {
-            formattedMessage = ColorUtils.color(StarChat.getPlayerPlaceholders().setPlaceholders(player, formattedMessage));
-        }
-
-        formattedMessage = ColorUtils.color(formattedMessage);
-        if (StarChat.isUseColorPermissions()) {
-            formattedMessage = formattedMessage.replace("{message}", ColorUtils.color(sender, message));
-        } else {
-            formattedMessage = formattedMessage.replace("{message}", ColorUtils.color(message));
-        }
-
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            if (viewPermission != null && viewPermission.isEmpty() || player.hasPermission(viewPermission)) {
-                player.sendMessage(formattedMessage);
-            }
-        }
-    }
-
     public String getViewPermission() {
-        return viewPermission;
+        return viewPermission.get();
     }
 
     public String getSendPermission() {
-        return sendPermission;
+        return sendPermission.get();
+    }
+
+    @Override
+    public void sendMessage(ChatContext context) {
+        String displayName;
+        String message;
+        
+        if (context.getSender() == null) {
+            displayName = "";
+            message = ColorUtils.color(context.getMessage());
+        } else {
+            if (!canSendMessages(context.getSender())) {
+                return;
+            }
+            
+            CommandSender sender = context.getSender();
+            
+            if (context.getChatEvent() != null && context.getChatEvent().isCancelled()) {
+                if (!sender.hasPermission("starchat.channel.bypass.cancelledevent")) {
+                    return;
+                }
+            }
+            
+            message = context.getMessage();
+            
+            if (this.useColorPermissions.get()) {
+                message = ColorUtils.color(context.getSender(), message);
+            }
+
+            if (context.getSender() instanceof ConsoleCommandSender) {
+                displayName = StarChat.getConsoleNameFormat();
+            } else if (context instanceof Player player) {
+                displayName = Objects.requireNonNullElse(this.displayNameHandler, StarChat.vaultDisplayNameFunction).apply(player);
+            } else {
+                return;
+            }
+        }
+
+        String format;
+        if (context.getSender() == null) {
+            format = systemFormat.get().replace("{message}", message);
+        } else {
+            if (context.getSender() instanceof Player player) {
+                format = ColorUtils.color(StarChat.getPlayerPlaceholders().setPlaceholders(player, senderFormat.get().replace("{displayname}", displayName))).replace("{message}", message);
+            } else {
+                format = ColorUtils.color(senderFormat.get().replace("{displayname}", displayName)).replace("{message}", message);
+            }
+        }
+        
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (canViewMessages(player)) {
+                player.sendMessage(format);
+            }
+        }
+    }
+
+    @Override
+    public boolean canSendMessages(CommandSender sender) {
+        if (sender != null) {
+            if (getViewPermission() != null && !getSendPermission().isEmpty()) {
+                return sender.hasPermission(getViewPermission());
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean canViewMessages(CommandSender sender) {
+        if (sender != null) {
+            if (getViewPermission() != null && !getViewPermission().isEmpty()) {
+                return sender.hasPermission(getViewPermission());
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public String getName() {
+        return name.get();
+    }
+
+    @Override
+    public long getId() {
+        return id.get();
+    }
+
+    @Override
+    public JavaPlugin getPlugin() {
+        return plugin;
+    }
+
+    public Function<Player, String> getDisplayNameHandler() {
+        return displayNameHandler;
+    }
+
+    public void setDisplayNameHandler(Function<Player, String> displayNameHandler) {
+        this.displayNameHandler = displayNameHandler;
+    }
+    
+    public void setName(String name) {
+        this.name.set(name);
+    }
+    
+    public void setSenderFormat(String senderFormat) {
+        this.senderFormat.set(senderFormat);
+    }
+    
+    public void setSystemFormat(String systemFormat) {
+        this.systemFormat.set(systemFormat);
+    }
+    
+    public void setViewPermission(String viewPermission) {
+        this.viewPermission.set(viewPermission);
+    }
+    
+    public void setSendPermission(String sendPermission) {
+        this.sendPermission.set(sendPermission);
+    }
+
+    public String getSenderFormat() {
+        return senderFormat.get();
+    }
+
+    public String getSystemFormat() {
+        return systemFormat.get();
+    }
+
+    public boolean isUseColorPermissions() {
+        return useColorPermissions.get();
     }
 }

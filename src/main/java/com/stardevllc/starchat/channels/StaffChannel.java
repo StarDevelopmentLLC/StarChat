@@ -6,14 +6,10 @@ import java.io.File;
 
 public class StaffChannel extends ChatChannel {
     public StaffChannel(JavaPlugin plugin, File configFile) {
-        super(plugin, "staff", configFile);
-        this.senderFormat = "&2&l[&a&lSTAFF&2] {displayname}&8: &f{message}";
-        this.systemFormat = "&2&l[&a&lSTAFF&2] &f{message}";
-        this.playerDisplayNameFormat = "{prefix}{name}";
-        this.viewPermission = "starchat.channels.staff.view";
-        this.sendPermission = "starchat.channels.staff.send";
-        this.affectedByPunishments = false;
-        this.createDefaults();
-        this.loadSettings();
+        super(plugin, "staff", configFile.toPath());
+        this.senderFormat.set("&2&l[&a&lSTAFF&2] {displayname}&8: &f{message}");
+        this.systemFormat.set("&2&l[&a&lSTAFF&2] &f{message}");
+        this.viewPermission.set("starchat.channels.staff.view");
+        this.sendPermission.set("starchat.channels.staff.send");
     }
 }

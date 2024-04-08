@@ -1,8 +1,8 @@
 package com.stardevllc.starchat.pm;
 
 import com.stardevllc.starchat.ChatSelector;
-import com.stardevllc.starchat.ChatSpace;
 import com.stardevllc.starchat.StarChat;
+import com.stardevllc.starchat.space.ChatSpace;
 import com.stardevllc.starcore.utils.actor.Actor;
 import com.stardevllc.starcore.utils.actor.PlayerActor;
 import com.stardevllc.starcore.utils.color.ColorUtils;

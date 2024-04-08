@@ -1,10 +1,10 @@
 package com.stardevllc.starchat.commands;
 
 import com.stardevllc.starchat.ChatSelector;
-import com.stardevllc.starchat.ChatSpace;
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.channels.ChatChannel;
 import com.stardevllc.starchat.rooms.ChatRoom;
+import com.stardevllc.starchat.space.ChatSpace;
 import com.stardevllc.starcore.utils.Config;
 import com.stardevllc.starcore.utils.color.ColorUtils;
 import org.bukkit.command.Command;

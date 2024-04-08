@@ -7,6 +7,7 @@ import com.stardevllc.starchat.commands.ChatCmd;
 import com.stardevllc.starchat.commands.MessageCmd;
 import com.stardevllc.starchat.commands.ReplyCmd;
 import com.stardevllc.starchat.commands.StarChatAdminCmd;
+import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.placeholder.DefaultPlaceholders;
 import com.stardevllc.starchat.placeholder.PAPIExpansion;
 import com.stardevllc.starchat.placeholder.PAPIPlaceholders;
@@ -16,6 +17,7 @@ import com.stardevllc.starchat.pm.PrivateMessage;
 import com.stardevllc.starchat.registry.ChannelRegistry;
 import com.stardevllc.starchat.registry.FocusRegistry;
 import com.stardevllc.starchat.registry.RoomRegistry;
+import com.stardevllc.starchat.space.ChatSpace;
 import com.stardevllc.starcore.utils.Config;
 import com.stardevllc.starcore.utils.actor.Actor;
 import com.stardevllc.starcore.utils.actor.PlayerActor;
@@ -35,6 +37,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.util.*;
+import java.util.function.Function;
 
 public class StarChat extends JavaPlugin implements Listener {
     private static String consoleNameFormat; //How the console name appears
@@ -50,7 +53,18 @@ public class StarChat extends JavaPlugin implements Listener {
     private PAPIExpansion papiExpansion;
 
     private static StarChat instance;
+    
+    public static final Function<Player, String> vaultDisplayNameFunction = new Function<>() {
+        @Override
+        public String apply(Player player) {
+            if (vaultChat == null) {
+                return null;
+            }
 
+            return vaultChat.getPlayerPrefix(player) + player.getName() + vaultChat.getPlayerSuffix(player);
+        }
+    };
+    
     private ChannelRegistry channelRegistry = new ChannelRegistry(); //All channels
     private RoomRegistry roomRegistry = new RoomRegistry(); //All rooms
     private Set<PrivateMessage> privateMessages = new HashSet<>();
@@ -102,7 +116,7 @@ public class StarChat extends JavaPlugin implements Listener {
         Set<String> channelsToRemove = new HashSet<>();
         for (ChatChannel channel : this.channelRegistry.getObjects().values()) {
             if (channel.getPlugin().getName().equalsIgnoreCase(this.getName())) {
-                channelsToRemove.add(channel.getSimplifiedName());
+                channelsToRemove.add(channel.getName());
             }
         }
 
@@ -127,10 +141,10 @@ public class StarChat extends JavaPlugin implements Listener {
         mainConfig.addDefault("messages.chatspace.notexist", "&cSorry but {PROVIDED} is not a valid chat space.");
         mainConfig.addDefault("messages.channel.nosendpermission", "&cYou do not have permission to send messages in {CHANNEL}.");
         mainConfig.addDefault("messages.room.notamember", "&cYou are not a member of {ROOM}");
-        mainConfig.addDefault("messages.command.chat.setfocus", "&aSet your chat focus to &b{SPACE}.");
+        mainConfig.addDefault("messages.command.chat.setfocus", "&eYou set your chat focus to &b{SPACE}.");
         mainConfig.addDefault("messages.command.admin.savesuccess", "&aSaved config.yml successfully.");
         mainConfig.addDefault("messages.command.admin.reloadsuccess", "&aReloaded successfully.");
-        mainConfig.addDefault("messages.command.admin.setconsolename", "&aSet the new console name format to &r{NEWNAME}");
+        mainConfig.addDefault("messages.command.admin.setconsolename", "&eYou set the new console name format to &r{NEWNAME}");
         mainConfig.addDefault("messages.command.admin.setusepapi.alreadyconfigandenabled", "&cPlaceholderAPI is already enabled and configured, no need to set it again.");
         mainConfig.addDefault("messages.command.admin.setusepapi.configbutnotenabled", "&aStarChat was configured to use PlaceholderAPI but was not able to load hook at startup, however, PlaceholderAPI was detected on this command and hook has been enabled now.");
         mainConfig.addDefault("messages.command.admin.setusepapi.configbutnotdetected", "&cStarChat is configured to use PlaceholderAPI, however, it was not detected, so the hook cannot be registered. Please install PlaceholderAPI and restart the server.");
@@ -146,6 +160,7 @@ public class StarChat extends JavaPlugin implements Listener {
         mainConfig.addDefault("messages.command.admin.list.channels.header", "&aList of all chat channels registered to StarChat.");
         mainConfig.addDefault("messages.command.admin.list.rooms.header", "&aList of all chat rooms registered to StarChat.");
         mainConfig.addDefault("messages.command.admin.list.conversations.header", "&aList of all conversations using StarChat.");
+        mainConfig.addDefault("messages.command.admin.channel.set.success", "&eYou set &b{channel}&e's &a{key} &eto &d{value}");
         
         mainConfig.save();
     }
@@ -174,8 +189,8 @@ public class StarChat extends JavaPlugin implements Listener {
             
             Config config = new Config(file);
             String name = config.getString("name");
-            ChatChannel chatChannel = new ChatChannel(this, name, file);
-            this.channelRegistry.register(chatChannel.getSimplifiedName(), chatChannel);
+            ChatChannel chatChannel = new ChatChannel(this, name, file.toPath());
+            this.channelRegistry.register(chatChannel.getName(), chatChannel);
         }
     }
 
@@ -187,27 +202,21 @@ public class StarChat extends JavaPlugin implements Listener {
     }
 
     private void loadDefaultChannels() {
-        globalChannel = new GlobalChannel(this, new File(getDataFolder() + File.separator + "channels" + File.separator + "defaults", "global.yml"));
-        this.channelRegistry.register(globalChannel.getSimplifiedName(), globalChannel);
+        globalChannel = new GlobalChannel(this, new File(getDataFolder() + File.separator + "channels", "global.yml"));
+        this.channelRegistry.register(globalChannel.getName(), globalChannel);
 
-        staffChannel = new StaffChannel(this, new File(getDataFolder() + File.separator + "channels" + File.separator + "defaults", "staff.yml"));
-        this.channelRegistry.register(staffChannel.getSimplifiedName(), staffChannel);
+        staffChannel = new StaffChannel(this, new File(getDataFolder() + File.separator + "channels", "staff.yml"));
+        this.channelRegistry.register(staffChannel.getName(), staffChannel);
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerChat(AsyncPlayerChatEvent e) {
         Player player = e.getPlayer();
-        String message = e.getMessage();
 
         ChatSpace chatSpace = getPlayerFocus(player);
-        if (e.isCancelled()) {
-            if (chatSpace.isAffectedByPunishments()) {
-                return; //Muted message should be handled by the punishments plugin.
-            }
-        }
         
         e.setCancelled(true);
-        chatSpace.sendMessage(player, message);
+        chatSpace.sendMessage(new ChatContext(e));
     }
 
     public PAPIExpansion getPapiExpansion() {

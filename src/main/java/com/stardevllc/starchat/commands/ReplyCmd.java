@@ -1,6 +1,7 @@
 package com.stardevllc.starchat.commands;
 
 import com.stardevllc.starchat.StarChat;
+import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.pm.PrivateMessage;
 import com.stardevllc.starcore.utils.actor.Actor;
 import com.stardevllc.starcore.utils.actor.PlayerActor;
@@ -68,7 +69,7 @@ public class ReplyCmd implements CommandExecutor {
             msgBuilder.append(args[i]).append(" ");
         }
 
-        privateMessage.sendMessage(sender, msgBuilder.toString().trim());
+        privateMessage.sendMessage(new ChatContext(sender, msgBuilder.toString().trim()));
         plugin.assignLastMessage(sender, msgBuilder, privateMessage, senderActor, targetActor);
         return true;
     }

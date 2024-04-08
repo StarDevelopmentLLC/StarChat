@@ -11,6 +11,11 @@ import com.stardevllc.starcore.utils.Config;
 import com.stardevllc.starcore.utils.actor.Actor;
 import com.stardevllc.starcore.utils.actor.PlayerActor;
 import com.stardevllc.starcore.utils.color.ColorUtils;
+import com.stardevllc.starlib.converter.BooleanStringConverter;
+import com.stardevllc.starlib.observable.property.BooleanProperty;
+import com.stardevllc.starlib.observable.property.Property;
+import com.stardevllc.starlib.observable.property.StringProperty;
+import com.stardevllc.starlib.reflection.ReflectionHelper;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -287,8 +292,8 @@ public class StarChatAdminCmd implements CommandExecutor {
                 String channelName = sb.toString().trim();
 
                 File file = new File(plugin.getDataFolder() + File.separator + "channels" + File.separator + ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', channelName)).toLowerCase().replace(" ", "_") + ".yml");
-                ChatChannel chatChannel = new ChatChannel(plugin, channelName, file);
-                plugin.getChannelRegistry().register(chatChannel.getSimplifiedName(), chatChannel);
+                ChatChannel chatChannel = new ChatChannel(plugin, channelName, file.toPath());
+                plugin.getChannelRegistry().register(chatChannel.getName(), chatChannel);
                 ColorUtils.coloredMessage(sender, "&aCreated a new channel called " + channelName);
                 return true;
             }
@@ -311,7 +316,7 @@ public class StarChatAdminCmd implements CommandExecutor {
                 }
 
                 chatChannel.getFile().delete();
-                plugin.getChannelRegistry().deregister(chatChannel.getSimplifiedName());
+                plugin.getChannelRegistry().deregister(chatChannel.getName());
                 ColorUtils.coloredMessage(sender, "&eYou deleted the chat channel &b" + chatChannel.getName());
             }
 
@@ -320,73 +325,37 @@ public class StarChatAdminCmd implements CommandExecutor {
                 return true;
             }
 
-            if (!(args.length > 3)) {
+            if (!(args.length > 4)) {
                 ColorUtils.coloredMessage(sender, "&cUsage: /" + label + " " + args[0] + " " + args[1] + " <subcommand> <arguments>");
                 return true;
             }
 
             StringBuilder sb = new StringBuilder();
-            for (int i = 3; i < args.length; i++) {
+            for (int i = 4; i < args.length; i++) {
                 sb.append(args[i]).append(" ");
             }
 
             String value = sb.toString().trim();
-
-            if (args[2].equalsIgnoreCase("setname")) {
-                if (!(sender.hasPermission("starchat.command.admin.channel.setname"))) {
-                    ColorUtils.coloredMessage(sender, pluginConfig.getString("messages.command.nopermission"));
+            
+            if (args[2].equalsIgnoreCase("set")) {
+                Property<?> property = ReflectionHelper.getProperty(Property.class, chatChannel, args[3]);
+                if (property == null) {
+                    ColorUtils.coloredMessage(sender, "You provided an invalid key name.");
                     return true;
                 }
-                String oldName = chatChannel.getName();
-                plugin.getChannelRegistry().deregister(chatChannel.getSimplifiedName());
-                chatChannel.setName(value);
-                plugin.getChannelRegistry().register(chatChannel.getSimplifiedName(), chatChannel);
-                ColorUtils.coloredMessage(sender, "&eSet &b" + oldName + "'s &enew name to &d" + chatChannel.getName());
-            } else if (args[2].equalsIgnoreCase("setsenderformat")) {
-                if (!(sender.hasPermission("starchat.command.admin.channel.setsenderformat"))) {
-                    ColorUtils.coloredMessage(sender, pluginConfig.getString("messages.command.nopermission"));
+                
+                if (property instanceof StringProperty stringProperty) {
+                    stringProperty.set(value);
+                } else if (property instanceof BooleanProperty booleanProperty) {
+                    booleanProperty.set(new BooleanStringConverter().fromString(value));
+                } else {
+                    ColorUtils.coloredMessage(sender, "Unsupported Property Value Type, contact the developer to add support.");
                     return true;
                 }
-                chatChannel.setSenderFormat(value);
-                sender.sendMessage(ColorUtils.color("&eSet &b" + chatChannel.getSimplifiedName() + "'s &esender format to: &r") + chatChannel.getSenderFormat());
-            } else if (args[2].equalsIgnoreCase("setsystemformat")) {
-                if (!(sender.hasPermission("starchat.command.admin.channel.setsystemformat"))) {
-                    ColorUtils.coloredMessage(sender, pluginConfig.getString("messages.command.nopermission"));
-                    return true;
-                }
-                chatChannel.setSystemFormat(value);
-                sender.sendMessage(ColorUtils.color("&eSet &b" + chatChannel.getSimplifiedName() + "'s &esystem format to: &r") + chatChannel.getSystemFormat());
-            } else if (args[2].equalsIgnoreCase("setdisplaynameformat")) {
-                if (!(sender.hasPermission("starchat.command.admin.channel.setdisplaynameformat"))) {
-                    ColorUtils.coloredMessage(sender, pluginConfig.getString("messages.command.nopermission"));
-                    return true;
-                }
-                chatChannel.setPlayerDisplayNameFormat(value);
-                sender.sendMessage(ColorUtils.color("&eSet &b" + chatChannel.getSimplifiedName() + "'s &esystem format to: &r") + chatChannel.getPlayerDisplayNameFormat());
-            } else if (args[2].equalsIgnoreCase("setaffectedbypunishments")) {
-                if (!(sender.hasPermission("starchat.command.admin.channel.setaffectedbypunishments"))) {
-                    ColorUtils.coloredMessage(sender, pluginConfig.getString("messages.command.nopermission"));
-                    return true;
-                }
-                boolean abpValue = Boolean.parseBoolean(value);
-                chatChannel.setAffectedByPunishments(abpValue);
-                ColorUtils.coloredMessage(sender, "&eSet &b" + chatChannel.getSimplifiedName() + "'s &eaffected by punishments value to: &d" + chatChannel.isAffectedByPunishments());
-            } else if (args[2].equalsIgnoreCase("setviewpermission")) {
-                if (!(sender.hasPermission("starchat.command.admin.channel.setviewpermission"))) {
-                    ColorUtils.coloredMessage(sender, pluginConfig.getString("messages.command.nopermission"));
-                    return true;
-                }
-                chatChannel.setViewPermission(value);
-                ColorUtils.coloredMessage(sender, "&eSet &b" + chatChannel.getSimplifiedName() + "'s &eview permission to &d" + value);
-            } else if (args[2].equalsIgnoreCase("setsendpermission")) {
-                if (!(sender.hasPermission("starchat.command.admin.channel.setsendpermission"))) {
-                    ColorUtils.coloredMessage(sender, pluginConfig.getString("messages.command.nopermission"));
-                    return true;
-                }
-                chatChannel.setSendPermission(value);
-                ColorUtils.coloredMessage(sender, "&eSet &b" + chatChannel.getSimplifiedName() + "'s &esend permission to &d" + value);
+                
+                ColorUtils.coloredMessage(sender, pluginConfig.getString("messages.command.admin.channel.set.success").replace("{channel}", chatChannel.getName()).replace("{key}", property.getName()).replace("{value}", property.getValue() + ""));
             } else {
-                ColorUtils.coloredMessage(sender, "&cInvalid subcommand.");
+                ColorUtils.coloredMessage(sender, "Invalid sub command.");
                 return true;
             }
 
@@ -397,13 +366,13 @@ public class StarChatAdminCmd implements CommandExecutor {
 
     private void listChannels(CommandSender sender) {
         for (ChatChannel chatChannel : plugin.getChannelRegistry()) {
-            ColorUtils.coloredMessage(sender, " &8- &eChannel &b" + chatChannel.getSimplifiedName() + " &eowned by the plugin &d" + chatChannel.getPlugin().getName());
+            ColorUtils.coloredMessage(sender, " &8- &eChannel &b" + chatChannel.getName() + " &eowned by the plugin &d" + chatChannel.getPlugin().getName());
         }
     }
 
     private void listRooms(CommandSender sender) {
         for (ChatRoom chatRoom : plugin.getRoomRegistry()) {
-            ColorUtils.coloredMessage(sender, " &8- &eRoom &b" + chatRoom.getSimplifiedName() + " &eowned by the plugin &d" + chatRoom.getPlugin().getName());
+            ColorUtils.coloredMessage(sender, " &8- &eRoom &b" + chatRoom.getName() + " &eowned by the plugin &d" + chatRoom.getPlugin().getName());
         }
     }
 
