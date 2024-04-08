@@ -344,6 +344,11 @@ public class StarChatAdminCmd implements CommandExecutor {
                     return true;
                 }
                 
+                if (!sender.hasPermission("starchat.command.admin.channel.set." + property.getName().toLowerCase().replace(" ", "_"))) {
+                    ColorUtils.coloredMessage(sender, pluginConfig.getString("messages.command.nopermission"));
+                    return true;
+                }
+                
                 if (property instanceof StringProperty stringProperty) {
                     stringProperty.set(value);
                 } else if (property instanceof BooleanProperty booleanProperty) {
