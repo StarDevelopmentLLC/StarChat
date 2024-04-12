@@ -135,7 +135,7 @@ public class ChatChannel implements ChatSpace {
 
         String format;
         if (context.getSender() == null) {
-            format = systemFormat.get().replace("{message}", message);
+            format = ColorUtils.color(systemFormat.get().replace("{message}", message));
         } else {
             if (context.getSender() instanceof Player player) {
                 format = ColorUtils.color(StarChat.getPlayerPlaceholders().setPlaceholders(player, senderFormat.get().replace("{displayname}", displayName))).replace("{message}", message);
