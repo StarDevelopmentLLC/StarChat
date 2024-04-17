@@ -3,8 +3,8 @@ package com.stardevllc.starchat.channels;
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.space.ChatSpace;
+import com.stardevllc.starcore.color.ColorUtils;
 import com.stardevllc.starcore.utils.Config;
-import com.stardevllc.starcore.utils.color.ColorUtils;
 import com.stardevllc.starlib.observable.property.BooleanProperty;
 import com.stardevllc.starlib.observable.property.LongProperty;
 import com.stardevllc.starlib.observable.property.StringProperty;
@@ -101,7 +101,7 @@ public class ChatChannel implements ChatSpace {
     public void sendMessage(ChatContext context) {
         String displayName;
         String message;
-        
+
         if (context.getSender() == null) {
             displayName = "";
             message = ColorUtils.color(context.getMessage());
@@ -109,19 +109,21 @@ public class ChatChannel implements ChatSpace {
             if (!canSendMessages(context.getSender())) {
                 return;
             }
-            
+
             CommandSender sender = context.getSender();
-            
+
             if (context.getChatEvent() != null && context.getChatEvent().isCancelled()) {
                 if (!sender.hasPermission("starchat.channel.bypass.cancelledevent")) {
                     return;
                 }
             }
-            
+
             message = context.getMessage();
-            
+
             if (this.useColorPermissions.get()) {
                 message = ColorUtils.color(context.getSender(), message);
+            } else {
+                message = ColorUtils.color(message);
             }
 
             if (context.getSender() instanceof ConsoleCommandSender) {
@@ -136,13 +138,14 @@ public class ChatChannel implements ChatSpace {
         if (context.getSender() == null) {
             format = ColorUtils.color(systemFormat.get().replace("{message}", message));
         } else {
-            if (context.getSender() instanceof Player player) {
-                format = ColorUtils.color(StarChat.getPlayerPlaceholders().setPlaceholders(player, senderFormat.get().replace("{displayname}", displayName))).replace("{message}", message);
-            } else {
+            if (context.getSender() instanceof ConsoleCommandSender) {
                 format = ColorUtils.color(senderFormat.get().replace("{displayname}", displayName)).replace("{message}", message);
+            } else {
+                Player player = (Player) context.getSender();
+                format = ColorUtils.color(StarChat.getPlayerPlaceholders().setPlaceholders(player, senderFormat.get().replace("{displayname}", displayName))).replace("{message}", message);
             }
         }
-        
+
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (canViewMessages(player)) {
                 player.sendMessage(format);
@@ -153,8 +156,10 @@ public class ChatChannel implements ChatSpace {
     @Override
     public boolean canSendMessages(CommandSender sender) {
         if (sender != null) {
-            if (getViewPermission() != null && !getSendPermission().isEmpty()) {
-                return sender.hasPermission(getViewPermission());
+            if (getSendPermission() != null && !getSendPermission().isEmpty()) {
+                return sender.hasPermission(getSendPermission());
+            } else {
+                return true;
             }
         }
         return false;
@@ -165,6 +170,8 @@ public class ChatChannel implements ChatSpace {
         if (sender != null) {
             if (getViewPermission() != null && !getViewPermission().isEmpty()) {
                 return sender.hasPermission(getViewPermission());
+            } else {
+                return true;
             }
         }
         return false;
@@ -192,23 +199,23 @@ public class ChatChannel implements ChatSpace {
     public void setDisplayNameHandler(Function<Player, String> displayNameHandler) {
         this.displayNameHandler = displayNameHandler;
     }
-    
+
     public void setName(String name) {
         this.name.set(name);
     }
-    
+
     public void setSenderFormat(String senderFormat) {
         this.senderFormat.set(senderFormat);
     }
-    
+
     public void setSystemFormat(String systemFormat) {
         this.systemFormat.set(systemFormat);
     }
-    
+
     public void setViewPermission(String viewPermission) {
         this.viewPermission.set(viewPermission);
     }
-    
+
     public void setSendPermission(String sendPermission) {
         this.sendPermission.set(sendPermission);
     }

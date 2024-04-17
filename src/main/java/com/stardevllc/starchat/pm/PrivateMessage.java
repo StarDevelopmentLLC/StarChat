@@ -2,8 +2,8 @@ package com.stardevllc.starchat.pm;
 
 import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.space.ChatSpace;
-import com.stardevllc.starcore.utils.actor.Actor;
-import com.stardevllc.starcore.utils.color.ColorUtils;
+import com.stardevllc.starcore.actor.Actor;
+import com.stardevllc.starcore.color.ColorUtils;
 import com.stardevllc.starlib.observable.property.StringProperty;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;

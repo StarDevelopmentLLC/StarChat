@@ -3,8 +3,8 @@ package com.stardevllc.starchat.rooms;
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.space.ChatSpace;
-import com.stardevllc.starcore.utils.actor.Actor;
-import com.stardevllc.starcore.utils.color.ColorUtils;
+import com.stardevllc.starcore.actor.Actor;
+import com.stardevllc.starcore.color.ColorUtils;
 import com.stardevllc.starlib.observable.property.BooleanProperty;
 import com.stardevllc.starlib.observable.property.StringProperty;
 import org.bukkit.Bukkit;
@@ -71,6 +71,8 @@ public class ChatRoom implements ChatSpace {
 
             if (this.useColorPermissions.get()) {
                 message = ColorUtils.color(context.getSender(), message);
+            } else {
+                message = ColorUtils.color(message);
             }
             
             if (context.getSender() instanceof ConsoleCommandSender) {
