@@ -126,10 +126,9 @@ public class ChatChannel implements ChatSpace {
 
             if (context.getSender() instanceof ConsoleCommandSender) {
                 displayName = StarChat.getConsoleNameFormat();
-            } else if (context instanceof Player player) {
-                displayName = Objects.requireNonNullElse(this.displayNameHandler, StarChat.vaultDisplayNameFunction).apply(player);
             } else {
-                return;
+                Player player = (Player) context.getSender();
+                displayName = Objects.requireNonNullElse(this.displayNameHandler, StarChat.vaultDisplayNameFunction).apply(player);
             }
         }
 

@@ -72,13 +72,12 @@ public class ChatRoom implements ChatSpace {
             if (this.useColorPermissions.get()) {
                 message = ColorUtils.color(context.getSender(), message);
             }
-
+            
             if (context.getSender() instanceof ConsoleCommandSender) {
                 displayName = StarChat.getConsoleNameFormat();
-            } else if (context instanceof Player player) {
-                displayName = Objects.requireNonNullElse(this.displayNameHandler, StarChat.vaultDisplayNameFunction).apply(player);
             } else {
-                return;
+                Player player = (Player) context.getSender();
+                displayName = Objects.requireNonNullElse(this.displayNameHandler, StarChat.vaultDisplayNameFunction).apply(player);
             }
         }
 
@@ -96,7 +95,9 @@ public class ChatRoom implements ChatSpace {
         for (UUID uuid : this.members.keySet()) {
             Player player = Bukkit.getPlayer(uuid);
             if (player != null) {
-                player.sendMessage(format);
+                if (canViewMessages(player)) {
+                    player.sendMessage(format);
+                }
             }
         }
     }

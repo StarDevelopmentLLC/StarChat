@@ -215,8 +215,8 @@ public class StarChat extends JavaPlugin implements Listener {
 
         ChatSpace chatSpace = getPlayerFocus(player);
         
-        e.setCancelled(true);
         chatSpace.sendMessage(new ChatContext(e));
+        e.setCancelled(true);
     }
 
     public PAPIExpansion getPapiExpansion() {
