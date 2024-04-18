@@ -41,7 +41,7 @@ jar {
 dependencies {
     compileOnly 'org.spigotmc:spigot-api:1.20.4-R0.1-SNAPSHOT'
     compileOnly 'com.github.StarDevelopmentLLC:StarCore:1.0.0-alpha.25'
-    compileOnly 'com.github.StarDevelopmentLLC:StarLib:1.0.0-alpha.10'
+    compileOnly 'com.github.StarDevelopmentLLC:StarLib:1.0.0-alpha.11'
     compileOnly 'com.github.MilkBowl:VaultAPI:1.7.1'
     compileOnly 'me.clip:placeholderapi:2.11.5'
 }
