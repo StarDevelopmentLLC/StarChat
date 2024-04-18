@@ -11,5 +11,6 @@ public class StaffChannel extends ChatChannel {
         this.systemFormat.set("&2&l[&a&lSTAFF&2] &f{message}");
         this.viewPermission.set("starchat.channels.staff.view");
         this.sendPermission.set("starchat.channels.staff.send");
+        this.config.save();
     }
 }

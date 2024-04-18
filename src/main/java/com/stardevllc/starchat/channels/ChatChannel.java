@@ -60,7 +60,7 @@ public class ChatChannel implements ChatSpace {
         this.sendPermission = new StringProperty(this, "sendPermission", this.config.getString("permissions.send"));
         this.sendPermission.addListener((observableValue, oldValue, newValue) -> config.set("permissions.send", newValue));
         this.senderFormat = new StringProperty(this, "senderFormat", this.config.getString("formats.sender"));
-        this.sendPermission.addListener((observableValue, oldValue, newValue) -> config.set("formats.sender", newValue));
+        this.senderFormat.addListener((observableValue, oldValue, newValue) -> config.set("formats.sender", newValue));
         this.systemFormat = new StringProperty(this, "systemFormat", this.config.getString("formats.system"));
         this.systemFormat.addListener((observableValue, oldValue, newValue) -> config.set("formats.system", newValue));
         this.useColorPermissions = new BooleanProperty(this, "useColorPermissions", config.getBoolean("settings.usecolorpermissions"));

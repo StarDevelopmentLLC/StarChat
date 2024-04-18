@@ -9,5 +9,6 @@ public class GlobalChannel extends ChatChannel {
         super(plugin, "Global", configFile.toPath());
         this.senderFormat.set("{displayname}&8: &r{message}");
         this.systemFormat.set("&r{message}");
+        this.config.save();
     }
 }
