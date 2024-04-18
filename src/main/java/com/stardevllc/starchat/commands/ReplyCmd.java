@@ -34,7 +34,7 @@ public class ReplyCmd implements CommandExecutor {
         Actor targetActor = Actor.create(args[0]);
 
         PrivateMessage privateMessage;
-
+        
         int msgStart;
         if (targetActor != null) {
             privateMessage = plugin.getPrivateMessage(senderActor, targetActor);
@@ -50,6 +50,11 @@ public class ReplyCmd implements CommandExecutor {
                 privateMessage = plugin.getConsoleLastMessage();
             }
 
+            if (privateMessage == null) {
+                ColorUtils.coloredMessage(sender, "&cYou do not have any active conversations.");
+                return true;
+            }
+
             if (privateMessage.getActor1().equals(senderActor)) {
                 targetActor = privateMessage.getActor2();
             } else {
@@ -57,11 +62,6 @@ public class ReplyCmd implements CommandExecutor {
             }
 
             msgStart = 0;
-        }
-
-        if (privateMessage == null) {
-            sender.sendMessage(ColorUtils.color("&cYou do not have a message to reply to."));
-            return true;
         }
 
         StringBuilder msgBuilder = new StringBuilder();
