@@ -18,6 +18,7 @@ import com.stardevllc.starchat.pm.PrivateMessage;
 import com.stardevllc.starchat.registry.ChannelRegistry;
 import com.stardevllc.starchat.registry.FocusRegistry;
 import com.stardevllc.starchat.registry.RoomRegistry;
+import com.stardevllc.starchat.registry.SpaceRegistry;
 import com.stardevllc.starchat.space.ChatSpace;
 import com.stardevllc.starcore.actor.Actor;
 import com.stardevllc.starcore.actor.PlayerActor;
@@ -51,15 +52,17 @@ public class StarChat extends JavaPlugin implements Listener {
         return vc.getChat().getPlayerPrefix(player) + player.getName() + vc.getChat().getPlayerSuffix(player);
     };
     
+    private SpaceRegistry spaceRegistry;
+    private ChannelRegistry channelRegistry;
+    private RoomRegistry roomRegistry;
+    private FocusRegistry playerChatSelection;
+    
     private PlaceholderHandler placeholderHandler;
     private Config mainConfig;
-    private ChatChannel globalChannel, staffChannel; //Default channels
-    private FocusRegistry playerChatSelection = new FocusRegistry(); //Current player focus
+    private ChatChannel globalChannel, staffChannel;
     private Map<String, ChatSelector> chatSelectors = new HashMap<>();
     private PAPIExpansion papiExpansion;
     private VaultHook vaultHook;
-    private ChannelRegistry channelRegistry = new ChannelRegistry(); //All channels
-    private RoomRegistry roomRegistry = new RoomRegistry(); //All rooms
     private Set<PrivateMessage> privateMessages = new HashSet<>();
     private Map<UUID, PrivateMessage> lastMessage = new HashMap<>();
     private PrivateMessage consoleLastMessage;
@@ -79,15 +82,21 @@ public class StarChat extends JavaPlugin implements Listener {
             }
         }
         
+        spaceRegistry = new SpaceRegistry();
+        channelRegistry = new ChannelRegistry(this);
+        roomRegistry = new RoomRegistry(this);
+        playerChatSelection = new FocusRegistry();
+        
         generateDefaultConfigOptions();
         loadDefaultChannels();
         loadChannels();
         determinePlaceholderHandler();
 
         ServicesManager servicesManager = getServer().getServicesManager();
-        servicesManager.register(FocusRegistry.class, playerChatSelection, this, ServicePriority.Highest);
+        servicesManager.register(SpaceRegistry.class, spaceRegistry, this, ServicePriority.Highest);
         servicesManager.register(ChannelRegistry.class, channelRegistry, this, ServicePriority.Highest);
         servicesManager.register(RoomRegistry.class, roomRegistry, this, ServicePriority.Highest);
+        servicesManager.register(FocusRegistry.class, playerChatSelection, this, ServicePriority.Highest);
 
         getServer().getPluginManager().registerEvents(this, this);
 
@@ -205,6 +214,10 @@ public class StarChat extends JavaPlugin implements Listener {
         
         chatSpace.sendMessage(new ChatContext(e));
         e.setCancelled(true);
+    }
+
+    public SpaceRegistry getSpaceRegistry() {
+        return spaceRegistry;
     }
 
     public PAPIExpansion getPapiExpansion() {
