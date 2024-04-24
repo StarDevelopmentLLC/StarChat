@@ -8,6 +8,9 @@ Java 17
 [URL='https://www.spigotmc.org/resources/placeholderapi.6245/']PlaceholderAPI[/URL]
 [URL='https://www.spigotmc.org/resources/vault.34315/']Vault[/URL]
 
+[B]Version Information[/B]
+This plugin is a work in progress and very unstable. I am constantly adding, changing and removing things within this library. This is based on need in my other projects, of which are also works in progress and constantly changing and evolving. I expect things to stabilize as time goes on.
+
 [B]Basic Information[/B]
 StarChat is a plugin that you can use to manage the chat on your server. It allows you to configure channels using commands or the yaml files. Plugins can also do this in code and create chat rooms. Please see the sections below for the differences.
 StarChat also provides private message handling.
