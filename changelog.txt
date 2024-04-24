@@ -1,0 +1,46 @@
+1.0.0-alpha.12
+- Updated StarCore to 1.0.0-alpha.27
+- Updated StarLib to 1.0.0-alpha.14
+- Changed Vault to be an optional dependency
+- Changed static fields to instance fields, or using the config values directly
+- Made it so that if you add a Channel or a Room via their registries, then they get added to a global SpaceRegistry that tracks all ChatSpaces
+- Made it so that the reload method removes all chat spaces that is owned by StarChat - This was just channels previously
+
+1.0.0-alpha.11
+- Fixed a few bugs with file based saving
+- Fixed some bugs with private messages
+
+1.0.0-alpha.10
+- Fixed a bug where messages were not being colored properly
+- Fixed a bug where messages were not being sent properly
+
+1.0.0-alpha.8
+- Downgraded to Java 17
+
+1.0.0-alpha.7
+- Updated StarCore to 1.0.0-alpha.20
+- Updated to Java 21
+- Updated to Spigot 1.20.4
+
+1.0.0-alpha.6
+- Updated StarCore to 1.0.0-alpha.19
+- Changed ChatSpace to be an interface instead of an abstract class
+- Changed fields to be Property's
+- Changed the set command for channels to use the property's
+
+1.0.0-alpha.5
+- Updated StarCore to 1.0.0-alpha.17
+
+1.0.0-alpha.4
+- Updated StarCore to 1.0.0-alpha.16
+- Made it so that the channel, room and focus registries where concrete sub classes of StringRegistry
+- Added Channel, Room and Focus Registries to the Bukkit ServicesManager
+
+1.0.0-alpha.3
+- Updated StarCore 1.0.0-alpha.15
+
+1.0.0-alpha.2
+- Updated StarCore to 1.0.0-alpha.14
+
+1.0.0-alpha.1
+- Initial release
