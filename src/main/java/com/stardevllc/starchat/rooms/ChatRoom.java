@@ -76,7 +76,7 @@ public class ChatRoom implements ChatSpace {
             }
             
             if (context.getSender() instanceof ConsoleCommandSender) {
-                displayName = StarChat.getConsoleNameFormat();
+                displayName = StarChat.getInstance().getConsoleNameFormat();
             } else {
                 Player player = (Player) context.getSender();
                 displayName = Objects.requireNonNullElse(this.displayNameHandler, StarChat.vaultDisplayNameFunction).apply(player);
@@ -88,7 +88,7 @@ public class ChatRoom implements ChatSpace {
             format = ColorUtils.color(systemFormat.get().replace("{message}", message));
         } else {
             if (context.getSender() instanceof Player player) {
-                format = ColorUtils.color(StarChat.getPlayerPlaceholders().setPlaceholders(player, senderFormat.get().replace("{displayname}", displayName))).replace("{message}", message);
+                format = ColorUtils.color(StarChat.getInstance().getPlaceholderHandler().setPlaceholders(player, senderFormat.get().replace("{displayname}", displayName))).replace("{message}", message);
             } else {
                 format = ColorUtils.color(senderFormat.get().replace("{displayname}", displayName)).replace("{message}", message);
             }

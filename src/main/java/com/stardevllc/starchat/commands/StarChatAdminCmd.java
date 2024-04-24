@@ -78,7 +78,7 @@ public class StarChatAdminCmd implements CommandExecutor {
             }
 
             String consoleName = sb.toString().trim();
-            StarChat.setConsoleNameFormat(consoleName);
+            plugin.setConsoleNameFormat(consoleName);
             ColorUtils.coloredMessage(sender, pluginConfig.getString("messages.command.admin.setconsolename").replace("{NEWNAME}", consoleName));
         } else if (args[0].equalsIgnoreCase("setprivatemessageformat") || args[0].equalsIgnoreCase("setpmf")) {
             if (!sender.hasPermission("starchat.command.admin.setprivatemessageformat")) {
@@ -96,7 +96,7 @@ public class StarChatAdminCmd implements CommandExecutor {
             }
 
             String privateMessageFormat = sb.toString().trim();
-            StarChat.setPrivateMessageFormat(privateMessageFormat);
+            plugin.setPrivateMessageFormat(privateMessageFormat);
             sender.sendMessage(ColorUtils.color("&aSet the new private message format to &r") + privateMessageFormat);
         } else if (args[0].equalsIgnoreCase("setuseplaceholderapi") || args[0].equalsIgnoreCase("setupapi")) {
             if (!sender.hasPermission("starchat.command.admin.setuseplaceholderapi")) {
@@ -109,7 +109,7 @@ public class StarChatAdminCmd implements CommandExecutor {
             }
 
             if (args[1].equalsIgnoreCase("true") || args[1].equalsIgnoreCase("yes")) {
-                if (StarChat.isUsePlaceholderAPI()) {
+                if (plugin.isUsePlaceholderAPI()) {
                     if (plugin.getPapiExpansion() != null && plugin.getPapiExpansion().isRegistered()) {
                         ColorUtils.coloredMessage(sender, pluginConfig.getString("messages.command.admin.setusepapi.alreadyconfigandenabled"));
                         return true;
@@ -118,7 +118,7 @@ public class StarChatAdminCmd implements CommandExecutor {
                         if (papi != null && papi.isEnabled()) {
                             plugin.setPapiExpansion(new PAPIExpansion(plugin));
                             plugin.getPapiExpansion().register();
-                            StarChat.setPlayerPlaceholders(new PAPIPlaceholders());
+                            plugin.setPlaceholderHandler(new PAPIPlaceholders());
                             ColorUtils.coloredMessage(sender, pluginConfig.getString("messages.command.admin.setusepapi.configbutnotenabled"));
                         } else {
                             ColorUtils.coloredMessage(sender, pluginConfig.getString("messages.command.admin.setusepapi.configbutnotdetected"));
@@ -129,9 +129,9 @@ public class StarChatAdminCmd implements CommandExecutor {
                     if (papi != null && papi.isEnabled()) {
                         plugin.setPapiExpansion(new PAPIExpansion(plugin));
                         plugin.getPapiExpansion().register();
-                        StarChat.setPlayerPlaceholders(new PAPIPlaceholders());
+                        plugin.setPlaceholderHandler(new PAPIPlaceholders());
                         plugin.getMainConfig().set("use-placeholderapi", true);
-                        StarChat.setUsePlaceholderAPI(true);
+                        plugin.setUsePlaceholderAPI(true);
                         ColorUtils.coloredMessage(sender, pluginConfig.getString("messages.command.admin.setusepapi.detectedandenabled"));
                     } else {
                         ColorUtils.coloredMessage(sender, pluginConfig.getString("messages.command.admin.setusepapi.notdetectednotenabled"));
@@ -145,7 +145,7 @@ public class StarChatAdminCmd implements CommandExecutor {
 
                 plugin.getPapiExpansion().unregister();
                 plugin.setPapiExpansion(null);
-                StarChat.setPlayerPlaceholders(new DefaultPlaceholders());
+                plugin.setPlaceholderHandler(new DefaultPlaceholders());
                 plugin.getMainConfig().set("use-placeholderapi", false);
                 ColorUtils.coloredMessage(sender, pluginConfig.getString("messages.command.admin.setusepapi.disabledsuccess"));
             } else {
@@ -163,18 +163,18 @@ public class StarChatAdminCmd implements CommandExecutor {
             }
 
             if (args[1].equalsIgnoreCase("true") || args[1].equalsIgnoreCase("yes")) {
-                if (StarChat.isUseColorPermissions()) {
+                if (plugin.isUseColorPermissions()) {
                     ColorUtils.coloredMessage(sender, pluginConfig.getString("messages.command.admin.setusecolorperms.alreadyenabled"));
                     return true;
                 }
-                StarChat.setUseColorPermissions(true);
+                plugin.setUseColorPermissions(true);
                 ColorUtils.coloredMessage(sender, pluginConfig.getString("messages.command.admin.setusecolorperms.enabled"));
             } else if (args[1].equalsIgnoreCase("false") || args[1].equalsIgnoreCase("no")) {
-                if (!StarChat.isUseColorPermissions()) {
+                if (!plugin.isUseColorPermissions()) {
                     ColorUtils.coloredMessage(sender, pluginConfig.getString("messages.command.admin.setusecolorperms.alreadydisabled"));
                     return true;
                 }
-                StarChat.setUseColorPermissions(false);
+                plugin.setUseColorPermissions(false);
                 ColorUtils.coloredMessage(sender, pluginConfig.getString("messages.command.admin.setusecolorperms.disabled"));
             } else {
                 ColorUtils.coloredMessage(sender, "&cYou must provide true, yes, false, or no.");

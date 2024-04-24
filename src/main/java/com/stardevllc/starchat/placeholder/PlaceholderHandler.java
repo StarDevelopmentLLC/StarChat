@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 
-public interface PlayerPlaceholders {
+public interface PlaceholderHandler {
     String setPlaceholders(Player player, String text);
     List<String> setPlaceholders(Player player, List<String> text);
     String setPlaceholders(OfflinePlayer player, String text);

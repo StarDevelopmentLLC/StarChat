@@ -12,7 +12,7 @@ import com.stardevllc.starchat.hooks.VaultHook;
 import com.stardevllc.starchat.placeholder.DefaultPlaceholders;
 import com.stardevllc.starchat.placeholder.PAPIExpansion;
 import com.stardevllc.starchat.placeholder.PAPIPlaceholders;
-import com.stardevllc.starchat.placeholder.PlayerPlaceholders;
+import com.stardevllc.starchat.placeholder.PlaceholderHandler;
 import com.stardevllc.starchat.pm.PrivateChatSelector;
 import com.stardevllc.starchat.pm.PrivateMessage;
 import com.stardevllc.starchat.registry.ChannelRegistry;
@@ -40,20 +40,8 @@ import java.util.*;
 import java.util.function.Function;
 
 public class StarChat extends JavaPlugin implements Listener {
-    private static String consoleNameFormat; //How the console name appears
-    private static String privateMessageFormat; //The format used for private messages
-    private static boolean usePlaceholderAPI;
-    private static PlayerPlaceholders playerPlaceholders;
-    private static boolean useColorPermissions;
-    private Config mainConfig;
-    private ChatChannel globalChannel, staffChannel; //Default channels
-    private FocusRegistry playerChatSelection = new FocusRegistry(); //Current player focus
-    private Map<String, ChatSelector> chatSelectors = new HashMap<>();
-    private PAPIExpansion papiExpansion;
-    private VaultHook vaultHook;
-
     private static StarChat instance;
-    
+
     public static final Function<Player, String> vaultDisplayNameFunction = player -> {
         VaultHook vc = getInstance().getVaultHook();
         if (vc == null) {
@@ -63,6 +51,13 @@ public class StarChat extends JavaPlugin implements Listener {
         return vc.getChat().getPlayerPrefix(player) + player.getName() + vc.getChat().getPlayerSuffix(player);
     };
     
+    private PlaceholderHandler placeholderHandler;
+    private Config mainConfig;
+    private ChatChannel globalChannel, staffChannel; //Default channels
+    private FocusRegistry playerChatSelection = new FocusRegistry(); //Current player focus
+    private Map<String, ChatSelector> chatSelectors = new HashMap<>();
+    private PAPIExpansion papiExpansion;
+    private VaultHook vaultHook;
     private ChannelRegistry channelRegistry = new ChannelRegistry(); //All channels
     private RoomRegistry roomRegistry = new RoomRegistry(); //All rooms
     private Set<PrivateMessage> privateMessages = new HashSet<>();
@@ -85,7 +80,6 @@ public class StarChat extends JavaPlugin implements Listener {
         }
         
         generateDefaultConfigOptions();
-        loadMainConfigValues();
         loadDefaultChannels();
         loadChannels();
         determinePlaceholderHandler();
@@ -125,7 +119,6 @@ public class StarChat extends JavaPlugin implements Listener {
         channelsToRemove.forEach(c -> this.channelRegistry.deregister(c));
         
         generateDefaultConfigOptions();
-        loadMainConfigValues();
         loadDefaultChannels();
         loadChannels();
         determinePlaceholderHandler();
@@ -168,13 +161,13 @@ public class StarChat extends JavaPlugin implements Listener {
     }
     
     private void determinePlaceholderHandler() {
-        StarChat.setUsePlaceholderAPI(getMainConfig().getBoolean("use-placeholderapi"));
-        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null && StarChat.usePlaceholderAPI) {
-            StarChat.playerPlaceholders = new PAPIPlaceholders();
+        setUsePlaceholderAPI(getMainConfig().getBoolean("use-placeholderapi"));
+        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null && isUsePlaceholderAPI()) {
+            placeholderHandler = new PAPIPlaceholders();
             this.papiExpansion = new PAPIExpansion(this);
             this.papiExpansion.register();
         } else {
-            StarChat.playerPlaceholders = new DefaultPlaceholders();
+            placeholderHandler = new DefaultPlaceholders();
         }
     }
     
@@ -194,13 +187,6 @@ public class StarChat extends JavaPlugin implements Listener {
             ChatChannel chatChannel = new ChatChannel(this, name, file.toPath());
             this.channelRegistry.register(chatChannel.getName(), chatChannel);
         }
-    }
-
-    private void loadMainConfigValues() {
-        StarChat.consoleNameFormat = mainConfig.getString("console-name-format");
-        StarChat.privateMessageFormat = mainConfig.getString("private-msg-format");
-        StarChat.usePlaceholderAPI = mainConfig.getBoolean("use-placeholder-api");
-        StarChat.useColorPermissions = mainConfig.getBoolean("use-color-permissions");
     }
 
     private void loadDefaultChannels() {
@@ -308,20 +294,20 @@ public class StarChat extends JavaPlugin implements Listener {
         this.chatSelectors.put(selector.getType().toLowerCase(), selector);
     }
 
-    public static String getConsoleNameFormat() {
-        return consoleNameFormat;
+    public String getConsoleNameFormat() {
+        return mainConfig.getString("console-name-format");
     }
 
-    public static String getPrivateMessageFormat() {
-        return privateMessageFormat;
+    public String getPrivateMessageFormat() {
+        return mainConfig.getString("private-msg-format");
     }
 
-    public static boolean isUsePlaceholderAPI() {
-        return usePlaceholderAPI;
+    public boolean isUsePlaceholderAPI() {
+        return mainConfig.getBoolean("use-placeholder-api");
     }
 
-    public static void setUsePlaceholderAPI(boolean usePlaceholderAPI) {
-        StarChat.usePlaceholderAPI = usePlaceholderAPI;
+    public void setUsePlaceholderAPI(boolean usePlaceholderAPI) {
+        mainConfig.set("use-placeholder-api", usePlaceholderAPI);
     }
 
     public VaultHook getVaultHook() {
@@ -332,12 +318,12 @@ public class StarChat extends JavaPlugin implements Listener {
         return staffChannel;
     }
 
-    public static PlayerPlaceholders getPlayerPlaceholders() {
-        return playerPlaceholders;
+    public PlaceholderHandler getPlaceholderHandler() {
+        return placeholderHandler;
     }
 
-    public static boolean isUseColorPermissions() {
-        return useColorPermissions;
+    public boolean isUseColorPermissions() {
+        return mainConfig.getBoolean("use-color-permissions");
     }
 
     public void addPrivateMessage(PrivateMessage privateMessage) {
@@ -348,23 +334,20 @@ public class StarChat extends JavaPlugin implements Listener {
         return this.consoleLastMessage;
     }
 
-    public static void setConsoleNameFormat(String consoleNameFormat) {
-        StarChat.consoleNameFormat = consoleNameFormat;
-        getInstance().getMainConfig().set("console-name-format", consoleNameFormat);
+    public void setConsoleNameFormat(String consoleNameFormat) {
+        mainConfig.set("console-name-format", consoleNameFormat);
     }
 
-    public static void setPrivateMessageFormat(String privateMessageFormat) {
-        StarChat.privateMessageFormat = privateMessageFormat;
-        getInstance().getMainConfig().set("private-message-format", privateMessageFormat);
+    public void setPrivateMessageFormat(String privateMessageFormat) {
+        mainConfig.set("private-message-format", privateMessageFormat);
     }
 
-    public static void setPlayerPlaceholders(PlayerPlaceholders playerPlaceholders) {
-        StarChat.playerPlaceholders = playerPlaceholders;
+    public void setPlaceholderHandler(PlaceholderHandler playerPlaceholders) {
+        placeholderHandler = playerPlaceholders;
     }
 
-    public static void setUseColorPermissions(boolean useColorPermissions) {
-        StarChat.useColorPermissions = useColorPermissions;
-        getInstance().getMainConfig().set("use-color-permissions", useColorPermissions);
+    public void setUseColorPermissions(boolean useColorPermissions) {
+        mainConfig.set("use-color-permissions", useColorPermissions);
     }
 
     public static StarChat getInstance() {

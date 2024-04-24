@@ -1,6 +1,7 @@
 package com.stardevllc.starchat.placeholder;
 
 import com.stardevllc.starchat.StarChat;
+import com.stardevllc.starchat.hooks.VaultHook;
 import net.milkbowl.vault.chat.Chat;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -8,15 +9,10 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DefaultPlaceholders implements PlayerPlaceholders {
-    
-    private Chat vaultChat = StarChat.getVaultChat();
+public class DefaultPlaceholders implements PlaceholderHandler {
     
     public String setPlaceholders(Player player, String text) {
-        String replacement = text.replace("{prefix}", vaultChat.getPlayerPrefix(player));
-        replacement = replacement.replace("{name}", player.getName());
-        replacement = replacement.replace("{suffix}", vaultChat.getPlayerSuffix(player));
-        return replacement;
+        return setPlaceholders((OfflinePlayer) player, text);
     }
 
     public List<String> setPlaceholders(Player player, List<String> text) {
@@ -28,10 +24,16 @@ public class DefaultPlaceholders implements PlayerPlaceholders {
     }
 
     public String setPlaceholders(OfflinePlayer player, String text) {
-        String replacement = text.replace("{prefix}", vaultChat.getPlayerPrefix(null, player));
-        replacement = replacement.replace("{name}", player.getName());
-        replacement = replacement.replace("{suffix}", vaultChat.getPlayerSuffix(null, player));
-        return replacement;
+        String prefix = "", suffix = "";
+
+        VaultHook vaultHook = StarChat.getInstance().getVaultHook();
+        if (vaultHook != null) {
+            Chat chat = vaultHook.getChat();
+            prefix = chat.getPlayerPrefix(null, player);
+            suffix = chat.getPlayerSuffix(null, player);
+        }
+
+        return text.replace("{prefix}", prefix).replace("{name}", player.getName()).replace("{suffix}", suffix);
     }
 
     public List<String> setPlaceholders(OfflinePlayer player, List<String> text) {

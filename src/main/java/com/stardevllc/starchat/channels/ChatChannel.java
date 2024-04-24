@@ -127,7 +127,7 @@ public class ChatChannel implements ChatSpace {
             }
 
             if (context.getSender() instanceof ConsoleCommandSender) {
-                displayName = StarChat.getConsoleNameFormat();
+                displayName = StarChat.getInstance().getConsoleNameFormat();
             } else {
                 Player player = (Player) context.getSender();
                 displayName = Objects.requireNonNullElse(this.displayNameHandler, StarChat.vaultDisplayNameFunction).apply(player);
@@ -142,7 +142,7 @@ public class ChatChannel implements ChatSpace {
                 format = ColorUtils.color(senderFormat.get().replace("{displayname}", displayName)).replace("{message}", message);
             } else {
                 Player player = (Player) context.getSender();
-                format = ColorUtils.color(StarChat.getPlayerPlaceholders().setPlaceholders(player, senderFormat.get().replace("{displayname}", displayName))).replace("{message}", message);
+                format = ColorUtils.color(StarChat.getInstance().getPlaceholderHandler().setPlaceholders(player, senderFormat.get().replace("{displayname}", displayName))).replace("{message}", message);
             }
         }
 

@@ -6,7 +6,7 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 
-public class PAPIPlaceholders implements PlayerPlaceholders {
+public class PAPIPlaceholders implements PlaceholderHandler {
     
     private DefaultPlaceholders defaultPlaceholders = new DefaultPlaceholders();
     
