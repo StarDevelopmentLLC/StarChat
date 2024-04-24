@@ -1,0 +1,143 @@
+StarChat is a simple plugin for managing server chat. It can be as simple as a chat formatter or as complex as to use it for many different channels and rooms.
+
+[B]Required Dependencies[/B]
+Java 17
+[URL='https://www.spigotmc.org/resources/starcore.110550/']StarCore 1.0.0-alpha.27[/URL]
+
+[B]Optional Dependencies[/B]
+[URL='https://www.spigotmc.org/resources/placeholderapi.6245/']PlaceholderAPI[/URL]
+[URL='https://www.spigotmc.org/resources/vault.34315/']Vault[/URL]
+
+[B]Basic Information[/B]
+StarChat is a plugin that you can use to manage the chat on your server. It allows you to configure channels using commands or the yaml files. Plugins can also do this in code and create chat rooms. Please see the sections below for the differences.
+StarChat also provides private message handling.
+
+[B]Installation - Server Owners[/B]
+Download the plugin and place it in your plugins folder and [B]restart[/B] the server to apply everything. You can configure the behavior of the plugin in the config.yml file. This file is documented using comments and generated when it loads.
+
+[B]Installation - Plugin Developers[/B]
+I strongly encourage the use of a build tool like Gradle or Maven. You can find the details needed to fill in what you need in your build tool.
+[B]Repository[/B]: [URL='https://www.jitpack.io/']https://www.jitpack.io[/URL]
+[B]Group[/B]: com.github.StarDevelopmentLLC
+[B]Artifact[/B]: StarChat
+[B]Version[/B]: 1.0.0-alpha.12
+This should be compileOnly for Gradle and provided scope for Maven, its a plugin.
+
+[B]Concepts - ChatSpace[/B]
+ChatSpaces is the parent concept for everything within StarChat. ChatSpace itself is an interface that allows full flexibility. This controls what the minimum functionality is needed for a ChatSpace
+
+[B]Concepts - ChatChannel[/B]
+ChatChannels are server-controlled spaces that are permission controlled for who can and cannot see and send messages. ChatChannels can be created and configured by the in-game commands (See commands), or by using a yml file. You can just copy an existing file and change it to what you want if you don't want to do things in game. Or you can create the channel using a command, as this will generate a default file for you to modify.
+
+[B]Concepts - ChatRooms[/B]
+ChatRooms are plugin-controlled spaces that have their own way of handling who can and cannot see and send messages. The default implementation uses a "member" type system with a permission enum. This behavior can be overridden though, but only by plugins that depend on StarChat. StarChat does not provide a way to create chatrooms directly, but will detect them. This is mainly due to the nature of idea behind the chatrooms.
+
+[B]Concepts - Private Messages[/B]
+Private messages are actually controlled using a ChatSpace implementation. This is for a feature explained futher down, and a few planned features that are not yet implemented. However, on the surface, they behave the way that you expect, you have a message and reply commands. The implementation of the private messages allows you to message and reply to the console.
+
+[B]Concepts - Chat Focus[/B]
+Each player has a chat focus, which is what space that the player is speaking in when they type in normal chat. This can be overridden by using commands (Like /msg, /reply). This can be set via a command (See commands), or plugins can automatially set this during execution.
+
+[B]Placeholders[/B]
+StarChat supports PlaceholderAPI as a soft-dependency, meaning you do not have to have PlaceholderAPI on the server, but StarChat will detect it and use it, however you can configure if StarChat will use PlaceholderAPI in the config.yml
+StarChat also has some default placeholers that it will replace. {displayname} will replace it with the Console DisplayName setting (in config,yml) or with the player display name in the format {prefix}{name}{suffix}. You can also use these placeholders and it will work as well.
+
+[B]PAPI Placeholders[/B]
+%starchat_space% - This placeholder is for getting the normalized name of the space that the player is in. (All lower case, spaces are underscores, no colors)
+%starchat_space_display% - The displayname of the chat space that the player is focused on.
+
+[B]Config[/B]
+The config file is generated on first run, or when it is not detected, it will also add any settings that it does not detect that exist. Comments are generated where approprite to provide documentation of what that setting does.
+
+[B]Command - /chat[/B]
+The /chat command allows players to switch which space they are currently focused on. This command is permission controlled to give server owners and admins flexibility on who can switch spaces. In order to switch to a space, that player must have the ability to send messages in that space.
+Permission: starchat.command.chat
+Usage: /chat <spacename>
+Alias: /ch
+
+You can use /chat private to switch your focus to who you or who messaged you. This allows you to carry on a conversation without having to type /reply or /message all the time. Talking in this channel does not change who you last messaged, so you can message another person with /msg and /r while focused on another player. (This was tested and works).
+
+[B]Command - /message and /reply[/B]
+These commands work together to provide the private messaging system. These commands also have their own permissions
+
+/message <target> <message>
+Permission: starchat.command.message
+Alias: /msg
+
+/reply <target> <message>
+/reply <message>
+Permission: starchat.command.reply
+Alias: /r
+
+[B]Command - /starchat[/B]
+This is the main admin command. The base permission is starchat.command.admin
+
+/starchat save
+Saves plugin related data
+Permission: starchat.command.admin.save
+
+/starchat reload
+Reloads plugin related data
+Permission: starchat.command.admin.reload
+
+/starchat setconsolenameformat <name>
+Sets the name format that the console will use in commands, channels or feedback.
+<name> can be multiple arguments
+Permission: starchat.command.admin.setconsolenameformat
+This setting can be changed in the config.yml
+
+/starchat setprivatemessageformat <format>
+Sets the format used for private messages.
+<format> can be multiple arguments
+Permission: starchat.command.admin.setprivatemessageformat
+This setting can be changed in the config.yml
+
+/starchat setuseplaceholderapi <true|yes|false|no>
+Sets the status of using placeholder api. If it is changed, the plugin will run through normal checks, you cannot force it to use placeholder api if it is not installed.
+Permission: starchat.command.admin.setuseplaceholderapi
+This setting can be changed in the config.yml
+
+/starchat setusecolorpermissions <true|yes|false|no>
+Sets the integration with StarCore's ColorUtils system. Note: this only works for senders that allow permission checks, and will only check it for the message. Everything else does not check against permissions. See StarCore for more details on this system
+Permission: starchat.command.admin.setusecolorpermissions
+This setting can be changed in the config.yml
+
+/starchat list <all|channels|rooms|conversations>
+This lists the registered spaces with a filter for which type. Note: You cannot see chat history (yet)
+Main Permission: starchat.command.admin.list
+When listing all, you will only see ones that you have the permission for.
+Channels Permission: starchat.command.admin.list.channels
+Rooms Permission: starchat.command.admin.list.rooms
+Conversations: starchat.command.admin.list.conversations
+
+/starchat setplayerchatfocus <player> <space>
+Sets the player's chat focus to the space provided
+Permission: starchat.command.admin.setplayerchatfocus
+
+/starchat channel create <name>
+Creates a channel with the given name. This name can be multiple arguments and this will be used as the display name of the channel.
+This command will also create the yml config file for that channel.
+Permission: starchat.command.admin.channel.create
+
+/starchat channel delete <name>
+Deletes the channel with the given name. This must be all one argument, no colors and spaces must be an underscore.
+You can only delete channels owned by StarChat. Channels created by other plugins cannot be deleted by this command.
+Permission: starchat.command.admin.channel.delete
+
+[I]For the further commands, you can only modify channels owned by StarChat. Channels created by other plugins cannot be modified with this command.[/I]
+
+/starchat channel set <id|name|viewpermisson|sendpermission|senderformat|systemformat|usecolorpermissions> <value>
+<value> must be the correct data type. Id is a whole number, usecolorpermissions is a true or false value, and the rest are text.
+<value> can be multiple arguments for the text settings.
+You must use /starchat save to save changes made to the channels
+Permissons: starchat.command.admin.channel.set.<setting>
+
+
+[B]Planned Features[/B]
+Make it so that the /chat command can take in optional arguments after the space name to talk in that space without switching focus
+Make it so that if you do not provide arguments to /chat, it will print out accessible channels/rooms and indicate the one that the player is focused on.
+Shortcut commands for channels (Like /global, /staff etc...)
+Chat Logging and admin commands to view it
+
+
+[I]This plugin is provided free of charge and under the MIT Open Source License. I will never sell this library anywhere. If you see it being sold, it is not by me and please report any of these cases to me directly. This library is only published as a GitHub Release and on SpigotMC, other sources are to be considered use at your own risk.[/I]
