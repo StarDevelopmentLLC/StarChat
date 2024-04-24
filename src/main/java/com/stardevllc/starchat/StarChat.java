@@ -8,6 +8,7 @@ import com.stardevllc.starchat.commands.MessageCmd;
 import com.stardevllc.starchat.commands.ReplyCmd;
 import com.stardevllc.starchat.commands.StarChatAdminCmd;
 import com.stardevllc.starchat.context.ChatContext;
+import com.stardevllc.starchat.hooks.VaultHook;
 import com.stardevllc.starchat.placeholder.DefaultPlaceholders;
 import com.stardevllc.starchat.placeholder.PAPIExpansion;
 import com.stardevllc.starchat.placeholder.PAPIPlaceholders;
@@ -22,7 +23,6 @@ import com.stardevllc.starcore.actor.Actor;
 import com.stardevllc.starcore.actor.PlayerActor;
 import com.stardevllc.starcore.actor.ServerActor;
 import com.stardevllc.starcore.utils.Config;
-import net.milkbowl.vault.chat.Chat;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -30,7 +30,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.plugin.RegisteredServiceProvider;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.ServicesManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -43,7 +43,6 @@ public class StarChat extends JavaPlugin implements Listener {
     private static String consoleNameFormat; //How the console name appears
     private static String privateMessageFormat; //The format used for private messages
     private static boolean usePlaceholderAPI;
-    private static Chat vaultChat; //Vault chat hook
     private static PlayerPlaceholders playerPlaceholders;
     private static boolean useColorPermissions;
     private Config mainConfig;
@@ -51,18 +50,17 @@ public class StarChat extends JavaPlugin implements Listener {
     private FocusRegistry playerChatSelection = new FocusRegistry(); //Current player focus
     private Map<String, ChatSelector> chatSelectors = new HashMap<>();
     private PAPIExpansion papiExpansion;
+    private VaultHook vaultHook;
 
     private static StarChat instance;
     
-    public static final Function<Player, String> vaultDisplayNameFunction = new Function<>() {
-        @Override
-        public String apply(Player player) {
-            if (vaultChat == null) {
-                return null;
-            }
-
-            return vaultChat.getPlayerPrefix(player) + player.getName() + vaultChat.getPlayerSuffix(player);
+    public static final Function<Player, String> vaultDisplayNameFunction = player -> {
+        VaultHook vc = getInstance().getVaultHook();
+        if (vc == null) {
+            return null;
         }
+
+        return vc.getChat().getPlayerPrefix(player) + player.getName() + vc.getChat().getPlayerSuffix(player);
     };
     
     private ChannelRegistry channelRegistry = new ChannelRegistry(); //All channels
@@ -76,12 +74,16 @@ public class StarChat extends JavaPlugin implements Listener {
         instance = this;
         mainConfig = new Config(new File(getDataFolder(), "config.yml"));
 
-        if (!setupChat()) {
-            getLogger().severe("Could not setup Vault Chat.");
-            getServer().getPluginManager().disablePlugin(this);
-            return;
+        Plugin vaultPlugin = getServer().getPluginManager().getPlugin("Vault");
+        if (vaultPlugin != null) {
+            if (vaultPlugin.isEnabled()) {
+                vaultHook = new VaultHook(this);
+                if (!vaultHook.setup()) {
+                    vaultHook = null;
+                }
+            }
         }
-
+        
         generateDefaultConfigOptions();
         loadMainConfigValues();
         loadDefaultChannels();
@@ -271,12 +273,6 @@ public class StarChat extends JavaPlugin implements Listener {
         this.playerChatSelection.setPlayerFocus(player.getUniqueId(), chatSpace);
     }
 
-    private boolean setupChat() {
-        RegisteredServiceProvider<Chat> rsp = getServer().getServicesManager().getRegistration(Chat.class);
-        vaultChat = rsp.getProvider();
-        return vaultChat != null;
-    }
-
     public Set<PrivateMessage> getPrivateMessages() {
         return privateMessages;
     }
@@ -328,8 +324,8 @@ public class StarChat extends JavaPlugin implements Listener {
         StarChat.usePlaceholderAPI = usePlaceholderAPI;
     }
 
-    public static Chat getVaultChat() {
-        return vaultChat;
+    public VaultHook getVaultHook() {
+        return vaultHook;
     }
 
     public ChatChannel getStaffChannel() {

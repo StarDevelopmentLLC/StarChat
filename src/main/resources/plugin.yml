@@ -3,8 +3,8 @@ version: ${version}
 api-version: 1.20
 name: ${name}
 author: Firestar311
-depend: [Vault, StarCore]
-softdepend: [PlaceholderAPI]
+depend: [StarCore]
+softdepend: [PlaceholderAPI, Vault]
 commands: 
   chat:
     aliases: [ch]
