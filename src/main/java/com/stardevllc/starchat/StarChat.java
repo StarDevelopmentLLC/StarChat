@@ -118,14 +118,14 @@ public class StarChat extends JavaPlugin implements Listener {
 
         mainConfig = new Config(new File(getDataFolder(), "config.yml"));
 
-        Set<String> channelsToRemove = new HashSet<>();
-        for (ChatChannel channel : this.channelRegistry.getObjects().values()) {
-            if (channel.getPlugin().getName().equalsIgnoreCase(this.getName())) {
-                channelsToRemove.add(channel.getName());
+        Set<String> spacesToRemove = new HashSet<>();
+        for (ChatSpace space : this.spaceRegistry.getObjects().values()) {
+            if (space.getPlugin().getName().equalsIgnoreCase(this.getName())) {
+                spacesToRemove.add(space.getName());
             }
         }
 
-        channelsToRemove.forEach(c -> this.channelRegistry.deregister(c));
+        spacesToRemove.forEach(c -> this.channelRegistry.deregister(c));
         
         generateDefaultConfigOptions();
         loadDefaultChannels();
