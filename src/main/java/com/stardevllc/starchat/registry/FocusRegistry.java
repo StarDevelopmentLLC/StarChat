@@ -11,7 +11,7 @@ public class FocusRegistry extends UUIDRegistry<ChatSpace> {
     
     public void setPlayerFocus(UUID uuid, ChatSpace chatSpace) {
         if (chatSpace == null) {
-            this.deregister(uuid);
+            this.unregister(uuid);
         } else {
             this.register(uuid, chatSpace);
         }

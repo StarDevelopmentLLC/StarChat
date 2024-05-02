@@ -15,14 +15,15 @@ public class ChannelRegistry extends StringRegistry<ChatChannel> {
     }
 
     @Override
-    public void register(String key, ChatChannel object) {
+    public ChatChannel register(String key, ChatChannel object) {
         super.register(key, object);
         plugin.getSpaceRegistry().register(key, object);
+        return object;
     }
 
     @Override
-    public void deregister(String key) {
-        super.deregister(key);
-        plugin.getSpaceRegistry().deregister(key);
+    public ChatChannel unregister(String key) {
+        plugin.getSpaceRegistry().unregister(key);
+        return super.unregister(key);
     }
 }

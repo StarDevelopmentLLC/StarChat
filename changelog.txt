@@ -1,3 +1,7 @@
+1.0.0-alpha.13
+- Updated to 1.20.6
+- Updated StarCore to 1.0.0-alpha.29
+
 1.0.0-alpha.12
 - Updated StarCore to 1.0.0-alpha.27
 - Updated StarLib to 1.0.0-alpha.14

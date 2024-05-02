@@ -316,7 +316,7 @@ public class StarChatAdminCmd implements CommandExecutor {
                 }
 
                 chatChannel.getFile().delete();
-                plugin.getChannelRegistry().deregister(chatChannel.getName());
+                plugin.getChannelRegistry().unregister(chatChannel.getName());
                 ColorUtils.coloredMessage(sender, "&eYou deleted the chat channel &b" + chatChannel.getName());
             }
 

@@ -15,14 +15,14 @@ public class RoomRegistry extends StringRegistry<ChatRoom> {
     }
 
     @Override
-    public void register(String key, ChatRoom object) {
-        super.register(key, object);
+    public ChatRoom register(String key, ChatRoom object) {
         this.plugin.getSpaceRegistry().register(key, object);
+        return super.register(key, object);
     }
 
     @Override
-    public void deregister(String key) {
-        super.deregister(key);
-        this.plugin.getSpaceRegistry().deregister(key);
+    public ChatRoom unregister(String key) {
+        this.plugin.getSpaceRegistry().unregister(key);
+        return super.unregister(key);
     }
 }

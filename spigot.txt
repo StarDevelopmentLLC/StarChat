@@ -23,7 +23,7 @@ I strongly encourage the use of a build tool like Gradle or Maven. You can find 
 [B]Repository[/B]: [URL='https://www.jitpack.io/']https://www.jitpack.io[/URL]
 [B]Group[/B]: com.github.StarDevelopmentLLC
 [B]Artifact[/B]: StarChat
-[B]Version[/B]: 1.0.0-alpha.12
+[B]Version[/B]: 1.0.0-alpha.13
 This should be compileOnly for Gradle and provided scope for Maven, its a plugin.
 
 [B]Concepts - ChatSpace[/B]

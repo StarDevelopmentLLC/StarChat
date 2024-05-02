@@ -125,7 +125,7 @@ public class StarChat extends JavaPlugin implements Listener {
             }
         }
 
-        spacesToRemove.forEach(c -> this.channelRegistry.deregister(c));
+        spacesToRemove.forEach(c -> this.channelRegistry.unregister(c));
         
         generateDefaultConfigOptions();
         loadDefaultChannels();
