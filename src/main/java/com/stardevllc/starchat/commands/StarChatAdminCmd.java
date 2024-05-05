@@ -12,9 +12,9 @@ import com.stardevllc.starcore.actor.PlayerActor;
 import com.stardevllc.starcore.color.ColorUtils;
 import com.stardevllc.starcore.utils.Config;
 import com.stardevllc.starlib.converter.BooleanStringConverter;
-import com.stardevllc.starlib.observable.property.BooleanProperty;
-import com.stardevllc.starlib.observable.property.Property;
-import com.stardevllc.starlib.observable.property.StringProperty;
+import com.stardevllc.starlib.observable.property.writable.BooleanProperty;
+import com.stardevllc.starlib.observable.property.writable.Property;
+import com.stardevllc.starlib.observable.property.writable.StringProperty;
 import com.stardevllc.starlib.reflection.ReflectionHelper;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -336,19 +336,19 @@ public class StarChatAdminCmd implements CommandExecutor {
             }
 
             String value = sb.toString().trim();
-            
+
             if (args[2].equalsIgnoreCase("set")) {
                 Property<?> property = ReflectionHelper.getProperty(Property.class, chatChannel, args[3]);
                 if (property == null) {
                     ColorUtils.coloredMessage(sender, "You provided an invalid key name.");
                     return true;
                 }
-                
+
                 if (!sender.hasPermission("starchat.command.admin.channel.set." + property.getName().toLowerCase().replace(" ", "_"))) {
                     ColorUtils.coloredMessage(sender, pluginConfig.getString("messages.command.nopermission"));
                     return true;
                 }
-                
+
                 if (property instanceof StringProperty stringProperty) {
                     stringProperty.set(value);
                 } else if (property instanceof BooleanProperty booleanProperty) {
@@ -357,7 +357,7 @@ public class StarChatAdminCmd implements CommandExecutor {
                     ColorUtils.coloredMessage(sender, "Unsupported Property Value Type, contact the developer to add support.");
                     return true;
                 }
-                
+
                 ColorUtils.coloredMessage(sender, pluginConfig.getString("messages.command.admin.channel.set.success").replace("{channel}", chatChannel.getName()).replace("{key}", property.getName()).replace("{value}", property.getValue() + ""));
             } else {
                 ColorUtils.coloredMessage(sender, "Invalid sub command.");
