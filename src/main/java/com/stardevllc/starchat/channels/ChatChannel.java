@@ -131,7 +131,14 @@ public class ChatChannel implements ChatSpace {
             } else {
                 Player player = (Player) context.getSender();
                 displayName = Objects.requireNonNullElse(this.displayNameHandler, StarChat.vaultDisplayNameFunction).apply(player);
+                if (displayName == null || displayName.isEmpty()) {
+                    displayName = player.getName();
+                }
             }
+        }
+        
+        if (displayName == null || displayName.isEmpty()) {
+            displayName = "";
         }
 
         String format;
