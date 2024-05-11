@@ -1,3 +1,9 @@
+1.0.0-alpha.15
+- Changed the global channel name
+- Fixed a bug with display names not retrieving if vault provider is null
+- Added tab completion for commands
+- Updated StarCore to 1.0.0-alpha.30
+
 1.0.0-alpha.14
 - Updated StarLib to 1.0.0-alpha.16
 - Updated StarCore to 1.0.0-alpha.13
