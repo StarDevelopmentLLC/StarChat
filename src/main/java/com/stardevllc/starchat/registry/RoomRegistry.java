@@ -10,7 +10,7 @@ public class RoomRegistry extends StringRegistry<ChatRoom> {
     private StarChat plugin;
     
     public RoomRegistry(StarChat starChat) {
-        super(string -> ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', string.toLowerCase().replace(" ", "_"))), ChatRoom::getName);
+        super(null, string -> ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', string.toLowerCase().replace(" ", "_"))), ChatRoom::getName, null);
         this.plugin = starChat;
     }
 

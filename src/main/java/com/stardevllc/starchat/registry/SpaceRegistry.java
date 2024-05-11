@@ -6,6 +6,6 @@ import org.bukkit.ChatColor;
 
 public class SpaceRegistry extends StringRegistry<ChatSpace> {
     public SpaceRegistry() {
-        super(string -> ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', string.toLowerCase().replace(" ", "_"))), ChatSpace::getName);
+        super(null, string -> ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', string.toLowerCase().replace(" ", "_"))), ChatSpace::getName, null);
     }
 }
