@@ -3,16 +3,21 @@ package com.stardevllc.starchat.commands;
 import com.stardevllc.starchat.ChatSelector;
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.channels.ChatChannel;
+import com.stardevllc.starchat.registry.ChannelRegistry;
 import com.stardevllc.starchat.rooms.ChatRoom;
 import com.stardevllc.starchat.space.ChatSpace;
 import com.stardevllc.starcore.color.ColorUtils;
 import com.stardevllc.starcore.utils.Config;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 
-public class ChatCmd implements CommandExecutor {
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+
+public class ChatCmd implements TabExecutor {
 
     private StarChat plugin;
     private Config pluginConfig;
@@ -84,5 +89,36 @@ public class ChatCmd implements CommandExecutor {
         }
         sender.sendMessage(ColorUtils.color(pluginConfig.getString("messages.command.chat.setfocus").replace("{SPACE}", spaceName)));
         return true;
+    }
+
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
+        if (!(sender.hasPermission("starchat.command.chat"))) {
+            return null;
+        }
+
+        if (!(sender instanceof Player)) {
+            return null;
+        }
+
+        if (!(args.length > 0)) {
+            return null;
+        }
+        
+        List<String> channels = new LinkedList<>();
+        
+        String name = args[0].toLowerCase();
+
+        ChannelRegistry channelRegistry = plugin.getChannelRegistry();
+        for (ChatChannel chatChannel : channelRegistry) {
+            if (chatChannel.canSendMessages(sender)) {
+                if (chatChannel.getName().startsWith(name)) {
+                    channels.add(chatChannel.getName());
+                }
+            }
+        }
+
+        Collections.sort(channels);
+        return channels;
     }
 }

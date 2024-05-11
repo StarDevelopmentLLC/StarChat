@@ -26,6 +26,7 @@ import com.stardevllc.starcore.actor.ServerActor;
 import com.stardevllc.starcore.utils.Config;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -102,10 +103,23 @@ public class StarChat extends JavaPlugin implements Listener {
 
         this.addSelector(new PrivateChatSelector());
 
-        getCommand("chat").setExecutor(new ChatCmd(this));
-        getCommand("message").setExecutor(new MessageCmd(this));
-        getCommand("reply").setExecutor(new ReplyCmd(this));
-        getCommand("starchat").setExecutor(new StarChatAdminCmd(this));
+        PluginCommand chatCommand = getCommand("chat");
+        ChatCmd chatCmdExecutor = new ChatCmd(this);
+        chatCommand.setExecutor(chatCmdExecutor);
+        chatCommand.setTabCompleter(chatCmdExecutor);
+
+        PluginCommand messageCommand = getCommand("message");
+        MessageCmd msgCmdExecutor = new MessageCmd(this);
+        messageCommand.setExecutor(msgCmdExecutor);
+        messageCommand.setTabCompleter(msgCmdExecutor);
+        PluginCommand replyCommand = getCommand("reply");
+        ReplyCmd replyCmdExecutor = new ReplyCmd(this);
+        replyCommand.setExecutor(replyCmdExecutor);
+        replyCommand.setTabCompleter(replyCmdExecutor);
+        PluginCommand starChatCmd = getCommand("starchat");
+        StarChatAdminCmd starChatCmdExecutor = new StarChatAdminCmd(this);
+        starChatCmd.setExecutor(starChatCmdExecutor);
+        starChatCmd.setTabCompleter(starChatCmdExecutor);
     }
 
     public void reload(boolean save) {

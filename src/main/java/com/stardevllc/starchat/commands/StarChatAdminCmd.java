@@ -19,14 +19,18 @@ import com.stardevllc.starlib.reflection.ReflectionHelper;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import java.io.File;
+import java.lang.reflect.Field;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
-public class StarChatAdminCmd implements CommandExecutor {
+public class StarChatAdminCmd implements TabExecutor {
 
     private StarChat plugin;
     private Config pluginConfig;
@@ -34,6 +38,140 @@ public class StarChatAdminCmd implements CommandExecutor {
     public StarChatAdminCmd(StarChat plugin) {
         this.plugin = plugin;
         this.pluginConfig = plugin.getMainConfig();
+    }
+
+    public List<String> onTabComplete(CommandSender sender, Command cmd, String alias, String[] args) {
+        if (!(sender.hasPermission("starchat.command.admin"))) {
+            return null;
+        }
+
+        if (args.length == 0) {
+            return null;
+        }
+
+        List<String> completions = new LinkedList<>();
+        String arg = "";
+        boolean noSort = false;
+        if (args.length == 1) {
+            completions.addAll(List.of("save", "reload", "setconsolenameformat", "setprivatemessageformat", "setuseplaceholderapi", "setusecolorpermissions", "list", "setplayerchatfocus", "channel"));
+
+            completions.removeIf(option -> !sender.hasPermission("starchat.command.admin." + option));
+
+            arg = args[0].toLowerCase();
+        } else if (args[0].equalsIgnoreCase("setconsolenameformat") || args[0].equalsIgnoreCase("setcnf")) {
+            if (!sender.hasPermission("starchat.command.admin.setconsolenameformat")) {
+                return null;
+            }
+
+            completions.add("<consolename>");
+            arg = args[1].toLowerCase();
+        } else if (args[0].equalsIgnoreCase("setprivatemessageformat") || args[0].equalsIgnoreCase("setpmf")) {
+            if (!sender.hasPermission("starchat.command.admin.setprivatemessageformat")) {
+                return null;
+            }
+
+            completions.add("<pmformat>");
+            arg = args[1].toLowerCase();
+        } else if (args[0].equalsIgnoreCase("setuseplaceholderapi") || args[0].equalsIgnoreCase("setupapi")) {
+            if (!sender.hasPermission("starchat.command.admin.setuseplaceholderapi")) {
+                return null;
+            }
+
+            completions.addAll(List.of("true", "yes", "false", "no"));
+            arg = args[1].toLowerCase();
+        } else if (args[0].equalsIgnoreCase("setusecolorpermissions") || args[0].equalsIgnoreCase("setucp")) {
+            if (!sender.hasPermission("starchat.command.admin.setusecolorpermissions")) {
+                return null;
+            }
+
+            completions.addAll(List.of("true", "yes", "false", "no"));
+            arg = args[1].toLowerCase();
+        } else if (args[0].equalsIgnoreCase("list")) {
+            if (!sender.hasPermission("starchat.command.admin.list")) {
+                return null;
+            }
+
+            completions.addAll(List.of("all", "channels", "rooms", "conversations"));
+
+            completions.removeIf(option -> !sender.hasPermission("starchat.command.admin.list." + option));
+
+            arg = args[1].toLowerCase();
+        } else if (args[0].equalsIgnoreCase("setplayerchatfocus") || args[0].equalsIgnoreCase("setplayerfocus") || args[0].equalsIgnoreCase("setfocus")) {
+            if (!(sender.hasPermission("starchat.command.admin.setplayerchatfocus"))) {
+                return null;
+            }
+
+            if (args.length == 2) {
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    completions.add(player.getName());
+                }
+                arg = args[1].toLowerCase();
+            } else if (args.length == 3) {
+                for (ChatChannel chatChannel : plugin.getChannelRegistry()) {
+                    completions.add(chatChannel.getName());
+                }
+                arg = args[2].toLowerCase();
+            }
+        } else if (args[0].equalsIgnoreCase("channel")) {
+            if (!(sender.hasPermission("starchat.command.admin.channel"))) {
+                return null;
+            }
+
+            if (args.length == 2) {
+                completions.add("create");
+                for (ChatChannel chatChannel : plugin.getChannelRegistry()) {
+                    if (chatChannel.getPlugin().getName().equalsIgnoreCase(this.plugin.getName())) {
+                        completions.add(chatChannel.getName());
+                    }
+                }
+                arg = args[1].toLowerCase();
+                noSort = true;
+            } else if (args[1].equalsIgnoreCase("create")) {
+                if (!(sender.hasPermission("starchat.command.admin.channel.create"))) {
+                    return null;
+                }
+
+                // /starchat channel create <name>
+                if (args.length == 3) {
+                    completions.add("<name>");
+                    arg = args[2].toLowerCase();
+                }
+            } else {
+                ChatChannel chatChannel = plugin.getChannelRegistry().get(args[1].toLowerCase());
+                if (chatChannel == null) {
+                    return null;
+                }
+                
+                if (args.length == 3) {
+                    // /starchat channel <name> <option>
+                    completions.addAll(List.of("delete", "set"));
+                    arg = args[2].toLowerCase();
+                } else if (args[2].equalsIgnoreCase("set")) {
+                    // /starchat channel <name> set <property> <value>
+                    
+                    if (args.length == 4) {
+                        for (Field field : ReflectionHelper.getClassFields(chatChannel.getClass())) {
+                            if (Property.class.isAssignableFrom(field.getType())) {
+                                completions.add(field.getName().toLowerCase());
+                            }
+                        }
+                        arg = args[3].toLowerCase();
+                    } else if (args.length == 5) {
+                        completions.add("<value>");
+                        arg = args[4].toLowerCase();
+                    }
+                }
+            }
+        }
+
+        String finalArg = arg;
+        completions.removeIf(option -> !option.toLowerCase().startsWith(finalArg));
+        
+        if (!noSort) {
+            Collections.sort(completions);
+        }
+
+        return completions;
     }
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {

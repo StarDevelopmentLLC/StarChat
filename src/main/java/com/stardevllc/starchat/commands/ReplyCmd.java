@@ -7,10 +7,13 @@ import com.stardevllc.starcore.actor.Actor;
 import com.stardevllc.starcore.actor.PlayerActor;
 import com.stardevllc.starcore.color.ColorUtils;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabExecutor;
+import org.bukkit.entity.Player;
 
-public class ReplyCmd implements CommandExecutor {
+import java.util.List;
+
+public class ReplyCmd implements TabExecutor {
     
     private StarChat plugin;
 
@@ -72,5 +75,32 @@ public class ReplyCmd implements CommandExecutor {
         privateMessage.sendMessage(new ChatContext(sender, msgBuilder.toString().trim()));
         plugin.assignLastMessage(sender, msgBuilder, privateMessage, senderActor, targetActor);
         return true;
+    }
+    
+    public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
+        if (!(sender.hasPermission("starchat.command.reply"))) {
+            return null;
+        }
+
+        if (!(sender instanceof Player player)) {
+            return null;
+        }
+        
+        if (args.length == 1) {
+            PrivateMessage lastMessage = plugin.getLastMessage(player.getUniqueId());
+            if (lastMessage == null) {
+                return null;
+            }
+            
+            if (lastMessage.getActor1().equals(player)) {
+                return List.of(lastMessage.getActor2().getName());
+            } else {
+                return List.of(lastMessage.getActor1().getName());
+            }
+        } else if (args.length >= 2) {
+            return List.of("<message>");
+        }
+        
+        return null;
     }
 }
