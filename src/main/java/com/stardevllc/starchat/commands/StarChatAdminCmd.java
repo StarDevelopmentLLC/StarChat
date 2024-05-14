@@ -476,8 +476,11 @@ public class StarChatAdminCmd implements TabExecutor {
             String value = sb.toString().trim();
 
             if (args[2].equalsIgnoreCase("set")) {
-                Property<?> property = ReflectionHelper.getProperty(Property.class, chatChannel, args[3]);
-                if (property == null) {
+                Property<?> property;
+                try {
+                    Field classField = ReflectionHelper.getClassField(chatChannel.getClass(), args[3]);
+                    property = (Property<?>) classField.get(chatChannel);
+                } catch (IllegalAccessException e) {
                     ColorUtils.coloredMessage(sender, "You provided an invalid key name.");
                     return true;
                 }
