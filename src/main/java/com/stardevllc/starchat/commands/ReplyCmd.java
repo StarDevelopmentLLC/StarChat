@@ -5,7 +5,7 @@ import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.pm.PrivateMessage;
 import com.stardevllc.starcore.actor.Actor;
 import com.stardevllc.starcore.actor.PlayerActor;
-import com.stardevllc.starcore.color.ColorUtils;
+import com.stardevllc.starcore.color.ColorHandler;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
@@ -23,13 +23,13 @@ public class ReplyCmd implements TabExecutor {
     
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (!(sender.hasPermission("starchat.command.reply"))) {
-            ColorUtils.coloredMessage(sender, plugin.getMainConfig().getString("messages.command.nopermission"));
+            ColorHandler.getInstance().coloredMessage(sender, plugin.getMainConfig().getString("messages.command.nopermission"));
             return true;
         }
         
         if (args.length == 0) {
-            sender.sendMessage(ColorUtils.color("&cUsage: /" + label + " <message>"));
-            sender.sendMessage(ColorUtils.color("&cUsage: /" + label + " <target> <message>"));
+            sender.sendMessage(ColorHandler.getInstance().color("&cUsage: /" + label + " <message>"));
+            sender.sendMessage(ColorHandler.getInstance().color("&cUsage: /" + label + " <target> <message>"));
             return true;
         }
 
@@ -42,7 +42,7 @@ public class ReplyCmd implements TabExecutor {
         if (targetActor != null) {
             privateMessage = plugin.getPrivateMessage(senderActor, targetActor);
             if (privateMessage == null) {
-                sender.sendMessage(ColorUtils.color("&cYou do not have a conversation open with " + targetActor.getName()));
+                sender.sendMessage(ColorHandler.getInstance().color("&cYou do not have a conversation open with " + targetActor.getName()));
                 return true;
             }
             msgStart = 1;
@@ -54,7 +54,7 @@ public class ReplyCmd implements TabExecutor {
             }
 
             if (privateMessage == null) {
-                ColorUtils.coloredMessage(sender, "&cYou do not have any active conversations.");
+                ColorHandler.getInstance().coloredMessage(sender, "&cYou do not have any active conversations.");
                 return true;
             }
 

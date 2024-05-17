@@ -4,8 +4,9 @@ import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.space.ChatSpace;
 import com.stardevllc.starcore.actor.Actor;
-import com.stardevllc.starcore.color.ColorUtils;
-import com.stardevllc.starlib.observable.property.writable.*;
+import com.stardevllc.starcore.color.ColorHandler;
+import com.stardevllc.starlib.observable.property.writable.ReadWriteBooleanProperty;
+import com.stardevllc.starlib.observable.property.writable.ReadWriteStringProperty;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
@@ -23,10 +24,10 @@ public class ChatRoom implements ChatSpace {
     protected long id;
     protected JavaPlugin plugin;
 
-    protected final StringProperty name;
-    protected final BooleanProperty useColorPermissions;
-    protected final StringProperty senderFormat;
-    protected final StringProperty systemFormat;
+    protected final ReadWriteStringProperty name;
+    protected final ReadWriteBooleanProperty useColorPermissions;
+    protected final ReadWriteStringProperty senderFormat;
+    protected final ReadWriteStringProperty systemFormat;
     protected Function<Player, String> displayNameHandler;
     
     protected Actor owner;
@@ -35,10 +36,10 @@ public class ChatRoom implements ChatSpace {
     public ChatRoom(JavaPlugin plugin, Actor owner, String name) {
         this.plugin = plugin;
         this.owner = owner;
-        this.name = new StringProperty(this, "name", name);
-        this.useColorPermissions = new BooleanProperty(this, "useColorPermissions", false);
-        this.senderFormat = new StringProperty(this, "senderFormat", "");
-        this.systemFormat = new StringProperty(this, "systemFormat", "");
+        this.name = new ReadWriteStringProperty(this, "name", name);
+        this.useColorPermissions = new ReadWriteBooleanProperty(this, "useColorPermissions", false);
+        this.senderFormat = new ReadWriteStringProperty(this, "senderFormat", "");
+        this.systemFormat = new ReadWriteStringProperty(this, "systemFormat", "");
     }
     
     public ChatRoom(JavaPlugin plugin, String name) {
@@ -52,7 +53,7 @@ public class ChatRoom implements ChatSpace {
 
         if (context.getSender() == null) {
             displayName = "";
-            message = ColorUtils.color(context.getMessage());
+            message = ColorHandler.getInstance().color(context.getMessage());
         } else {
             if (!canSendMessages(context.getSender())) {
                 return;
@@ -69,9 +70,9 @@ public class ChatRoom implements ChatSpace {
             message = context.getMessage();
 
             if (this.useColorPermissions.get()) {
-                message = ColorUtils.color(context.getSender(), message);
+                message = ColorHandler.getInstance().color(context.getSender(), message);
             } else {
-                message = ColorUtils.color(message);
+                message = ColorHandler.getInstance().color(message);
             }
             
             if (context.getSender() instanceof ConsoleCommandSender) {
@@ -84,12 +85,12 @@ public class ChatRoom implements ChatSpace {
 
         String format;
         if (context.getSender() == null) {
-            format = ColorUtils.color(systemFormat.get().replace("{message}", message));
+            format = ColorHandler.getInstance().color(systemFormat.get().replace("{message}", message));
         } else {
             if (context.getSender() instanceof Player player) {
-                format = ColorUtils.color(StarChat.getInstance().getPlaceholderHandler().setPlaceholders(player, senderFormat.get().replace("{displayname}", displayName))).replace("{message}", message);
+                format = ColorHandler.getInstance().color(StarChat.getInstance().getPlaceholderHandler().setPlaceholders(player, senderFormat.get().replace("{displayname}", displayName))).replace("{message}", message);
             } else {
-                format = ColorUtils.color(senderFormat.get().replace("{displayname}", displayName)).replace("{message}", message);
+                format = ColorHandler.getInstance().color(senderFormat.get().replace("{displayname}", displayName)).replace("{message}", message);
             }
         }
 

@@ -3,11 +3,11 @@ package com.stardevllc.starchat.channels;
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.space.ChatSpace;
-import com.stardevllc.starcore.color.ColorUtils;
+import com.stardevllc.starcore.color.ColorHandler;
 import com.stardevllc.starcore.utils.Config;
-import com.stardevllc.starlib.observable.property.writable.BooleanProperty;
-import com.stardevllc.starlib.observable.property.writable.LongProperty;
-import com.stardevllc.starlib.observable.property.writable.StringProperty;
+import com.stardevllc.starlib.observable.property.writable.ReadWriteBooleanProperty;
+import com.stardevllc.starlib.observable.property.writable.ReadWriteLongProperty;
+import com.stardevllc.starlib.observable.property.writable.ReadWriteStringProperty;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
@@ -24,15 +24,15 @@ public class ChatChannel implements ChatSpace {
     protected transient File file; //The main file for the config.
     protected transient Config config; //Config to store information as channels are mainly config/command controlled, transient modifier allows StarData to ignore this field without having to depend on StarData directly
 
-    protected final LongProperty id;
+    protected final ReadWriteLongProperty id;
     protected final JavaPlugin plugin;
 
-    protected final StringProperty name;
-    protected final StringProperty viewPermission;
-    protected final StringProperty sendPermission;
-    protected final StringProperty senderFormat;
-    protected final StringProperty systemFormat;
-    protected final BooleanProperty useColorPermissions;
+    protected final ReadWriteStringProperty name;
+    protected final ReadWriteStringProperty viewPermission;
+    protected final ReadWriteStringProperty sendPermission;
+    protected final ReadWriteStringProperty senderFormat;
+    protected final ReadWriteStringProperty systemFormat;
+    protected final ReadWriteBooleanProperty useColorPermissions;
 
     protected Function<Player, String> displayNameHandler;
 
@@ -49,21 +49,21 @@ public class ChatChannel implements ChatSpace {
 
         this.config = new Config(file);
 
-        this.id = new LongProperty(this, "id");
-        this.name = new StringProperty(this, "name", name);
+        this.id = new ReadWriteLongProperty(this, "id");
+        this.name = new ReadWriteStringProperty(this, "name", name);
 
         createDefaults();
 
         this.name.addListener((observableValue, oldValue, newValue) -> config.set("name", newValue));
-        this.viewPermission = new StringProperty(this, "viewPermission", this.config.getString("permissions.view"));
+        this.viewPermission = new ReadWriteStringProperty(this, "viewPermission", this.config.getString("permissions.view"));
         this.viewPermission.addListener((observableValue, oldValue, newValue) -> config.set("permissions.view", newValue));
-        this.sendPermission = new StringProperty(this, "sendPermission", this.config.getString("permissions.send"));
+        this.sendPermission = new ReadWriteStringProperty(this, "sendPermission", this.config.getString("permissions.send"));
         this.sendPermission.addListener((observableValue, oldValue, newValue) -> config.set("permissions.send", newValue));
-        this.senderFormat = new StringProperty(this, "senderFormat", this.config.getString("formats.sender"));
+        this.senderFormat = new ReadWriteStringProperty(this, "senderFormat", this.config.getString("formats.sender"));
         this.senderFormat.addListener((observableValue, oldValue, newValue) -> config.set("formats.sender", newValue));
-        this.systemFormat = new StringProperty(this, "systemFormat", this.config.getString("formats.system"));
+        this.systemFormat = new ReadWriteStringProperty(this, "systemFormat", this.config.getString("formats.system"));
         this.systemFormat.addListener((observableValue, oldValue, newValue) -> config.set("formats.system", newValue));
-        this.useColorPermissions = new BooleanProperty(this, "useColorPermissions", config.getBoolean("settings.usecolorpermissions"));
+        this.useColorPermissions = new ReadWriteBooleanProperty(this, "useColorPermissions", config.getBoolean("settings.usecolorpermissions"));
         this.useColorPermissions.addListener((observableValue, oldValue, newValue) -> config.set("settings.usecolorpermissions", newValue));
     }
 
@@ -104,7 +104,7 @@ public class ChatChannel implements ChatSpace {
 
         if (context.getSender() == null) {
             displayName = "";
-            message = ColorUtils.color(context.getMessage());
+            message = ColorHandler.getInstance().color(context.getMessage());
         } else {
             if (!canSendMessages(context.getSender())) {
                 return;
@@ -121,9 +121,9 @@ public class ChatChannel implements ChatSpace {
             message = context.getMessage();
 
             if (this.useColorPermissions.get()) {
-                message = ColorUtils.color(context.getSender(), message);
+                message = ColorHandler.getInstance().color(context.getSender(), message);
             } else {
-                message = ColorUtils.color(message);
+                message = ColorHandler.getInstance().color(message);
             }
 
             if (context.getSender() instanceof ConsoleCommandSender) {
@@ -143,13 +143,13 @@ public class ChatChannel implements ChatSpace {
 
         String format;
         if (context.getSender() == null) {
-            format = ColorUtils.color(systemFormat.get().replace("{message}", message));
+            format = ColorHandler.getInstance().color(systemFormat.get().replace("{message}", message));
         } else {
             if (context.getSender() instanceof ConsoleCommandSender) {
-                format = ColorUtils.color(senderFormat.get().replace("{displayname}", displayName)).replace("{message}", message);
+                format = ColorHandler.getInstance().color(senderFormat.get().replace("{displayname}", displayName)).replace("{message}", message);
             } else {
                 Player player = (Player) context.getSender();
-                format = ColorUtils.color(StarChat.getInstance().getPlaceholderHandler().setPlaceholders(player, senderFormat.get().replace("{displayname}", displayName))).replace("{message}", message);
+                format = ColorHandler.getInstance().color(StarChat.getInstance().getPlaceholderHandler().setPlaceholders(player, senderFormat.get().replace("{displayname}", displayName))).replace("{message}", message);
             }
         }
 

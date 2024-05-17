@@ -10,7 +10,7 @@ public class ChannelRegistry extends StringRegistry<ChatChannel> {
     private StarChat plugin;
     
     public ChannelRegistry(StarChat starChat) {
-        super(null, string -> ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', string.toLowerCase().replace(" ", "_"))), ChatChannel::getName, null);
+        super(null, string -> ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', string.toLowerCase().replace(" ", "_"))), ChatChannel::getName, null, null);
         this.plugin = starChat;
     }
 

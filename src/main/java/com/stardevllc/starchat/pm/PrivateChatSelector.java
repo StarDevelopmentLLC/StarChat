@@ -5,7 +5,7 @@ import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.space.ChatSpace;
 import com.stardevllc.starcore.actor.Actor;
 import com.stardevllc.starcore.actor.PlayerActor;
-import com.stardevllc.starcore.color.ColorUtils;
+import com.stardevllc.starcore.color.ColorHandler;
 import org.bukkit.entity.Player;
 
 public class PrivateChatSelector extends ChatSelector {
@@ -21,14 +21,14 @@ public class PrivateChatSelector extends ChatSelector {
         if (args.length >= 2) {
             Actor targetActor = Actor.create(args[1]);
             if (targetActor == null) {
-                player.sendMessage(ColorUtils.color("&cInvalid target."));
+                player.sendMessage(ColorHandler.getInstance().color("&cInvalid target."));
                 return null;
             }
 
 
             chatSpace = StarChat.getInstance().getPrivateMessage(senderActor, targetActor);
             if (chatSpace == null) {
-                player.sendMessage(ColorUtils.color("You do not have a private conversation with " + targetActor.getName()));
+                player.sendMessage(ColorHandler.getInstance().color("You do not have a private conversation with " + targetActor.getName()));
                 return null;
             }
             nameOverride = "Private (" + targetActor.getName() + ")";
@@ -36,7 +36,7 @@ public class PrivateChatSelector extends ChatSelector {
             PrivateMessage privateMessage = StarChat.getInstance().getLastMessage(player.getUniqueId());
             chatSpace = privateMessage;
             if (chatSpace == null) {
-                player.sendMessage(ColorUtils.color("&cYou do not have a last conversation to use as a focus."));
+                player.sendMessage(ColorHandler.getInstance().color("&cYou do not have a last conversation to use as a focus."));
                 return null;
             }
 
