@@ -11,7 +11,7 @@ import com.stardevllc.starcore.actor.Actor;
 import com.stardevllc.starcore.actor.PlayerActor;
 import com.stardevllc.starcore.color.ColorHandler;
 import com.stardevllc.starcore.utils.Config;
-import com.stardevllc.starlib.converter.BooleanStringConverter;
+import com.stardevllc.starlib.converter.string.BooleanStringConverter;
 import com.stardevllc.starlib.observable.Property;
 import com.stardevllc.starlib.observable.ReadWriteProperty;
 import com.stardevllc.starlib.observable.property.writable.ReadWriteBooleanProperty;
