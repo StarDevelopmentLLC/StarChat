@@ -502,12 +502,38 @@ public class StarChatAdminCmd implements TabExecutor {
 
                 ColorHandler.getInstance().coloredMessage(sender, pluginConfig.getString("messages.command.admin.channel.set.success").replace("{channel}", chatChannel.getName()).replace("{key}", property.getName()).replace("{value}", property.getValue() + ""));
             } else {
-                ColorHandler.getInstance().coloredMessage(sender, "Invalid sub command.");
+                ColorHandler.getInstance().coloredMessage(sender, "&cInvalid sub command.");
                 return true;
             }
 
             chatChannel.saveConfig();
-        }
+        } else if (args[0].equalsIgnoreCase("setusestaffchannel")) {
+            if (!(args.length > 1)) {
+                ColorHandler.getInstance().coloredMessage(sender, "&cYou must provide true or false.");
+                return true;
+            }
+            
+            boolean current = plugin.getMainConfig().getBoolean("use-staff-channel");
+            boolean value = Boolean.parseBoolean(args[1]);
+            
+            if (value) {
+                if (current) {
+                    ColorHandler.getInstance().coloredMessage(sender, "&cThe staff channel is already enabled.");
+                    return true;
+                } else {
+                    plugin.getMainConfig().set("use-staff-channel", true);
+                    plugin.loadStaffChannel();
+                }
+            } else {
+                if (!current) {
+                    ColorHandler.getInstance().coloredMessage(sender, "&cThe staff channel is already disabled.");
+                    return true;
+                } else {
+                    plugin.getMainConfig().set("use-staff-channel", false);
+                    plugin.unloadStaffChannel();
+                }
+            }
+        } 
         return true;
     }
 

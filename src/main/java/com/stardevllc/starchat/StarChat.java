@@ -216,9 +216,18 @@ public class StarChat extends JavaPlugin implements Listener {
         this.channelRegistry.register(globalChannel.getName(), globalChannel);
     
         if (mainConfig.getBoolean("use-staff-channel")) {
-            staffChannel = new StaffChannel(this, new File(getDataFolder() + File.separator + "channels", "staff.yml"));
-            this.channelRegistry.register(staffChannel.getName(), staffChannel);
+            loadStaffChannel();
         }
+    }
+    
+    public void loadStaffChannel() {
+        staffChannel = new StaffChannel(this, new File(getDataFolder() + File.separator + "channels", "staff.yml"));
+        this.channelRegistry.register(staffChannel.getName(), staffChannel);
+    }
+
+    public void unloadStaffChannel() {
+        this.channelRegistry.unregister(staffChannel.getName());
+        this.staffChannel = null;
     }
 
     public SpaceRegistry getSpaceRegistry() {
