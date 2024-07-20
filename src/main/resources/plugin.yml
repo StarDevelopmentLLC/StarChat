@@ -13,3 +13,5 @@ commands:
   reply:
     aliases: [r]
   starchat:
+  clearchat: 
+    aliases: [cc]
