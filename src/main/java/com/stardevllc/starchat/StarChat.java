@@ -7,8 +7,8 @@ import com.stardevllc.starchat.commands.ChatCmd;
 import com.stardevllc.starchat.commands.MessageCmd;
 import com.stardevllc.starchat.commands.ReplyCmd;
 import com.stardevllc.starchat.commands.StarChatAdminCmd;
-import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.hooks.VaultHook;
+import com.stardevllc.starchat.listener.PlayerListener;
 import com.stardevllc.starchat.placeholder.DefaultPlaceholders;
 import com.stardevllc.starchat.placeholder.PAPIExpansion;
 import com.stardevllc.starchat.placeholder.PAPIPlaceholders;
@@ -28,10 +28,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.ServicesManager;
@@ -98,8 +95,8 @@ public class StarChat extends JavaPlugin implements Listener {
         servicesManager.register(ChannelRegistry.class, channelRegistry, this, ServicePriority.Highest);
         servicesManager.register(RoomRegistry.class, roomRegistry, this, ServicePriority.Highest);
         servicesManager.register(FocusRegistry.class, playerChatSelection, this, ServicePriority.Highest);
-
-        getServer().getPluginManager().registerEvents(this, this);
+        
+        getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
 
         this.addSelector(new PrivateChatSelector());
 
@@ -218,16 +215,6 @@ public class StarChat extends JavaPlugin implements Listener {
 
         staffChannel = new StaffChannel(this, new File(getDataFolder() + File.separator + "channels", "staff.yml"));
         this.channelRegistry.register(staffChannel.getName(), staffChannel);
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onPlayerChat(AsyncPlayerChatEvent e) {
-        Player player = e.getPlayer();
-
-        ChatSpace chatSpace = getPlayerFocus(player);
-        
-        chatSpace.sendMessage(new ChatContext(e));
-        e.setCancelled(true);
     }
 
     public SpaceRegistry getSpaceRegistry() {
