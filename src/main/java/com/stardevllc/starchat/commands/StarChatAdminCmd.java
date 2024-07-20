@@ -54,7 +54,7 @@ public class StarChatAdminCmd implements TabExecutor {
         String arg = "";
         boolean noSort = false;
         if (args.length == 1) {
-            completions.addAll(List.of("save", "reload", "setconsolenameformat", "setprivatemessageformat", "setuseplaceholderapi", "setusecolorpermissions", "list", "setplayerchatfocus", "channel"));
+            completions.addAll(List.of("save", "reload", "setconsolenameformat", "setprivatemessageformat", "setuseplaceholderapi", "setusecolorpermissions", "list", "setplayerchatfocus", "channel", "renameglobalchannel", "setusestaffchannel"));
 
             completions.removeIf(option -> !sender.hasPermission("starchat.command.admin." + option));
 
@@ -522,6 +522,7 @@ public class StarChatAdminCmd implements TabExecutor {
                     return true;
                 } else {
                     plugin.getMainConfig().set("use-staff-channel", true);
+                    plugin.getMainConfig().save();
                     plugin.loadStaffChannel();
                     ColorHandler.getInstance().coloredMessage(sender, "&aYou enabled the staff channel.");
                 }
@@ -531,6 +532,7 @@ public class StarChatAdminCmd implements TabExecutor {
                     return true;
                 } else {
                     plugin.getMainConfig().set("use-staff-channel", false);
+                    plugin.getMainConfig().save();
                     plugin.unloadStaffChannel();
                     ColorHandler.getInstance().coloredMessage(sender, "&aYou disbaled the staff channel.");
                 }
