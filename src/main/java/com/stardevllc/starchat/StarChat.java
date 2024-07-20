@@ -130,7 +130,7 @@ public class StarChat extends JavaPlugin implements Listener {
         mainConfig = new Config(new File(getDataFolder(), "config.yml"));
 
         Set<String> spacesToRemove = new HashSet<>();
-        for (ChatSpace space : this.spaceRegistry.getObjects().values()) {
+        for (ChatSpace space : this.channelRegistry.getObjects().values()) {
             if (space.getPlugin().getName().equalsIgnoreCase(this.getName())) {
                 spacesToRemove.add(space.getName());
             }
