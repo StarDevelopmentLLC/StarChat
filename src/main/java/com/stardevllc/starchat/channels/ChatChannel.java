@@ -238,4 +238,9 @@ public class ChatChannel implements ChatSpace {
     public boolean isUseColorPermissions() {
         return useColorPermissions.get();
     }
+
+    public void setFile(File newFile) {
+        this.file = newFile;
+        this.config = new Config(this.file);
+    }
 }

@@ -554,15 +554,25 @@ public class StarChatAdminCmd implements TabExecutor {
                 return true;
             }
             
-            plugin.getGlobalChannel().setName(newName);
+            plugin.getChannelRegistry().unregister(oldName);
+
             File oldFile = plugin.getGlobalChannel().getFile();
             File newFile = new File(oldFile.getParentFile(), newName + ".yml");
-            
+
             if (newFile.exists()) {
                 newFile.delete();
             }
-            
+
             oldFile.renameTo(newFile);
+            
+            plugin.getGlobalChannel().setFile(newFile);
+            plugin.getGlobalChannel().setName(newName);
+            plugin.getGlobalChannel().saveConfig();
+            plugin.getMainConfig().set("global-channel-name", newName);
+            plugin.getMainConfig().save();
+            
+            plugin.getChannelRegistry().register(plugin.getGlobalChannel().getName(), plugin.getGlobalChannel());
+            
             ColorHandler.getInstance().coloredMessage(sender, "&aYou renamed the global channel from &e" + oldName + " &ato &e" + newName + "&a.");
         }
         return true;
