@@ -523,6 +523,7 @@ public class StarChatAdminCmd implements TabExecutor {
                 } else {
                     plugin.getMainConfig().set("use-staff-channel", true);
                     plugin.loadStaffChannel();
+                    ColorHandler.getInstance().coloredMessage(sender, "&aYou enabled the staff channel.");
                 }
             } else {
                 if (!current) {
@@ -531,9 +532,39 @@ public class StarChatAdminCmd implements TabExecutor {
                 } else {
                     plugin.getMainConfig().set("use-staff-channel", false);
                     plugin.unloadStaffChannel();
+                    ColorHandler.getInstance().coloredMessage(sender, "&aYou disbaled the staff channel.");
                 }
             }
-        } 
+        } else if (args[0].equalsIgnoreCase("renameglobalchannel")) {
+            if (!(args.length > 1)) {
+                ColorHandler.getInstance().coloredMessage(sender, "&cYou must provide a new name.");
+                return true;
+            }
+            
+            String newName = ColorHandler.stripColor(args[1]).toLowerCase();
+            String oldName = plugin.getMainConfig().getString("global-channel-name");
+            
+            if (newName.isBlank()) {
+                ColorHandler.getInstance().coloredMessage(sender, "&cThe new name is blank or effectively blank.");
+                return true;
+            }
+            
+            if (oldName.equals(newName)) {
+                ColorHandler.getInstance().coloredMessage(sender, "&cThe old name and the new name are the same.");
+                return true;
+            }
+            
+            plugin.getGlobalChannel().setName(newName);
+            File oldFile = plugin.getGlobalChannel().getFile();
+            File newFile = new File(oldFile.getParentFile(), newName + ".yml");
+            
+            if (newFile.exists()) {
+                newFile.delete();
+            }
+            
+            oldFile.renameTo(newFile);
+            ColorHandler.getInstance().coloredMessage(sender, "&aYou renamed the global channel from &e" + oldName + " &ato &e" + newName + "&a.");
+        }
         return true;
     }
 
