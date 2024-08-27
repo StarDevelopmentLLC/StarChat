@@ -1,11 +1,11 @@
-Move Color and Chat formatting stuff to the Kyori Adventure API. Will require a change in StarCore though (This supports 1.8 to 1.20.4)
+Move Color and Chat formatting stuff to the Kyori Adventure API. Will require a change in StarCore though (This supports 1.8 to 1.21.1)
 Maybe use ProtocolLib?
 
 Add logging - Channels, Rooms and PMs
 
 Cross Server Communication - BungeeCord (Also when the Java Socket based api is implemented, do it this way as well)
 
-Add Discord Hook
+Add Discord Hook - Need a bot based api for plugins
 
 Add Symbol Shortcuts for Channels (Like the Nexus Reborn @ for staff chat)
 
@@ -45,5 +45,7 @@ Per Group Rooms
 World Guard support?
 
 Towny Support?
+
+Factions Support?
 
 Range based chat - either based on sender pos or an anchor
