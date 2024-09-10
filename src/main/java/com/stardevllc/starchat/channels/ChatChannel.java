@@ -8,6 +8,8 @@ import com.stardevllc.starcore.utils.Config;
 import com.stardevllc.starlib.observable.property.writable.ReadWriteBooleanProperty;
 import com.stardevllc.starlib.observable.property.writable.ReadWriteLongProperty;
 import com.stardevllc.starlib.observable.property.writable.ReadWriteStringProperty;
+import com.stardevllc.starlib.time.TimeFormat;
+import com.stardevllc.starlib.time.TimeParser;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
@@ -17,7 +19,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.function.Function;
 
 public class ChatChannel implements ChatSpace {
@@ -35,6 +40,12 @@ public class ChatChannel implements ChatSpace {
     protected final ReadWriteBooleanProperty useColorPermissions;
 
     protected Function<Player, String> displayNameHandler;
+
+    protected final ReadWriteLongProperty cooldownLength;
+
+    protected Map<UUID, Long> lastMessage = new HashMap<>();
+    
+    protected static final TimeFormat TIME_FORMAT = new TimeFormat("%*#0h%%*#0m%%*#0s%");
 
     public ChatChannel(JavaPlugin plugin, String name, Path filePath) {
         this.plugin = plugin;
@@ -65,6 +76,8 @@ public class ChatChannel implements ChatSpace {
         this.systemFormat.addListener((observableValue, oldValue, newValue) -> config.set("formats.system", newValue));
         this.useColorPermissions = new ReadWriteBooleanProperty(this, "useColorPermissions", config.getBoolean("settings.usecolorpermissions"));
         this.useColorPermissions.addListener((observableValue, oldValue, newValue) -> config.set("settings.usecolorpermissions", newValue));
+        this.cooldownLength = new ReadWriteLongProperty(this, "cooldownLength", new TimeParser().parseTime(config.getString("settings.cooldownlength")));
+        this.cooldownLength.addListener((observableValue, oldValue, newValue) -> config.set("settings.cooldownlength", newValue));
     }
 
     protected void createDefaults() {
@@ -74,6 +87,7 @@ public class ChatChannel implements ChatSpace {
         config.addDefault("permissions.view", "", "The permission that is required to have in order for a player to receive messages from this channel.");
         config.addDefault("permissions.send", "", "The permission that is required to have in order for a player to send messages in this channel.");
         config.addDefault("settings.usecolorpermissions", false, "Whether or not to use fine-controlled color permissions from StarCore.");
+        config.addDefault("settings.cooldownlength", "3s", "The amount of time in-between chat messages.", "This can be bypasses with starcore.channel.<channelname>.bypasscooldown.");
         config.save();
     }
 
@@ -112,6 +126,18 @@ public class ChatChannel implements ChatSpace {
 
             CommandSender sender = context.getSender();
 
+            if (sender instanceof Player player) {
+                if (!sender.hasPermission("starchat.channel." + getName().toLowerCase() + ".bypasscooldown")) {
+                    long lastMessage = this.lastMessage.getOrDefault(player.getUniqueId(), 0L);
+                    if (lastMessage != 0L) {
+                        if (System.currentTimeMillis() < lastMessage + cooldownLength.get()) {
+                            ColorHandler.getInstance().coloredMessage(player, "&cYou must wait " + TIME_FORMAT.format(lastMessage + cooldownLength.get() - System.currentTimeMillis()) + " before you can chat again.");
+                            return;
+                        }
+                    }
+                }
+            }
+
             if (context.getChatEvent() != null && context.getChatEvent().isCancelled()) {
                 if (!sender.hasPermission("starchat.channel.bypass.cancelledevent")) {
                     return;
@@ -136,7 +162,7 @@ public class ChatChannel implements ChatSpace {
                 }
             }
         }
-        
+
         if (displayName == null || displayName.isEmpty()) {
             displayName = "";
         }
@@ -197,6 +223,11 @@ public class ChatChannel implements ChatSpace {
     @Override
     public JavaPlugin getPlugin() {
         return plugin;
+    }
+
+    @Override
+    public boolean supportsCooldowns() {
+        return true;
     }
 
     public Function<Player, String> getDisplayNameHandler() {

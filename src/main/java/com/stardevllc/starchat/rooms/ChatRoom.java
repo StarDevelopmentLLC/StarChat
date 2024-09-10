@@ -151,6 +151,11 @@ public class ChatRoom implements ChatSpace {
         return plugin;
     }
 
+    @Override
+    public boolean supportsCooldowns() {
+        return false;
+    }
+
     public boolean isOwner(UUID uuid) {
         if (owner.isPlayer()) {
             return owner.equals(uuid);

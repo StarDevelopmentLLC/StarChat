@@ -11,4 +11,6 @@ public interface ChatSpace {
     String getName();
     long getId();
     JavaPlugin getPlugin();
+    
+    boolean supportsCooldowns();
 }
