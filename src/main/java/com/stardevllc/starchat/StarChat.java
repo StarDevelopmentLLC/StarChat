@@ -20,7 +20,7 @@ import com.stardevllc.starchat.space.ChatSpace;
 import com.stardevllc.starcore.actor.Actor;
 import com.stardevllc.starcore.actor.PlayerActor;
 import com.stardevllc.starcore.actor.ServerActor;
-import com.stardevllc.starcore.utils.Config;
+import com.stardevllc.starcore.config.Config;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;

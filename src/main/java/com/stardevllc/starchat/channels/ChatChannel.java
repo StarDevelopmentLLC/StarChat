@@ -1,15 +1,15 @@
 package com.stardevllc.starchat.channels;
 
+import com.stardevllc.property.BooleanProperty;
+import com.stardevllc.property.LongProperty;
+import com.stardevllc.property.StringProperty;
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.space.ChatSpace;
 import com.stardevllc.starcore.color.ColorHandler;
-import com.stardevllc.starcore.utils.Config;
-import com.stardevllc.starlib.observable.property.writable.ReadWriteBooleanProperty;
-import com.stardevllc.starlib.observable.property.writable.ReadWriteLongProperty;
-import com.stardevllc.starlib.observable.property.writable.ReadWriteStringProperty;
-import com.stardevllc.starlib.time.TimeFormat;
-import com.stardevllc.starlib.time.TimeParser;
+import com.stardevllc.starcore.config.Config;
+import com.stardevllc.time.TimeFormat;
+import com.stardevllc.time.TimeParser;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
@@ -29,19 +29,19 @@ public class ChatChannel implements ChatSpace {
     protected transient File file; //The main file for the config.
     protected transient Config config; //Config to store information as channels are mainly config/command controlled, transient modifier allows StarData to ignore this field without having to depend on StarData directly
 
-    protected final ReadWriteLongProperty id;
+    protected final LongProperty id;
     protected final JavaPlugin plugin;
 
-    protected final ReadWriteStringProperty name;
-    protected final ReadWriteStringProperty viewPermission;
-    protected final ReadWriteStringProperty sendPermission;
-    protected final ReadWriteStringProperty senderFormat;
-    protected final ReadWriteStringProperty systemFormat;
-    protected final ReadWriteBooleanProperty useColorPermissions;
+    protected final StringProperty name;
+    protected final StringProperty viewPermission;
+    protected final StringProperty sendPermission;
+    protected final StringProperty senderFormat;
+    protected final StringProperty systemFormat;
+    protected final BooleanProperty useColorPermissions;
 
     protected Function<Player, String> displayNameHandler;
 
-    protected final ReadWriteLongProperty cooldownLength;
+    protected final LongProperty cooldownLength;
 
     protected Map<UUID, Long> lastMessage = new HashMap<>();
     
@@ -60,24 +60,24 @@ public class ChatChannel implements ChatSpace {
 
         this.config = new Config(file);
 
-        this.id = new ReadWriteLongProperty(this, "id");
-        this.name = new ReadWriteStringProperty(this, "name", name);
+        this.id = new LongProperty(this, "id", 0);
+        this.name = new StringProperty(this, "name", name);
 
         createDefaults();
 
-        this.name.addListener((observableValue, oldValue, newValue) -> config.set("name", newValue));
-        this.viewPermission = new ReadWriteStringProperty(this, "viewPermission", this.config.getString("permissions.view"));
-        this.viewPermission.addListener((observableValue, oldValue, newValue) -> config.set("permissions.view", newValue));
-        this.sendPermission = new ReadWriteStringProperty(this, "sendPermission", this.config.getString("permissions.send"));
-        this.sendPermission.addListener((observableValue, oldValue, newValue) -> config.set("permissions.send", newValue));
-        this.senderFormat = new ReadWriteStringProperty(this, "senderFormat", this.config.getString("formats.sender"));
-        this.senderFormat.addListener((observableValue, oldValue, newValue) -> config.set("formats.sender", newValue));
-        this.systemFormat = new ReadWriteStringProperty(this, "systemFormat", this.config.getString("formats.system"));
-        this.systemFormat.addListener((observableValue, oldValue, newValue) -> config.set("formats.system", newValue));
-        this.useColorPermissions = new ReadWriteBooleanProperty(this, "useColorPermissions", config.getBoolean("settings.usecolorpermissions"));
-        this.useColorPermissions.addListener((observableValue, oldValue, newValue) -> config.set("settings.usecolorpermissions", newValue));
-        this.cooldownLength = new ReadWriteLongProperty(this, "cooldownLength", new TimeParser().parseTime(config.getString("settings.cooldownlength")));
-        this.cooldownLength.addListener((observableValue, oldValue, newValue) -> config.set("settings.cooldownlength", newValue));
+        this.name.addListener(e -> config.set("name", e.newValue()));
+        this.viewPermission = new StringProperty(this, "viewPermission", this.config.getString("permissions.view"));
+        this.viewPermission.addListener(e -> config.set("permissions.view", e.newValue()));
+        this.sendPermission = new StringProperty(this, "sendPermission", this.config.getString("permissions.send"));
+        this.sendPermission.addListener(e -> config.set("permissions.send", e.newValue()));
+        this.senderFormat = new StringProperty(this, "senderFormat", this.config.getString("formats.sender"));
+        this.senderFormat.addListener(e -> config.set("formats.sender", e.newValue()));
+        this.systemFormat = new StringProperty(this, "systemFormat", this.config.getString("formats.system"));
+        this.systemFormat.addListener(e -> config.set("formats.system", e.newValue()));
+        this.useColorPermissions = new BooleanProperty(this, "useColorPermissions", config.getBoolean("settings.usecolorpermissions"));
+        this.useColorPermissions.addListener(e -> config.set("settings.usecolorpermissions", e.newValue()));
+        this.cooldownLength = new LongProperty(this, "cooldownLength", new TimeParser().parseTime(config.getString("settings.cooldownlength")));
+        this.cooldownLength.addListener(e -> config.set("settings.cooldownlength", e.newValue()));
     }
 
     protected void createDefaults() {

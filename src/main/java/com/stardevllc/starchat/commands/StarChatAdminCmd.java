@@ -1,5 +1,10 @@
 package com.stardevllc.starchat.commands;
 
+import com.stardevllc.converter.string.StringConverters;
+import com.stardevllc.helper.ReflectionHelper;
+import com.stardevllc.observable.Property;
+import com.stardevllc.property.BooleanProperty;
+import com.stardevllc.property.StringProperty;
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.channels.ChatChannel;
 import com.stardevllc.starchat.placeholder.DefaultPlaceholders;
@@ -10,13 +15,7 @@ import com.stardevllc.starchat.rooms.ChatRoom;
 import com.stardevllc.starcore.actor.Actor;
 import com.stardevllc.starcore.actor.PlayerActor;
 import com.stardevllc.starcore.color.ColorHandler;
-import com.stardevllc.starcore.utils.Config;
-import com.stardevllc.starlib.converter.string.BooleanStringConverter;
-import com.stardevllc.starlib.observable.Property;
-import com.stardevllc.starlib.observable.ReadWriteProperty;
-import com.stardevllc.starlib.observable.property.writable.ReadWriteBooleanProperty;
-import com.stardevllc.starlib.observable.property.writable.ReadWriteStringProperty;
-import com.stardevllc.starlib.reflection.ReflectionHelper;
+import com.stardevllc.starcore.config.Config;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -152,7 +151,7 @@ public class StarChatAdminCmd implements TabExecutor {
                     
                     if (args.length == 4) {
                         for (Field field : ReflectionHelper.getClassFields(chatChannel.getClass())) {
-                            if (ReadWriteProperty.class.isAssignableFrom(field.getType())) {
+                            if (Property.class.isAssignableFrom(field.getType())) {
                                 completions.add(field.getName().toLowerCase());
                             }
                         }
@@ -491,10 +490,10 @@ public class StarChatAdminCmd implements TabExecutor {
                     return true;
                 }
 
-                if (property instanceof ReadWriteStringProperty stringProperty) {
+                if (property instanceof StringProperty stringProperty) {
                     stringProperty.set(value);
-                } else if (property instanceof ReadWriteBooleanProperty booleanProperty) {
-                    booleanProperty.set(new BooleanStringConverter().fromString(value));
+                } else if (property instanceof BooleanProperty booleanProperty) {
+                    booleanProperty.set(StringConverters.getConverter(boolean.class).convertTo(value));
                 } else {
                     ColorHandler.getInstance().coloredMessage(sender, "Unsupported Property Value Type, contact the developer to add support.");
                     return true;

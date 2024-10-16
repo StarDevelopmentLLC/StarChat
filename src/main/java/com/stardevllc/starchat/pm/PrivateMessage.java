@@ -1,11 +1,10 @@
 package com.stardevllc.starchat.pm;
 
-import com.mysql.cj.conf.StringProperty;
+import com.stardevllc.property.StringProperty;
 import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.space.ChatSpace;
 import com.stardevllc.starcore.actor.Actor;
 import com.stardevllc.starcore.color.ColorHandler;
-import com.stardevllc.starlib.observable.property.writable.ReadWriteStringProperty;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -18,16 +17,16 @@ public class PrivateMessage implements ChatSpace {
     protected long id;
     protected JavaPlugin plugin;
 
-    protected final ReadWriteStringProperty name;
-    protected final ReadWriteStringProperty senderFormat;
+    protected final StringProperty name;
+    protected final StringProperty senderFormat;
     protected Function<Player, String> displayNameHandler;
 
     private Actor actor1, actor2;
 
     public PrivateMessage(JavaPlugin plugin, Actor actor1, Actor actor2, String format) {
         this.plugin = plugin;
-        this.name = new ReadWriteStringProperty(this, "name", "pm-" + actor1.getName() + "-" + actor2.getName());
-        this.senderFormat = new ReadWriteStringProperty(this, "senderFormat", format);
+        this.name = new StringProperty(this, "name", "pm-" + actor1.getName() + "-" + actor2.getName());
+        this.senderFormat = new StringProperty(this, "senderFormat", format);
         this.actor1 = actor1;
         this.actor2 = actor2;
     }
@@ -84,6 +83,11 @@ public class PrivateMessage implements ChatSpace {
     @Override
     public JavaPlugin getPlugin() {
         return plugin;
+    }
+
+    @Override
+    public boolean supportsCooldowns() {
+        return false;
     }
 
     public Actor getActor1() {

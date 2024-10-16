@@ -1,8 +1,8 @@
 package com.stardevllc.starchat.registry;
 
+import com.stardevllc.registry.StringRegistry;
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.channels.ChatChannel;
-import com.stardevllc.starlib.registry.StringRegistry;
 import org.bukkit.ChatColor;
 
 public class ChannelRegistry extends StringRegistry<ChatChannel> {

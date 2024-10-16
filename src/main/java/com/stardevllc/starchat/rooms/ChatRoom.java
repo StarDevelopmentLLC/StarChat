@@ -1,12 +1,12 @@
 package com.stardevllc.starchat.rooms;
 
+import com.stardevllc.property.BooleanProperty;
+import com.stardevllc.property.StringProperty;
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.space.ChatSpace;
 import com.stardevllc.starcore.actor.Actor;
 import com.stardevllc.starcore.color.ColorHandler;
-import com.stardevllc.starlib.observable.property.writable.ReadWriteBooleanProperty;
-import com.stardevllc.starlib.observable.property.writable.ReadWriteStringProperty;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
@@ -24,10 +24,10 @@ public class ChatRoom implements ChatSpace {
     protected long id;
     protected JavaPlugin plugin;
 
-    protected final ReadWriteStringProperty name;
-    protected final ReadWriteBooleanProperty useColorPermissions;
-    protected final ReadWriteStringProperty senderFormat;
-    protected final ReadWriteStringProperty systemFormat;
+    protected final StringProperty name;
+    protected final BooleanProperty useColorPermissions;
+    protected final StringProperty senderFormat;
+    protected final StringProperty systemFormat;
     protected Function<Player, String> displayNameHandler;
     
     protected Actor owner;
@@ -36,10 +36,10 @@ public class ChatRoom implements ChatSpace {
     public ChatRoom(JavaPlugin plugin, Actor owner, String name) {
         this.plugin = plugin;
         this.owner = owner;
-        this.name = new ReadWriteStringProperty(this, "name", name);
-        this.useColorPermissions = new ReadWriteBooleanProperty(this, "useColorPermissions", false);
-        this.senderFormat = new ReadWriteStringProperty(this, "senderFormat", "");
-        this.systemFormat = new ReadWriteStringProperty(this, "systemFormat", "");
+        this.name = new StringProperty(this, "name", name);
+        this.useColorPermissions = new BooleanProperty(this, "useColorPermissions", false);
+        this.senderFormat = new StringProperty(this, "senderFormat", "");
+        this.systemFormat = new StringProperty(this, "systemFormat", "");
     }
     
     public ChatRoom(JavaPlugin plugin, String name) {

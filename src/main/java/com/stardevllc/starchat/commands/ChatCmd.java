@@ -7,7 +7,7 @@ import com.stardevllc.starchat.registry.ChannelRegistry;
 import com.stardevllc.starchat.rooms.ChatRoom;
 import com.stardevllc.starchat.space.ChatSpace;
 import com.stardevllc.starcore.color.ColorHandler;
-import com.stardevllc.starcore.utils.Config;
+import com.stardevllc.starcore.config.Config;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
