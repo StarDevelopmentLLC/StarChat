@@ -1,3 +1,25 @@
+0.1.0
+- Version Schema Change
+- Updated StarCore library to 0.1.0
+
+1.0.0-alpha.21
+- Update internal structure for StarDevLLC libraries
+
+1.0.0-alpha.20
+- Added a /clearchat command - Note: This will interfere with other plugins that use that command signature.
+
+1.0.0-alpha.19
+- Added the ability to disable the staff channel from generating/regenerating
+- Added the ability to rename the global channel
+- Fixed a bug where channels were not reloading sometimes
+
+1.0.0-alpha.18 
+- Fixed a bug where the chat listener was not being registered due to PAPI missing
+
+1.0.0-alpha.16-17
+- Updated Internal Libraries
+- Updated to Java 21
+
 1.0.0-alpha.15
 - Changed the global channel name
 - Fixed a bug with display names not retrieving if vault provider is null
