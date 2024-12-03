@@ -28,7 +28,6 @@ public class ClearChatCmd implements CommandExecutor {
     
     public ClearChatCmd(StarChat plugin) {
         this.plugin = plugin;
-        
     }
     
     @Override

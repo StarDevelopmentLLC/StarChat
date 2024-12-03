@@ -66,11 +66,7 @@ public class MessageCmd implements TabExecutor {
         if ((boolean) flags.getFlagValues().get(FOCUS)) {
             if (sender instanceof Player player) {
                 plugin.setPlayerFocus(player, privateMessage);
-                String spaceName = privateMessage.getName();
-                String nameOverride = "";
-                if (nameOverride != null && !nameOverride.isEmpty()) {
-                    spaceName = nameOverride;
-                }
+                String spaceName = "Private (" + targetActor.getName() + ")";
                 sender.sendMessage(ColorHandler.getInstance().color(plugin.getConfig().getString("messages.command.chat.setfocus").replace("{SPACE}", spaceName)));
             }
         }
