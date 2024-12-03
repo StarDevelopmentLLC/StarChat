@@ -442,7 +442,7 @@ public class StarChatAdminCmd implements TabExecutor {
                 return true;
             }
 
-            if (args[1].equalsIgnoreCase("delete")) {
+            if (args[2].equalsIgnoreCase("delete")) {
                 if (!(sender.hasPermission("starchat.command.admin.channel.delete"))) {
                     ColorHandler.getInstance().coloredMessage(sender, pluginConfig.getString("messages.command.nopermission"));
                     return true;
