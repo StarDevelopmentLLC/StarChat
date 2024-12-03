@@ -6,12 +6,15 @@ import com.stardevllc.starchat.pm.PrivateMessage;
 import com.stardevllc.starcore.actor.Actor;
 import com.stardevllc.starcore.actor.PlayerActor;
 import com.stardevllc.starcore.color.ColorHandler;
+import com.stardevllc.starcore.utils.cmdflags.CmdFlags;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 
 import java.util.List;
+
+import static com.stardevllc.starchat.commands.MessageCmd.FOCUS;
 
 public class ReplyCmd implements TabExecutor {
     
@@ -26,6 +29,9 @@ public class ReplyCmd implements TabExecutor {
             ColorHandler.getInstance().coloredMessage(sender, plugin.getMainConfig().getString("messages.command.nopermission"));
             return true;
         }
+
+        CmdFlags flags = new CmdFlags(FOCUS);
+        args = flags.parse(args);
         
         if (args.length == 0) {
             sender.sendMessage(ColorHandler.getInstance().color("&cUsage: /" + label + " <message>"));
@@ -74,6 +80,17 @@ public class ReplyCmd implements TabExecutor {
 
         privateMessage.sendMessage(new ChatContext(sender, msgBuilder.toString().trim()));
         plugin.assignLastMessage(sender, msgBuilder, privateMessage, senderActor, targetActor);
+        if ((boolean) flags.getFlagValues().get(FOCUS)) {
+            if (sender instanceof Player player) {
+                plugin.setPlayerFocus(player, privateMessage);
+                String spaceName = privateMessage.getName();
+                String nameOverride = "";
+                if (nameOverride != null && !nameOverride.isEmpty()) {
+                    spaceName = nameOverride;
+                }
+                sender.sendMessage(ColorHandler.getInstance().color(plugin.getConfig().getString("messages.command.chat.setfocus").replace("{SPACE}", spaceName)));
+            }
+        }
         return true;
     }
     

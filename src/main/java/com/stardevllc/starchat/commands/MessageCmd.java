@@ -5,6 +5,9 @@ import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.pm.PrivateMessage;
 import com.stardevllc.starcore.actor.Actor;
 import com.stardevllc.starcore.color.ColorHandler;
+import com.stardevllc.starcore.utils.cmdflags.CmdFlags;
+import com.stardevllc.starcore.utils.cmdflags.Flag;
+import com.stardevllc.starcore.utils.cmdflags.type.PresenceFlag;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -18,6 +21,8 @@ import java.util.List;
 public class MessageCmd implements TabExecutor {
     
     private StarChat plugin;
+    
+    protected static final Flag FOCUS = new PresenceFlag("f", "FOCUS");
 
     public MessageCmd(StarChat plugin) {
         this.plugin = plugin;
@@ -28,6 +33,9 @@ public class MessageCmd implements TabExecutor {
             ColorHandler.getInstance().coloredMessage(sender, plugin.getMainConfig().getString("messages.command.nopermission"));
             return true;
         }
+
+        CmdFlags flags = new CmdFlags(FOCUS);
+        args = flags.parse(args);
         
         if (!(args.length >= 2)) {
             sender.sendMessage(ColorHandler.getInstance().color("&cUsage: /" + label + " <target> <message>"));
@@ -55,6 +63,17 @@ public class MessageCmd implements TabExecutor {
         
         privateMessage.sendMessage(new ChatContext(sender, msgBuilder.toString().trim()));
         plugin.assignLastMessage(sender, msgBuilder, privateMessage, senderActor, targetActor);
+        if ((boolean) flags.getFlagValues().get(FOCUS)) {
+            if (sender instanceof Player player) {
+                plugin.setPlayerFocus(player, privateMessage);
+                String spaceName = privateMessage.getName();
+                String nameOverride = "";
+                if (nameOverride != null && !nameOverride.isEmpty()) {
+                    spaceName = nameOverride;
+                }
+                sender.sendMessage(ColorHandler.getInstance().color(plugin.getConfig().getString("messages.command.chat.setfocus").replace("{SPACE}", spaceName)));
+            }
+        }
         return true;
     }
     
