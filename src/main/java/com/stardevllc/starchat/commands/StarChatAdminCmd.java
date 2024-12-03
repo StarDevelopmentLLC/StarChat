@@ -507,6 +507,11 @@ public class StarChatAdminCmd implements TabExecutor {
 
             chatChannel.saveConfig();
         } else if (args[0].equalsIgnoreCase("setusestaffchannel")) {
+            if (!sender.hasPermission("starchat.command.admin.setusestaffchannel")) {
+                ColorHandler.getInstance().coloredMessage(sender, pluginConfig.getString("messages.command.nopermission"));
+                return true;
+            }
+            
             if (!(args.length > 1)) {
                 ColorHandler.getInstance().coloredMessage(sender, "&cYou must provide true or false.");
                 return true;
@@ -537,6 +542,11 @@ public class StarChatAdminCmd implements TabExecutor {
                 }
             }
         } else if (args[0].equalsIgnoreCase("renameglobalchannel")) {
+            if (!sender.hasPermission("starchat.command.admin.renameglobalchannel")) {
+                ColorHandler.getInstance().coloredMessage(sender, pluginConfig.getString("messages.command.nopermission"));
+                return true;
+            }
+            
             if (!(args.length > 1)) {
                 ColorHandler.getInstance().coloredMessage(sender, "&cYou must provide a new name.");
                 return true;
