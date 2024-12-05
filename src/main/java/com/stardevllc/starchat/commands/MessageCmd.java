@@ -1,9 +1,9 @@
 package com.stardevllc.starchat.commands;
 
+import com.stardevllc.actors.Actor;
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.pm.PrivateMessage;
-import com.stardevllc.starcore.actor.Actor;
 import com.stardevllc.starcore.color.ColorHandler;
 import com.stardevllc.starcore.utils.cmdflags.CmdFlags;
 import com.stardevllc.starcore.utils.cmdflags.Flag;
@@ -63,7 +63,7 @@ public class MessageCmd implements TabExecutor {
         
         privateMessage.sendMessage(new ChatContext(sender, msgBuilder.toString().trim()));
         plugin.assignLastMessage(sender, msgBuilder, privateMessage, senderActor, targetActor);
-        if ((boolean) flags.getFlagValues().get(FOCUS)) {
+        if ((boolean) flagResult.flagValues().get(FOCUS)) {
             if (sender instanceof Player player) {
                 plugin.setPlayerFocus(player, privateMessage);
                 String spaceName = "Private (" + targetActor.getName() + ")";

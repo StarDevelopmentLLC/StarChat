@@ -1,5 +1,7 @@
 package com.stardevllc.starchat.commands;
 
+import com.stardevllc.actors.Actor;
+import com.stardevllc.actors.PlayerActor;
 import com.stardevllc.converter.string.StringConverters;
 import com.stardevllc.helper.ReflectionHelper;
 import com.stardevllc.observable.Property;
@@ -12,8 +14,6 @@ import com.stardevllc.starchat.placeholder.PAPIExpansion;
 import com.stardevllc.starchat.placeholder.PAPIPlaceholders;
 import com.stardevllc.starchat.pm.PrivateMessage;
 import com.stardevllc.starchat.rooms.ChatRoom;
-import com.stardevllc.starcore.actor.Actor;
-import com.stardevllc.starcore.actor.PlayerActor;
 import com.stardevllc.starcore.color.ColorHandler;
 import com.stardevllc.starcore.config.Config;
 import org.bukkit.Bukkit;

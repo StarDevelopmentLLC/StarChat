@@ -1,5 +1,8 @@
 package com.stardevllc.starchat;
 
+import com.stardevllc.actors.Actor;
+import com.stardevllc.actors.PlayerActor;
+import com.stardevllc.actors.ServerActor;
 import com.stardevllc.starchat.channels.ChatChannel;
 import com.stardevllc.starchat.channels.GlobalChannel;
 import com.stardevllc.starchat.channels.StaffChannel;
@@ -17,9 +20,6 @@ import com.stardevllc.starchat.registry.FocusRegistry;
 import com.stardevllc.starchat.registry.RoomRegistry;
 import com.stardevllc.starchat.registry.SpaceRegistry;
 import com.stardevllc.starchat.space.ChatSpace;
-import com.stardevllc.starcore.actor.Actor;
-import com.stardevllc.starcore.actor.PlayerActor;
-import com.stardevllc.starcore.actor.ServerActor;
 import com.stardevllc.starcore.config.Config;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;

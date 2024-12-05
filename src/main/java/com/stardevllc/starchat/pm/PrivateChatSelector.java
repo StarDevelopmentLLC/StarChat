@@ -1,10 +1,10 @@
 package com.stardevllc.starchat.pm;
 
+import com.stardevllc.actors.Actor;
+import com.stardevllc.actors.PlayerActor;
 import com.stardevllc.starchat.ChatSelector;
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.space.ChatSpace;
-import com.stardevllc.starcore.actor.Actor;
-import com.stardevllc.starcore.actor.PlayerActor;
 import com.stardevllc.starcore.color.ColorHandler;
 import org.bukkit.entity.Player;
 
