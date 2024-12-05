@@ -7,6 +7,7 @@ import com.stardevllc.starchat.pm.PrivateMessage;
 import com.stardevllc.starcore.color.ColorHandler;
 import com.stardevllc.starcore.utils.cmdflags.CmdFlags;
 import com.stardevllc.starcore.utils.cmdflags.Flag;
+import com.stardevllc.starcore.utils.cmdflags.ParseResult;
 import com.stardevllc.starcore.utils.cmdflags.type.PresenceFlag;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -24,6 +25,8 @@ public class MessageCmd implements TabExecutor {
     
     protected static final Flag FOCUS = new PresenceFlag("f", "FOCUS");
 
+    protected static final CmdFlags flags = new CmdFlags(FOCUS);
+
     public MessageCmd(StarChat plugin) {
         this.plugin = plugin;
     }
@@ -34,8 +37,8 @@ public class MessageCmd implements TabExecutor {
             return true;
         }
 
-        CmdFlags flags = new CmdFlags(FOCUS);
-        args = flags.parse(args);
+        ParseResult flagResult = flags.parse(args);
+        args = flagResult.args();
         
         if (!(args.length >= 2)) {
             sender.sendMessage(ColorHandler.getInstance().color("&cUsage: /" + label + " <target> <message>"));
@@ -63,7 +66,7 @@ public class MessageCmd implements TabExecutor {
         
         privateMessage.sendMessage(new ChatContext(sender, msgBuilder.toString().trim()));
         plugin.assignLastMessage(sender, msgBuilder, privateMessage, senderActor, targetActor);
-        if ((boolean) flagResult.flagValues().get(FOCUS)) {
+        if (flagResult.isPresent(FOCUS)) {
             if (sender instanceof Player player) {
                 plugin.setPlayerFocus(player, privateMessage);
                 String spaceName = "Private (" + targetActor.getName() + ")";
