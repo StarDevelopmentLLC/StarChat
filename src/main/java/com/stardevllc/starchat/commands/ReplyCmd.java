@@ -2,11 +2,11 @@ package com.stardevllc.starchat.commands;
 
 import com.stardevllc.actors.Actor;
 import com.stardevllc.actors.PlayerActor;
+import com.stardevllc.cmdflags.ParseResult;
+import com.stardevllc.colors.StarColors;
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.pm.PrivateMessage;
-import com.stardevllc.starcore.color.ColorHandler;
-import com.stardevllc.starcore.utils.cmdflags.ParseResult;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
@@ -27,7 +27,7 @@ public class ReplyCmd implements TabExecutor {
     
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (!(sender.hasPermission("starchat.command.reply"))) {
-            ColorHandler.getInstance().coloredMessage(sender, plugin.getMainConfig().getString("messages.command.nopermission"));
+            StarColors.coloredMessage(sender, plugin.getMainConfig().getString("messages.command.nopermission"));
             return true;
         }
 
@@ -35,8 +35,8 @@ public class ReplyCmd implements TabExecutor {
         args = flagResult.args();
         
         if (args.length == 0) {
-            sender.sendMessage(ColorHandler.getInstance().color("&cUsage: /" + label + " <message>"));
-            sender.sendMessage(ColorHandler.getInstance().color("&cUsage: /" + label + " <target> <message>"));
+            sender.sendMessage(StarColors.color("&cUsage: /" + label + " <message>"));
+            sender.sendMessage(StarColors.color("&cUsage: /" + label + " <target> <message>"));
             return true;
         }
 
@@ -49,7 +49,7 @@ public class ReplyCmd implements TabExecutor {
         if (targetActor != null) {
             privateMessage = plugin.getPrivateMessage(senderActor, targetActor);
             if (privateMessage == null) {
-                sender.sendMessage(ColorHandler.getInstance().color("&cYou do not have a conversation open with " + targetActor.getName()));
+                sender.sendMessage(StarColors.color("&cYou do not have a conversation open with " + targetActor.getName()));
                 return true;
             }
             msgStart = 1;
@@ -61,7 +61,7 @@ public class ReplyCmd implements TabExecutor {
             }
 
             if (privateMessage == null) {
-                ColorHandler.getInstance().coloredMessage(sender, "&cYou do not have any active conversations.");
+                StarColors.coloredMessage(sender, "&cYou do not have any active conversations.");
                 return true;
             }
 
@@ -85,7 +85,7 @@ public class ReplyCmd implements TabExecutor {
             if (sender instanceof Player player) {
                 plugin.setPlayerFocus(player, privateMessage);
                 String spaceName = "Private (" + targetActor.getName() + ")";
-                sender.sendMessage(ColorHandler.getInstance().color(plugin.getConfig().getString("messages.command.chat.setfocus").replace("{SPACE}", spaceName)));
+                sender.sendMessage(StarColors.color(plugin.getConfig().getString("messages.command.chat.setfocus").replace("{SPACE}", spaceName)));
             }
         }
         return true;

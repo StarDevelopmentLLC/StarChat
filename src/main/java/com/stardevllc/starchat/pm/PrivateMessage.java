@@ -1,10 +1,10 @@
 package com.stardevllc.starchat.pm;
 
 import com.stardevllc.actors.Actor;
+import com.stardevllc.colors.StarColors;
 import com.stardevllc.property.StringProperty;
 import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.space.ChatSpace;
-import com.stardevllc.starcore.color.ColorHandler;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -46,7 +46,7 @@ public class PrivateMessage implements ChatSpace {
             senderActor = actor2;
             targetActor = actor1;
         } else {
-            sender.sendMessage(ColorHandler.getInstance().color("&cCould not determine if you are involved with that conversation."));
+            sender.sendMessage(StarColors.color("&cCould not determine if you are involved with that conversation."));
             return;
         }
 
@@ -55,8 +55,8 @@ public class PrivateMessage implements ChatSpace {
         String senderMsg = format.replace("{from}", "me").replace("{to}", targetActor.getName());
         String targetMsg = format.replace("{from}", senderActor.getName()).replace("{to}", "me");
         
-        senderActor.sendMessage(ColorHandler.getInstance().color(senderMsg));
-        targetActor.sendMessage(ColorHandler.getInstance().color(targetMsg));
+        senderActor.sendMessage(StarColors.color(senderMsg));
+        targetActor.sendMessage(StarColors.color(targetMsg));
     }
 
     @Override
