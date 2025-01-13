@@ -1,12 +1,12 @@
 package com.stardevllc.starchat.rooms;
 
 import com.stardevllc.actors.Actor;
+import com.stardevllc.colors.StarColors;
 import com.stardevllc.property.BooleanProperty;
 import com.stardevllc.property.StringProperty;
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.space.ChatSpace;
-import com.stardevllc.starcore.color.ColorHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
@@ -53,7 +53,7 @@ public class ChatRoom implements ChatSpace {
 
         if (context.getSender() == null) {
             displayName = "";
-            message = ColorHandler.getInstance().color(context.getMessage());
+            message = StarColors.color(context.getMessage());
         } else {
             if (!canSendMessages(context.getSender())) {
                 return;
@@ -70,9 +70,9 @@ public class ChatRoom implements ChatSpace {
             message = context.getMessage();
 
             if (this.useColorPermissions.get()) {
-                message = ColorHandler.getInstance().color(context.getSender(), message);
+                message = StarColors.color(context.getSender(), message);
             } else {
-                message = ColorHandler.getInstance().color(message);
+                message = StarColors.color(message);
             }
             
             if (context.getSender() instanceof ConsoleCommandSender) {
@@ -85,12 +85,12 @@ public class ChatRoom implements ChatSpace {
 
         String format;
         if (context.getSender() == null) {
-            format = ColorHandler.getInstance().color(systemFormat.get().replace("{message}", message));
+            format = StarColors.color(systemFormat.get().replace("{message}", message));
         } else {
             if (context.getSender() instanceof Player player) {
-                format = ColorHandler.getInstance().color(StarChat.getInstance().getPlaceholderHandler().setPlaceholders(player, senderFormat.get().replace("{displayname}", displayName))).replace("{message}", message);
+                format = StarColors.color(StarChat.getInstance().getPlaceholderHandler().setPlaceholders(player, senderFormat.get().replace("{displayname}", displayName))).replace("{message}", message);
             } else {
-                format = ColorHandler.getInstance().color(senderFormat.get().replace("{displayname}", displayName)).replace("{message}", message);
+                format = StarColors.color(senderFormat.get().replace("{displayname}", displayName)).replace("{message}", message);
             }
         }
 

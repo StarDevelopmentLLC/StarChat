@@ -1,12 +1,12 @@
 package com.stardevllc.starchat.commands;
 
+import com.stardevllc.colors.StarColors;
 import com.stardevllc.starchat.ChatSelector;
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.channels.ChatChannel;
 import com.stardevllc.starchat.registry.ChannelRegistry;
 import com.stardevllc.starchat.rooms.ChatRoom;
 import com.stardevllc.starchat.space.ChatSpace;
-import com.stardevllc.starcore.color.ColorHandler;
 import com.stardevllc.starcore.config.Config;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -29,17 +29,17 @@ public class ChatCmd implements TabExecutor {
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (!(sender.hasPermission("starchat.command.chat"))) {
-            ColorHandler.getInstance().coloredMessage(sender, plugin.getMainConfig().getString("messages.command.nopermission"));
+            StarColors.coloredMessage(sender, plugin.getMainConfig().getString("messages.command.nopermission"));
             return true;
         }
         
         if (!(sender instanceof Player player)) {
-            sender.sendMessage(ColorHandler.getInstance().color(pluginConfig.getString("messages.command.onlyplayers")));
+            sender.sendMessage(StarColors.color(pluginConfig.getString("messages.command.onlyplayers")));
             return true;
         }
 
         if (!(args.length > 0)) {
-            sender.sendMessage(ColorHandler.getInstance().color("&cUsage: /" + label + " <channelName>"));
+            sender.sendMessage(StarColors.color("&cUsage: /" + label + " <channelName>"));
             return true;
         }
 
@@ -65,19 +65,19 @@ public class ChatCmd implements TabExecutor {
         }
 
         if (chatSpace == null) {
-            sender.sendMessage(ColorHandler.getInstance().color(pluginConfig.getString("messages.chatspace.notexist").replace("{PROVIDED}", channelName)));
+            sender.sendMessage(StarColors.color(pluginConfig.getString("messages.chatspace.notexist").replace("{PROVIDED}", channelName)));
             return true;
         }
 
         if (chatSpace instanceof ChatChannel chatChannel) {
             String sendPermission = chatChannel.getSendPermission();
             if (!sendPermission.isEmpty() && !player.hasPermission(sendPermission)) {
-                sender.sendMessage(ColorHandler.getInstance().color(pluginConfig.getString("messages.channel.nosendpermission").replace("{CHANNEL}", chatChannel.getName())));
+                sender.sendMessage(StarColors.color(pluginConfig.getString("messages.channel.nosendpermission").replace("{CHANNEL}", chatChannel.getName())));
                 return true;
             }
         } else if (chatSpace instanceof ChatRoom chatRoom) {
             if (!chatRoom.isMember(player.getUniqueId())) {
-                sender.sendMessage(ColorHandler.getInstance().color(pluginConfig.getString("messages.room.notamember").replace("{ROOM}", chatRoom.getName())));
+                sender.sendMessage(StarColors.color(pluginConfig.getString("messages.room.notamember").replace("{ROOM}", chatRoom.getName())));
                 return true;
             }
         }
@@ -87,7 +87,7 @@ public class ChatCmd implements TabExecutor {
         if (nameOverride != null && !nameOverride.isEmpty()) {
             spaceName = nameOverride;
         }
-        sender.sendMessage(ColorHandler.getInstance().color(pluginConfig.getString("messages.command.chat.setfocus").replace("{SPACE}", spaceName)));
+        sender.sendMessage(StarColors.color(pluginConfig.getString("messages.command.chat.setfocus").replace("{SPACE}", spaceName)));
         return true;
     }
 

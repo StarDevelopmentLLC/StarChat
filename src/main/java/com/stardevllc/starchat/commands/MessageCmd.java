@@ -1,14 +1,14 @@
 package com.stardevllc.starchat.commands;
 
 import com.stardevllc.actors.Actor;
+import com.stardevllc.cmdflags.CmdFlags;
+import com.stardevllc.cmdflags.Flag;
+import com.stardevllc.cmdflags.ParseResult;
+import com.stardevllc.cmdflags.type.PresenceFlag;
+import com.stardevllc.colors.StarColors;
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.pm.PrivateMessage;
-import com.stardevllc.starcore.color.ColorHandler;
-import com.stardevllc.starcore.utils.cmdflags.CmdFlags;
-import com.stardevllc.starcore.utils.cmdflags.Flag;
-import com.stardevllc.starcore.utils.cmdflags.ParseResult;
-import com.stardevllc.starcore.utils.cmdflags.type.PresenceFlag;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -33,7 +33,7 @@ public class MessageCmd implements TabExecutor {
     
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (!(sender.hasPermission("starchat.command.message"))) {
-            ColorHandler.getInstance().coloredMessage(sender, plugin.getMainConfig().getString("messages.command.nopermission"));
+            StarColors.coloredMessage(sender, plugin.getMainConfig().getString("messages.command.nopermission"));
             return true;
         }
 
@@ -41,7 +41,7 @@ public class MessageCmd implements TabExecutor {
         args = flagResult.args();
         
         if (!(args.length >= 2)) {
-            sender.sendMessage(ColorHandler.getInstance().color("&cUsage: /" + label + " <target> <message>"));
+            sender.sendMessage(StarColors.color("&cUsage: /" + label + " <target> <message>"));
             return true;
         }
 
@@ -49,7 +49,7 @@ public class MessageCmd implements TabExecutor {
         Actor targetActor = Actor.create(args[0]);
 
         if (targetActor == null) {
-            sender.sendMessage(ColorHandler.getInstance().color("&cInvalid target. They must be online, or the console."));
+            sender.sendMessage(StarColors.color("&cInvalid target. They must be online, or the console."));
             return true;
         }
 
@@ -70,7 +70,7 @@ public class MessageCmd implements TabExecutor {
             if (sender instanceof Player player) {
                 plugin.setPlayerFocus(player, privateMessage);
                 String spaceName = "Private (" + targetActor.getName() + ")";
-                sender.sendMessage(ColorHandler.getInstance().color(plugin.getConfig().getString("messages.command.chat.setfocus").replace("{SPACE}", spaceName)));
+                sender.sendMessage(StarColors.color(plugin.getConfig().getString("messages.command.chat.setfocus").replace("{SPACE}", spaceName)));
             }
         }
         return true;
