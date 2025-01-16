@@ -1,6 +1,7 @@
 package com.stardevllc.starchat.channels;
 
 import com.stardevllc.colors.StarColors;
+import com.stardevllc.config.file.yaml.YamlConfig;
 import com.stardevllc.observable.ChangeEvent;
 import com.stardevllc.observable.ChangeListener;
 import com.stardevllc.property.BooleanProperty;
@@ -9,7 +10,6 @@ import com.stardevllc.property.StringProperty;
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.space.ChatSpace;
-import com.stardevllc.starcore.config.Config;
 import com.stardevllc.time.TimeFormat;
 import com.stardevllc.time.TimeParser;
 import org.bukkit.Bukkit;
@@ -29,7 +29,7 @@ import java.util.function.Function;
 
 public class ChatChannel implements ChatSpace {
     protected transient File file; //The main file for the config.
-    protected transient Config config; //Config to store information as channels are mainly config/command controlled, transient modifier allows StarData to ignore this field without having to depend on StarData directly
+    protected transient YamlConfig config; //Config to store information as channels are mainly config/command controlled, transient modifier allows StarData to ignore this field without having to depend on StarData directly
 
     protected final LongProperty id;
     protected final JavaPlugin plugin;
@@ -59,7 +59,9 @@ public class ChatChannel implements ChatSpace {
         @Override
         public void changed(ChangeEvent<T> e) {
             config.set(path, e.newValue());
-            config.save();
+            try {
+                config.save(file);
+            } catch (IOException ex) {}
         }
     }
     
@@ -74,7 +76,7 @@ public class ChatChannel implements ChatSpace {
             }
         }
 
-        this.config = new Config(file);
+        this.config = YamlConfig.loadConfiguration(this.file);
 
         this.id = new LongProperty(this, "id", 0);
         this.name = new StringProperty(this, "name", name);
@@ -104,10 +106,12 @@ public class ChatChannel implements ChatSpace {
         config.addDefault("permissions.send", "", "The permission that is required to have in order for a player to send messages in this channel.");
         config.addDefault("settings.usecolorpermissions", false, "Whether or not to use fine-controlled color permissions from StarCore.");
         config.addDefault("settings.cooldownlength", "3s", "The amount of time in-between chat messages.", "This can be bypasses with starcore.channel.<channelname>.bypasscooldown.");
-        config.save();
+        try {
+            config.save(file);
+        } catch (IOException e) {}
     }
 
-    public Config getConfig() {
+    public YamlConfig getConfig() {
         return config;
     }
 
@@ -116,7 +120,9 @@ public class ChatChannel implements ChatSpace {
     }
 
     public void saveConfig() {
-        config.save();
+        try {
+            config.save(file);
+        } catch (IOException e) {}
     }
 
     public String getViewPermission() {
@@ -288,6 +294,6 @@ public class ChatChannel implements ChatSpace {
 
     public void setFile(File newFile) {
         this.file = newFile;
-        this.config = new Config(this.file);
+        this.config = YamlConfig.loadConfiguration(file);
     }
 }

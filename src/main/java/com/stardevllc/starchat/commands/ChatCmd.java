@@ -1,13 +1,13 @@
 package com.stardevllc.starchat.commands;
 
 import com.stardevllc.colors.StarColors;
+import com.stardevllc.config.file.yaml.YamlConfig;
 import com.stardevllc.starchat.ChatSelector;
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.channels.ChatChannel;
 import com.stardevllc.starchat.registry.ChannelRegistry;
 import com.stardevllc.starchat.rooms.ChatRoom;
 import com.stardevllc.starchat.space.ChatSpace;
-import com.stardevllc.starcore.config.Config;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
@@ -20,7 +20,7 @@ import java.util.List;
 public class ChatCmd implements TabExecutor {
 
     private StarChat plugin;
-    private Config pluginConfig;
+    private YamlConfig pluginConfig;
 
     public ChatCmd(StarChat plugin) {
         this.plugin = plugin;

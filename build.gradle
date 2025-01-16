@@ -27,7 +27,7 @@ publishing {
 }
 
 group 'com.github.StarDevelopmentLLC'
-version '0.1.3'
+version '0.1.4'
 
 processResources {
     filesMatching("*.yml") {
@@ -42,16 +42,37 @@ jar {
 shadowJar {
     archiveClassifier.set('')
     //destinationDirectory = file(System.getProperty("user.home") + File.separator + "Documents" + File.separator + "JarOutput")
+    relocate('com.stardevllc.converter', 'com.stardevllc.starchat.converter')
+    relocate('com.stardevllc.cmdflags', 'com.stardevllc.starchat.cmdflags')
+    relocate('com.stardevllc.colors', 'com.stardevllc.starchat.colors')
+    relocate('com.stardevllc.config', 'com.stardevllc.starchat.config')
+    relocate('org.yaml', 'com.stardevllc.starchat.config.snakeyaml')
+    relocate('com.stardevllc.property', 'com.stardevllc.starchat.property')
+    relocate('com.stardevllc.time', 'com.stardevllc.starchat.time')
+    relocate('com.stardevllc.actors', 'com.stardevllc.starchat.actors')
+    relocate('com.stardevllc.registry', 'com.stardevllc.starchat.registry')
+    relocate('com.stardevllc.helper', 'com.stardevllc.starchat.helper')
+    relocate('com.stardevllc.eventbus', 'com.stardevllc.starchat.eventbus')
+    relocate('com.stardevllc.observable', 'com.stardevllc.starchat.observable')
+    relocate('com.stardevllc.starlib', 'com.stardevllc.starchat.starlib')
+
+    minimize()
 }
 
 dependencies {
     compileOnly 'org.spigotmc:spigot-api:1.21.4-R0.1-SNAPSHOT'
-    compileOnly 'com.github.StarDevelopmentLLC:StarCore:0.1.8'
-    compileOnly 'com.github.StarDevelopmentLLC:converter:0.1.0'
+//    compileOnly 'com.github.StarDevelopmentLLC:StarCore:0.1.10'
+    implementation 'com.github.StarDevelopmentLLC:converter:0.1.0'
     compileOnly 'com.github.MilkBowl:VaultAPI:1.7.1'
     compileOnly 'me.clip:placeholderapi:2.11.6'
     implementation 'com.github.StarDevelopmentLLC:cmdflags:0.1.0'
-    compileOnly 'com.github.StarDevelopmentLLC:colors:0.1.4'
+    implementation 'com.github.StarDevelopmentLLC:colors:0.1.4'
+    implementation 'com.github.StarDevelopmentLLC:config:0.1.3'
+    implementation 'com.github.StarDevelopmentLLC:property:0.1.4'
+    implementation 'com.github.StarDevelopmentLLC:time:0.1.0'
+    implementation 'com.github.StarDevelopmentLLC:actors:0.1.1'
+    implementation 'com.github.StarDevelopmentLLC:registry:0.1.0'
+    implementation 'com.github.StarDevelopmentLLC:helper:0.1.1'
 }
 
 java {

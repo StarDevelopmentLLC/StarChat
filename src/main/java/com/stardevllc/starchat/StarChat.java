@@ -3,6 +3,7 @@ package com.stardevllc.starchat;
 import com.stardevllc.actors.Actor;
 import com.stardevllc.actors.PlayerActor;
 import com.stardevllc.actors.ServerActor;
+import com.stardevllc.config.file.yaml.YamlConfig;
 import com.stardevllc.starchat.channels.ChatChannel;
 import com.stardevllc.starchat.channels.GlobalChannel;
 import com.stardevllc.starchat.channels.StaffChannel;
@@ -20,7 +21,6 @@ import com.stardevllc.starchat.registry.FocusRegistry;
 import com.stardevllc.starchat.registry.RoomRegistry;
 import com.stardevllc.starchat.registry.SpaceRegistry;
 import com.stardevllc.starchat.space.ChatSpace;
-import com.stardevllc.starcore.config.Config;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
@@ -32,6 +32,7 @@ import org.bukkit.plugin.ServicesManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.function.Function;
 
@@ -53,7 +54,8 @@ public class StarChat extends JavaPlugin implements Listener {
     private FocusRegistry playerChatSelection;
     
     private PlaceholderHandler placeholderHandler;
-    private Config mainConfig;
+    private File mainConfigFile;
+    private YamlConfig mainConfig;
     private ChatChannel globalChannel, staffChannel;
     private Map<String, ChatSelector> chatSelectors = new HashMap<>();
     private PAPIExpansion papiExpansion;
@@ -65,7 +67,21 @@ public class StarChat extends JavaPlugin implements Listener {
     @Override
     public void onEnable() {
         instance = this;
-        mainConfig = new Config(new File(getDataFolder(), "config.yml"));
+        mainConfigFile = new File(getDataFolder(), "config.yml");
+        
+        if (!mainConfigFile.exists()) {
+            if (!mainConfigFile.getParentFile().exists()) {
+                mainConfigFile.getParentFile().mkdirs();
+            }
+
+            try {
+                mainConfigFile.createNewFile();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        
+        mainConfig = YamlConfig.loadConfiguration(mainConfigFile);
 
         Plugin vaultPlugin = getServer().getPluginManager().getPlugin("Vault");
         if (vaultPlugin != null) {
@@ -117,16 +133,28 @@ public class StarChat extends JavaPlugin implements Listener {
         
         getCommand("clearchat").setExecutor(new ClearChatCmd(this));
     }
+    
+    public void saveMainConfig() {
+        try {
+            mainConfig.save(this.mainConfigFile);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     public void reload(boolean save) {
         if (save) {
-            mainConfig.save();
+            saveMainConfig();
             for (ChatChannel channel : this.channelRegistry.getObjects().values()) {
-                channel.getConfig().save();
+                try {
+                    channel.getConfig().save(mainConfigFile);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
 
-        mainConfig = new Config(new File(getDataFolder(), "config.yml"));
+        mainConfig = YamlConfig.loadConfiguration(this.mainConfigFile);
 
         Set<String> spacesToRemove = new HashSet<>();
         for (ChatSpace space : this.channelRegistry.getObjects().values()) {
@@ -184,8 +212,12 @@ public class StarChat extends JavaPlugin implements Listener {
         mainConfig.addDefault("messages.command.admin.channel.set.success", "&eYou set &b{channel}&e's &a{key} &eto &d{value}");
         mainConfig.addDefault("messages.command.clearchat.immune", "&aThe chat has been cleared by &e{actor} &abut you are immune.");
         mainConfig.addDefault("messages.command.clearchat.success", "&aThe chat has been cleared by &e{actor}");
-        
-        mainConfig.save();
+
+        try {
+            mainConfig.save(this.mainConfigFile);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
     
     private void determinePlaceholderHandler() {
@@ -210,7 +242,7 @@ public class StarChat extends JavaPlugin implements Listener {
                 continue;
             }
             
-            Config config = new Config(file);
+            YamlConfig config = YamlConfig.loadConfiguration(file);
             String name = config.getString("name");
             ChatChannel chatChannel = new ChatChannel(this, name, file.toPath());
             this.channelRegistry.register(chatChannel.getName(), chatChannel);
@@ -319,7 +351,7 @@ public class StarChat extends JavaPlugin implements Listener {
         return privateMessages;
     }
 
-    public Config getMainConfig() {
+    public YamlConfig getMainConfig() {
         return mainConfig;
     }
 

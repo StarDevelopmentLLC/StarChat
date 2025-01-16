@@ -4,6 +4,7 @@ import com.stardevllc.actors.Actor;
 import com.stardevllc.actors.PlayerActor;
 import com.stardevllc.colors.StarColors;
 import com.stardevllc.colors.base.ColorHandler;
+import com.stardevllc.config.file.yaml.YamlConfig;
 import com.stardevllc.converter.string.StringConverters;
 import com.stardevllc.helper.ReflectionHelper;
 import com.stardevllc.observable.Property;
@@ -16,7 +17,6 @@ import com.stardevllc.starchat.placeholder.PAPIExpansion;
 import com.stardevllc.starchat.placeholder.PAPIPlaceholders;
 import com.stardevllc.starchat.pm.PrivateMessage;
 import com.stardevllc.starchat.rooms.ChatRoom;
-import com.stardevllc.starcore.config.Config;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -34,7 +34,7 @@ import java.util.List;
 public class StarChatAdminCmd implements TabExecutor {
 
     private StarChat plugin;
-    private Config pluginConfig;
+    private YamlConfig pluginConfig;
 
     public StarChatAdminCmd(StarChat plugin) {
         this.plugin = plugin;
@@ -191,7 +191,7 @@ public class StarChatAdminCmd implements TabExecutor {
                 StarColors.coloredMessage(sender, pluginConfig.getString("messages.command.nopermission"));
                 return true;
             }
-            plugin.getMainConfig().save();
+            plugin.saveMainConfig();
             StarColors.coloredMessage(sender, pluginConfig.getString("messages.command.admin.savesuccess"));
         } else if (args[0].equalsIgnoreCase("reload")) {
             if (!sender.hasPermission("starchat.command.admin.reload")) {
@@ -527,7 +527,7 @@ public class StarChatAdminCmd implements TabExecutor {
                     return true;
                 } else {
                     plugin.getMainConfig().set("use-staff-channel", true);
-                    plugin.getMainConfig().save();
+                    plugin.saveMainConfig();
                     plugin.loadStaffChannel();
                     StarColors.coloredMessage(sender, "&aYou enabled the staff channel.");
                 }
@@ -537,7 +537,7 @@ public class StarChatAdminCmd implements TabExecutor {
                     return true;
                 } else {
                     plugin.getMainConfig().set("use-staff-channel", false);
-                    plugin.getMainConfig().save();
+                    plugin.saveMainConfig();
                     plugin.unloadStaffChannel();
                     StarColors.coloredMessage(sender, "&aYou disbaled the staff channel.");
                 }
@@ -581,7 +581,7 @@ public class StarChatAdminCmd implements TabExecutor {
             plugin.getGlobalChannel().setName(newName);
             plugin.getGlobalChannel().saveConfig();
             plugin.getMainConfig().set("global-channel-name", newName);
-            plugin.getMainConfig().save();
+            plugin.saveMainConfig();
             
             plugin.getChannelRegistry().register(plugin.getGlobalChannel().getName(), plugin.getGlobalChannel());
             
