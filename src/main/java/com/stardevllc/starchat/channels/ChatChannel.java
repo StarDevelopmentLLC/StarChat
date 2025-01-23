@@ -9,6 +9,7 @@ import com.stardevllc.property.LongProperty;
 import com.stardevllc.property.StringProperty;
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.context.ChatContext;
+import com.stardevllc.starchat.handler.DisplayNameHandler;
 import com.stardevllc.starchat.space.ChatSpace;
 import com.stardevllc.time.TimeFormat;
 import com.stardevllc.time.TimeParser;
@@ -25,7 +26,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.function.Function;
 
 public class ChatChannel implements ChatSpace {
     protected transient File file; //The main file for the config.
@@ -41,7 +41,7 @@ public class ChatChannel implements ChatSpace {
     protected final StringProperty systemFormat;
     protected final BooleanProperty useColorPermissions;
 
-    protected Function<Player, String> displayNameHandler;
+    protected DisplayNameHandler displayNameHandler;
 
     protected final LongProperty cooldownLength;
 
@@ -135,11 +135,14 @@ public class ChatChannel implements ChatSpace {
 
     @Override
     public void sendMessage(ChatContext context) {
-        String displayName;
+        String displayName, prefix, playerName, suffix;
         String message;
 
         if (context.getSender() == null) {
             displayName = "";
+            playerName = "";
+            prefix = "";
+            suffix = "";
             message = StarColors.color(context.getMessage());
         } else {
             if (!canSendMessages(context.getSender())) {
@@ -176,17 +179,17 @@ public class ChatChannel implements ChatSpace {
 
             if (context.getSender() instanceof ConsoleCommandSender) {
                 displayName = StarChat.getInstance().getConsoleNameFormat();
+                playerName = "";
+                prefix = "";
+                suffix = "";
             } else {
                 Player player = (Player) context.getSender();
-                displayName = Objects.requireNonNullElse(this.displayNameHandler, StarChat.vaultDisplayNameFunction).apply(player);
-                if (displayName == null || displayName.isEmpty()) {
-                    displayName = player.getName();
-                }
+                DisplayNameHandler handler = Objects.requireNonNullElse(this.displayNameHandler, StarChat.getDefaultDisplayNameHandler());
+                displayName = handler.getDisplayName(player);
+                playerName = handler.getName(player);
+                prefix = handler.getPrefix(player);
+                suffix = handler.getSuffix(player);
             }
-        }
-
-        if (displayName == null || displayName.isEmpty()) {
-            displayName = "";
         }
 
         String format;
@@ -197,7 +200,7 @@ public class ChatChannel implements ChatSpace {
                 format = StarColors.color(senderFormat.get().replace("{displayname}", displayName)).replace("{message}", message);
             } else {
                 Player player = (Player) context.getSender();
-                format = StarColors.color(StarChat.getInstance().getPlaceholderHandler().setPlaceholders(player, senderFormat.get().replace("{displayname}", displayName))).replace("{message}", message);
+                format = StarColors.color(StarChat.getInstance().getPlaceholderHandler().setPlaceholders(player, senderFormat.get().replace("{displayname}", displayName).replace("{prefix}", prefix).replace("{name}", playerName).replace("{suffix}", suffix))).replace("{message}", message);
             }
         }
 
@@ -252,11 +255,11 @@ public class ChatChannel implements ChatSpace {
         return true;
     }
 
-    public Function<Player, String> getDisplayNameHandler() {
+    public DisplayNameHandler getDisplayNameHandler() {
         return displayNameHandler;
     }
 
-    public void setDisplayNameHandler(Function<Player, String> displayNameHandler) {
+    public void setDisplayNameHandler(DisplayNameHandler displayNameHandler) {
         this.displayNameHandler = displayNameHandler;
     }
 

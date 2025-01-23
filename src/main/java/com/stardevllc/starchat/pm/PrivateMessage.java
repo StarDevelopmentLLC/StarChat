@@ -4,13 +4,12 @@ import com.stardevllc.actors.Actor;
 import com.stardevllc.colors.StarColors;
 import com.stardevllc.property.StringProperty;
 import com.stardevllc.starchat.context.ChatContext;
+import com.stardevllc.starchat.handler.DisplayNameHandler;
 import com.stardevllc.starchat.space.ChatSpace;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Objects;
-import java.util.function.Function;
 
 public class PrivateMessage implements ChatSpace {
 
@@ -19,7 +18,7 @@ public class PrivateMessage implements ChatSpace {
 
     protected final StringProperty name;
     protected final StringProperty senderFormat;
-    protected Function<Player, String> displayNameHandler;
+    protected DisplayNameHandler displayNameHandler;
 
     private Actor actor1, actor2;
 

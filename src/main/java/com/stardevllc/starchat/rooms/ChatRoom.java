@@ -6,6 +6,7 @@ import com.stardevllc.property.BooleanProperty;
 import com.stardevllc.property.StringProperty;
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.context.ChatContext;
+import com.stardevllc.starchat.handler.DisplayNameHandler;
 import com.stardevllc.starchat.space.ChatSpace;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -17,7 +18,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.function.Function;
 
 @SuppressWarnings("EqualsBetweenInconvertibleTypes")
 public class ChatRoom implements ChatSpace {
@@ -28,7 +28,7 @@ public class ChatRoom implements ChatSpace {
     protected final BooleanProperty useColorPermissions;
     protected final StringProperty senderFormat;
     protected final StringProperty systemFormat;
-    protected Function<Player, String> displayNameHandler;
+    protected DisplayNameHandler displayNameHandler;
     
     protected Actor owner;
     protected Map<UUID, RoomMember> members = new HashMap<>();
@@ -48,11 +48,14 @@ public class ChatRoom implements ChatSpace {
 
     @Override
     public void sendMessage(ChatContext context) {
-        String displayName;
+        String displayName, prefix, playerName, suffix;
         String message;
 
         if (context.getSender() == null) {
             displayName = "";
+            playerName = "";
+            prefix = "";
+            suffix = "";
             message = StarColors.color(context.getMessage());
         } else {
             if (!canSendMessages(context.getSender())) {
@@ -77,9 +80,16 @@ public class ChatRoom implements ChatSpace {
             
             if (context.getSender() instanceof ConsoleCommandSender) {
                 displayName = StarChat.getInstance().getConsoleNameFormat();
+                playerName = "";
+                prefix = "";
+                suffix = "";
             } else {
                 Player player = (Player) context.getSender();
-                displayName = Objects.requireNonNullElse(this.displayNameHandler, StarChat.vaultDisplayNameFunction).apply(player);
+                DisplayNameHandler handler = Objects.requireNonNullElse(this.displayNameHandler, StarChat.getDefaultDisplayNameHandler());
+                displayName = handler.getDisplayName(player);
+                prefix = handler.getPrefix(player);
+                playerName = handler.getName(player);
+                suffix = handler.getSuffix(player);
             }
         }
 
@@ -88,7 +98,7 @@ public class ChatRoom implements ChatSpace {
             format = StarColors.color(systemFormat.get().replace("{message}", message));
         } else {
             if (context.getSender() instanceof Player player) {
-                format = StarColors.color(StarChat.getInstance().getPlaceholderHandler().setPlaceholders(player, senderFormat.get().replace("{displayname}", displayName))).replace("{message}", message);
+                format = StarColors.color(StarChat.getInstance().getPlaceholderHandler().setPlaceholders(player, senderFormat.get().replace("{displayname}", displayName).replace("{prefix}", prefix).replace("{name}", playerName).replace("{suffix}", suffix))).replace("{message}", message);
             } else {
                 format = StarColors.color(senderFormat.get().replace("{displayname}", displayName)).replace("{message}", message);
             }
