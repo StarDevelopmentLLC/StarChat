@@ -1,12 +1,11 @@
 package com.stardevllc.starchat.channels;
 
+import com.stardevllc.actors.Actor;
 import com.stardevllc.colors.StarColors;
 import com.stardevllc.config.file.yaml.YamlConfig;
 import com.stardevllc.observable.ChangeEvent;
 import com.stardevllc.observable.ChangeListener;
-import com.stardevllc.property.BooleanProperty;
-import com.stardevllc.property.LongProperty;
-import com.stardevllc.property.StringProperty;
+import com.stardevllc.property.*;
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.handler.DisplayNameHandler;
@@ -40,6 +39,13 @@ public class ChatChannel implements ChatSpace {
     protected final StringProperty senderFormat;
     protected final StringProperty systemFormat;
     protected final BooleanProperty useColorPermissions;
+    protected final BooleanProperty muted;
+    protected final ObjectProperty<Actor> mutedBy;
+    protected final StringProperty muteReason;
+    protected final StringProperty muteFormat;
+    protected final StringProperty unmuteFormat;
+    protected final StringProperty muteErrorFormat;
+    protected final StringProperty muteBypassPermission;
 
     protected DisplayNameHandler displayNameHandler;
 
@@ -96,6 +102,26 @@ public class ChatChannel implements ChatSpace {
         this.useColorPermissions.addListener(new ConfigChangeListener<>("settings.usecolorpermissions"));
         this.cooldownLength = new LongProperty(this, "cooldownLength", new TimeParser().parseTime(config.getString("settings.cooldownlength")));
         this.cooldownLength.addListener(e -> new ConfigChangeListener<>("settings.cooldownlength"));
+        this.muted = new BooleanProperty(this, "muted", this.config.getBoolean("mute.enabled"));
+        this.muted.addListener(new ConfigChangeListener<>("mute.enabled"));
+        this.mutedBy = new ObjectProperty<>(this, "mutedby", Actor.create(this.config.getString("mute.actor")));
+        this.mutedBy.addListener(changeEvent -> {
+            if (changeEvent.newValue() == null) {
+                config.set("mute.actor", "");
+            } else {
+                config.set("mute.actor", changeEvent.newValue().toString());
+            }
+        });
+        this.muteReason = new StringProperty(this, "muteReason", this.config.getString("mute.reason"));
+        this.muteReason.addListener(new ConfigChangeListener<>("mute.reason"));
+        this.muteFormat = new StringProperty(this, "muteFormat", this.config.getString("mute.formats.on_mute"));
+        this.muteFormat.addListener(new ConfigChangeListener<>("mute.formats.on_mute"));
+        this.unmuteFormat = new StringProperty(this, "unmuteFormat", this.config.getString("mute.formats.on_unmute"));
+        this.unmuteFormat.addListener(new ConfigChangeListener<>("mute.formats.on_unmute"));
+        this.muteErrorFormat = new StringProperty(this, "muteErrorFormat", this.config.getString("mute.formats.muted_error"));
+        this.muteErrorFormat.addListener(new ConfigChangeListener<>("mute.formats.muted_error"));
+        this.muteBypassPermission = new StringProperty(this, "muteBypassPermission", this.config.getString("mute.bypass_permission"));
+        this.muteBypassPermission.addListener(new ConfigChangeListener<>("mute.bypass_permission"));
     }
 
     protected void createDefaults() {
@@ -106,11 +132,19 @@ public class ChatChannel implements ChatSpace {
         config.addDefault("permissions.send", "", "The permission that is required to have in order for a player to send messages in this channel.");
         config.addDefault("settings.usecolorpermissions", false, "Whether or not to use fine-controlled color permissions from StarCore.");
         config.addDefault("settings.cooldownlength", "3s", "The amount of time in-between chat messages.", "This can be bypasses with starcore.channel.<channelname>.bypasscooldown.");
+        config.addDefault("mute.enabled", false, "Controls if this channel is currently muted or not");
+        config.addDefault("mute.actor", "", "This is the player that muted the chat");
+        config.addDefault("mute.reason", "", "This is the reason supplied for muting the chat. This can be empty");
+        config.addDefault("mute.formats.on_mute", "&cThe {channelName} channel has been muted by {actor}", "The format used when the channel is muted");
+        config.addDefault("mute.formats.on_unmute", "&cThe {channelName} channel has been unmuted by {actor}", "The format used when the channel is unmuted");
+        config.addDefault("mute.formats.muted_error", "&cYou cannot speak in {channelName} as it has been muted by {actor}", "The format sent to players that are trying to talk in the channel while it is muted");
+        config.addDefault("mute.bypass_permission", "starchat." + this.name + ".mute.bypass", "The permission where those with this permission can bypass the channel mute");
+        
         try {
             config.save(file);
         } catch (IOException e) {}
     }
-
+    
     public YamlConfig getConfig() {
         return config;
     }
@@ -132,12 +166,40 @@ public class ChatChannel implements ChatSpace {
     public String getSendPermission() {
         return sendPermission.get();
     }
+    
+    public void mute(Actor actor) {
+        mute(actor, null);
+    }
+    
+    public void mute(Actor actor, String reason) {
+        if (!this.muted.get()) {
+            this.muted.set(true);
+            this.mutedBy.set(actor);
+            this.muteReason.set(reason);
+            String muteMsg = this.muteFormat.get();
+            muteMsg = muteMsg.replace("{channelName}", this.name.get());
+            muteMsg = muteMsg.replace("{actor}", actor.getName());
+            sendMessage(new ChatContext(muteMsg));
+        }
+    }
+    
+    public void unmute(Actor actor) {
+        if (this.muted.get()) {
+            this.muted.set(false);
+            this.mutedBy.set(null);
+            this.muteReason.set(null);
+            String unmuteMsg = this.unmuteFormat.get();
+            unmuteMsg = unmuteMsg.replace("{channelName}", this.name.get());
+            unmuteMsg = unmuteMsg.replace("{actor}", actor.getName());
+            sendMessage(new ChatContext(unmuteMsg));
+        }
+    }
 
     @Override
     public void sendMessage(ChatContext context) {
         String displayName, prefix, playerName, suffix;
         String message;
-
+        
         if (context.getSender() == null) {
             displayName = "";
             playerName = "";
@@ -150,6 +212,16 @@ public class ChatChannel implements ChatSpace {
             }
 
             CommandSender sender = context.getSender();
+            
+            if (this.isMuted()) {
+                if (!sender.hasPermission(this.muteBypassPermission.get())) {
+                    String msg = this.muteErrorFormat.get();
+                    msg = msg.replace("{channelName}", this.name.get());
+                    msg = msg.replace("{actor}", mutedBy.get().getName());
+                    StarColors.coloredMessage(sender, msg);
+                    return;
+                }
+            }
 
             if (sender instanceof Player player) {
                 if (!sender.hasPermission("starchat.channel." + getName().toLowerCase() + ".bypasscooldown")) {
@@ -253,6 +325,11 @@ public class ChatChannel implements ChatSpace {
     @Override
     public boolean supportsCooldowns() {
         return true;
+    }
+
+    @Override
+    public boolean isMuted() {
+        return this.muted.get();
     }
 
     public DisplayNameHandler getDisplayNameHandler() {

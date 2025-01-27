@@ -89,6 +89,21 @@ public class PrivateMessage implements ChatSpace {
         return false;
     }
 
+    @Override
+    public boolean isMuted() {
+        return false;
+    }
+
+    @Override
+    public void mute(Actor actor, String reason) {
+        
+    }
+
+    @Override
+    public void unmute(Actor actor) {
+
+    }
+
     public Actor getActor1() {
         return actor1;
     }
