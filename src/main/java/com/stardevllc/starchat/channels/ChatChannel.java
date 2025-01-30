@@ -46,13 +46,13 @@ public class ChatChannel implements ChatSpace {
     protected final StringProperty unmuteFormat;
     protected final StringProperty muteErrorFormat;
     protected final StringProperty muteBypassPermission;
-
+    
     protected DisplayNameHandler displayNameHandler;
 
     protected final LongProperty cooldownLength;
 
     protected Map<UUID, Long> lastMessage = new HashMap<>();
-    
+
     protected static final TimeFormat TIME_FORMAT = new TimeFormat("%*#0h%%*#0m%%*#0s%");
 
     class ConfigChangeListener<T> implements ChangeListener<T> {
@@ -72,7 +72,7 @@ public class ChatChannel implements ChatSpace {
             }
         }
     }
-    
+
     public ChatChannel(JavaPlugin plugin, String name, Path filePath) {
         this.plugin = plugin;
         this.file = new File(filePath.toFile().getAbsolutePath());
@@ -144,9 +144,10 @@ public class ChatChannel implements ChatSpace {
 
         try {
             config.save(file);
-        } catch (IOException e) {}
+        } catch (IOException e) {
+        }
     }
-    
+
     public YamlConfig getConfig() {
         return config;
     }
@@ -158,7 +159,8 @@ public class ChatChannel implements ChatSpace {
     public void saveConfig() {
         try {
             config.save(file);
-        } catch (IOException e) {}
+        } catch (IOException e) {
+        }
     }
 
     public String getViewPermission() {
@@ -168,40 +170,36 @@ public class ChatChannel implements ChatSpace {
     public String getSendPermission() {
         return sendPermission.get();
     }
-    
+
     public void mute(Actor actor) {
         mute(actor, null);
     }
-    
+
     public void mute(Actor actor, String reason) {
-        if (!this.muted.get()) {
-            this.muted.set(true);
-            this.mutedBy.set(actor);
-            this.muteReason.set(reason);
-            String muteMsg = this.muteFormat.get();
-            muteMsg = muteMsg.replace("{channelName}", this.name.get());
-            muteMsg = muteMsg.replace("{actor}", actor.getName());
-            sendMessage(new ChatContext(muteMsg));
-        }
+        this.muted.set(true);
+        this.mutedBy.set(actor);
+        this.muteReason.set(reason);
+        String muteMsg = this.muteFormat.get();
+        muteMsg = muteMsg.replace("{channelName}", this.name.get());
+        muteMsg = muteMsg.replace("{actor}", actor.getName());
+        sendMessage(new ChatContext(muteMsg));
     }
-    
+
     public void unmute(Actor actor) {
-        if (this.muted.get()) {
-            this.muted.set(false);
-            this.mutedBy.set(null);
-            this.muteReason.set(null);
-            String unmuteMsg = this.unmuteFormat.get();
-            unmuteMsg = unmuteMsg.replace("{channelName}", this.name.get());
-            unmuteMsg = unmuteMsg.replace("{actor}", actor.getName());
-            sendMessage(new ChatContext(unmuteMsg));
-        }
+        this.muted.set(false);
+        this.mutedBy.set(null);
+        this.muteReason.set(null);
+        String unmuteMsg = this.unmuteFormat.get();
+        unmuteMsg = unmuteMsg.replace("{channelName}", this.name.get());
+        unmuteMsg = unmuteMsg.replace("{actor}", actor.getName());
+        sendMessage(new ChatContext(unmuteMsg));
     }
 
     @Override
     public void sendMessage(ChatContext context) {
         String displayName, prefix, playerName, suffix;
         String message;
-        
+
         if (context.getSender() == null) {
             displayName = "";
             playerName = "";
@@ -214,7 +212,7 @@ public class ChatChannel implements ChatSpace {
             }
 
             CommandSender sender = context.getSender();
-            
+
             if (this.isMuted()) {
                 if (!sender.hasPermission(this.muteBypassPermission.get())) {
                     String msg = this.muteErrorFormat.get();
@@ -331,7 +329,7 @@ public class ChatChannel implements ChatSpace {
 
     @Override
     public boolean isMuted() {
-        return this.muted.get();
+        return this.muted.getValue();
     }
 
     public DisplayNameHandler getDisplayNameHandler() {
