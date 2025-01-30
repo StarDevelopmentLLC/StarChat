@@ -140,8 +140,8 @@ public class ChatChannel implements ChatSpace {
         config.addDefault("mute.formats.on_mute", "&cThe {channelName} channel has been muted by {actor}", "The format used when the channel is muted");
         config.addDefault("mute.formats.on_unmute", "&cThe {channelName} channel has been unmuted by {actor}", "The format used when the channel is unmuted");
         config.addDefault("mute.formats.muted_error", "&cYou cannot speak in {channelName} as it has been muted by {actor}", "The format sent to players that are trying to talk in the channel while it is muted");
-        config.addDefault("mute.bypass_permission", "starchat." + this.name + ".mute.bypass", "The permission where those with this permission can bypass the channel mute");
-        
+        config.addDefault("mute.bypass_permission", "starchat." + this.name.get() + ".mute.bypass", "The permission where those with this permission can bypass the channel mute");
+
         try {
             config.save(file);
         } catch (IOException e) {}
