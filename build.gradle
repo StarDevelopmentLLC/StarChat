@@ -27,7 +27,7 @@ publishing {
 }
 
 group 'com.github.StarDevelopmentLLC'
-version '0.1.5'
+version '0.1.6'
 
 processResources {
     filesMatching("*.yml") {
@@ -42,20 +42,20 @@ jar {
 shadowJar {
     archiveClassifier.set('')
     //destinationDirectory = file(System.getProperty("user.home") + File.separator + "Documents" + File.separator + "JarOutput")
-    relocate('com.stardevllc.converter', 'com.stardevllc.starchat.converter')
-    relocate('com.stardevllc.cmdflags', 'com.stardevllc.starchat.cmdflags')
-    relocate('com.stardevllc.colors', 'com.stardevllc.starchat.colors')
-    relocate('com.stardevllc.config', 'com.stardevllc.starchat.config')
+//    relocate('com.stardevllc.converter', 'com.stardevllc.starchat.converter')
+//    relocate('com.stardevllc.cmdflags', 'com.stardevllc.starchat.cmdflags')
+//    relocate('com.stardevllc.colors', 'com.stardevllc.starchat.colors')
+//    relocate('com.stardevllc.config', 'com.stardevllc.starchat.config')
     relocate('org.yaml', 'com.stardevllc.starchat.config.snakeyaml')
-    relocate('com.stardevllc.property', 'com.stardevllc.starchat.property')
-    relocate('com.stardevllc.time', 'com.stardevllc.starchat.time')
-    relocate('com.stardevllc.actors', 'com.stardevllc.starchat.actors')
-    relocate('com.stardevllc.registry', 'com.stardevllc.starchat.registry')
-    relocate('com.stardevllc.helper', 'com.stardevllc.starchat.helper')
-    relocate('com.stardevllc.eventbus', 'com.stardevllc.starchat.eventbus')
-    relocate('com.stardevllc.observable', 'com.stardevllc.starchat.observable')
-    relocate('com.stardevllc.starlib', 'com.stardevllc.starchat.starlib')
-    relocate('com.stardevllc.hierarchy', 'com.stardevllc.starchat.hierarchy')
+//    relocate('com.stardevllc.property', 'com.stardevllc.starchat.property')
+//    relocate('com.stardevllc.time', 'com.stardevllc.starchat.time')
+//    relocate('com.stardevllc.actors', 'com.stardevllc.starchat.actors')
+//    relocate('com.stardevllc.registry', 'com.stardevllc.starchat.registry')
+//    relocate('com.stardevllc.helper', 'com.stardevllc.starchat.helper')
+//    relocate('com.stardevllc.eventbus', 'com.stardevllc.starchat.eventbus')
+//    relocate('com.stardevllc.observable', 'com.stardevllc.starchat.observable')
+//    relocate('com.stardevllc.starlib', 'com.stardevllc.starchat.starlib')
+//    relocate('com.stardevllc.hierarchy', 'com.stardevllc.starchat.hierarchy')
 
     minimize()
 }
