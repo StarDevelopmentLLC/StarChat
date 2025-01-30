@@ -146,7 +146,7 @@ public class StarChatAdminCmd implements TabExecutor {
                 
                 if (args.length == 3) {
                     // /starchat channel <name> <option>
-                    completions.addAll(List.of("delete", "set"));
+                    completions.addAll(List.of("delete", "set", "mute", "unmute"));
                     arg = args[2].toLowerCase();
                 } else if (args[2].equalsIgnoreCase("set")) {
                     // /starchat channel <name> set <property> <value>
@@ -512,6 +512,39 @@ public class StarChatAdminCmd implements TabExecutor {
                 }
 
                 StarColors.coloredMessage(sender, pluginConfig.getString("messages.command.admin.channel.set.success").replace("{channel}", chatChannel.getName()).replace("{key}", property.getName()).replace("{value}", property.getValue() + ""));
+            } else if (args[2].equalsIgnoreCase("mute")) {
+                if (!sender.hasPermission("starchat.command.admin.channel.mute")) {
+                    StarColors.coloredMessage(sender, pluginConfig.getString("messages.command.nopermission"));
+                    return true;
+                }
+                
+                if (chatChannel.isMuted()) {
+                    StarColors.coloredMessage(sender, "&cThat channel is already muted.");
+                    return true;
+                }
+                
+                Actor actor = Actor.create(sender);
+                
+                StringBuilder rb = new StringBuilder();
+                for (int i = 3; i < args.length; i++) {
+                    rb.append(args[i]).append(" ");
+                }
+                
+                String reason = rb.toString().trim();
+                chatChannel.mute(actor, reason);
+            } else if (args[2].equalsIgnoreCase("unmute")) {
+                if (!sender.hasPermission("starchat.command.admin.channel.unmute")) {
+                    StarColors.coloredMessage(sender, pluginConfig.getString("messages.command.nopermission"));
+                    return true;
+                }
+                
+                if (!chatChannel.isMuted()) {
+                    StarColors.coloredMessage(sender, "&cThat channel is not muted.");
+                    return true;
+                }
+
+                Actor actor = Actor.create(sender);
+                chatChannel.unmute(actor);
             } else {
                 StarColors.coloredMessage(sender, "&cInvalid sub command.");
                 return true;
