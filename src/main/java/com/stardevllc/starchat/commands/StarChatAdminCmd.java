@@ -30,6 +30,7 @@ import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 public class StarChatAdminCmd implements TabExecutor {
 
@@ -479,10 +480,20 @@ public class StarChatAdminCmd implements TabExecutor {
             if (args[2].equalsIgnoreCase("set")) {
                 Property<?> property;
                 try {
-                    Field classField = ReflectionHelper.getClassField(chatChannel.getClass(), args[3]);
+                    Field classField = null;
+                    Set<Field> classFields = ReflectionHelper.getClassFields(chatChannel.getClass());
+
+                    for (Field field : classFields) {
+                        if (field.getName().equalsIgnoreCase(args[3])) {
+                            classField = field;
+                            break;
+                        }
+                    }
+                    
+                    classField.setAccessible(true);
                     property = (Property<?>) classField.get(chatChannel);
-                } catch (IllegalAccessException e) {
-                    StarColors.coloredMessage(sender, "You provided an invalid key name.");
+                } catch (IllegalAccessException | NullPointerException e) {
+                    StarColors.coloredMessage(sender, "&cYou provided an invalid setting name.");
                     return true;
                 }
 

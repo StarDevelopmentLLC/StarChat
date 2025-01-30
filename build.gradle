@@ -73,7 +73,7 @@ dependencies {
     implementation 'com.github.StarDevelopmentLLC:actors:0.1.1'
     implementation 'com.github.StarDevelopmentLLC:registry:0.1.0'
     implementation 'com.github.StarDevelopmentLLC:helper:0.1.1'
-    implementation 'com.github.StarDevelopmentLLC:hierarchy:0.1.0'
+//    implementation 'com.github.StarDevelopmentLLC:hierarchy:0.1.0'
 }
 
 java {

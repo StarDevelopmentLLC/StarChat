@@ -67,7 +67,9 @@ public class ChatChannel implements ChatSpace {
             config.set(path, e.newValue());
             try {
                 config.save(file);
-            } catch (IOException ex) {}
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
         }
     }
     
