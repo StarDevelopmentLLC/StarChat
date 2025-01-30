@@ -30,6 +30,7 @@ public class FocusRegistry extends UUIDRegistry<ChatSpace> {
         if (focus == null) {
             focus = defaultSpace;
         }
+        setPlayerFocus(player.getUniqueId(), focus);
         return focus;
     }
 }
