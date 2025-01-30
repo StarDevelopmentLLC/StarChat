@@ -465,19 +465,24 @@ public class StarChatAdminCmd implements TabExecutor {
                 return true;
             }
 
-            if (!(args.length > 4)) {
+            if (!(args.length > 2)) {
                 StarColors.coloredMessage(sender, "&cUsage: /" + label + " " + args[0] + " " + args[1] + " <subcommand> <arguments>");
                 return true;
             }
 
-            StringBuilder sb = new StringBuilder();
-            for (int i = 4; i < args.length; i++) {
-                sb.append(args[i]).append(" ");
-            }
-
-            String value = sb.toString().trim();
-
             if (args[2].equalsIgnoreCase("set")) {
+                if (!(args.length > 4)) {
+                    StarColors.coloredMessage(sender, "&cUsage: /" + label + " " + args[0] + " " + args[1] + " <subcommand> <arguments>");
+                    return true;
+                }
+
+                StringBuilder sb = new StringBuilder();
+                for (int i = 4; i < args.length; i++) {
+                    sb.append(args[i]).append(" ");
+                }
+
+                String value = sb.toString().trim();
+                
                 Property<?> property;
                 try {
                     Field classField = null;
