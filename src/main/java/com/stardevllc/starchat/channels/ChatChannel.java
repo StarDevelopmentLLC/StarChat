@@ -111,7 +111,7 @@ public class ChatChannel implements ChatSpace {
             if (changeEvent.newValue() == null) {
                 config.set("mute.actor", "");
             } else {
-                config.set("mute.actor", changeEvent.newValue().toString());
+                config.set("mute.actor", changeEvent.newValue().getConfigString());
             }
         });
         this.muteReason = new StringProperty(this, "muteReason", this.config.getString("mute.reason"));
