@@ -9,6 +9,7 @@ import com.stardevllc.converter.string.StringConverters;
 import com.stardevllc.helper.ReflectionHelper;
 import com.stardevllc.observable.Property;
 import com.stardevllc.property.BooleanProperty;
+import com.stardevllc.property.ObjectProperty;
 import com.stardevllc.property.StringProperty;
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.channels.ChatChannel;
@@ -507,13 +508,19 @@ public class StarChatAdminCmd implements TabExecutor {
                     return true;
                 }
 
-                if (property instanceof StringProperty stringProperty) {
-                    stringProperty.set(value);
-                } else if (property instanceof BooleanProperty booleanProperty) {
-                    booleanProperty.set(StringConverters.getConverter(boolean.class).convertTo(value));
-                } else {
-                    StarColors.coloredMessage(sender, "Unsupported Property Value Type, contact the developer to add support.");
-                    return true;
+                switch (property) {
+                    case StringProperty stringProperty -> stringProperty.set(value);
+                    case BooleanProperty booleanProperty ->
+                            booleanProperty.set(StringConverters.getConverter(boolean.class).convertTo(value));
+                    case ObjectProperty<?> objectProperty -> {
+                        if (objectProperty.getName().equalsIgnoreCase("mutedBy")) {
+                            ((ObjectProperty<Actor>) objectProperty).set(Actor.create(value));
+                        }
+                    }
+                    default -> {
+                        StarColors.coloredMessage(sender, "&cUnsupported Property Value Type, contact the developer to add support.");
+                        return true;
+                    }
                 }
 
                 StarColors.coloredMessage(sender, pluginConfig.getString("messages.command.admin.channel.set.success").replace("{channel}", chatChannel.getName()).replace("{key}", property.getName()).replace("{value}", property.getValue() + ""));
