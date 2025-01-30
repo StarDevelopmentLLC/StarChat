@@ -247,6 +247,10 @@ public class StarChat extends JavaPlugin implements Listener {
             YamlConfig config = YamlConfig.loadConfiguration(file);
             String name = config.getString("name");
             ChatChannel chatChannel = new ChatChannel(this, name, file.toPath());
+            if ((this.globalChannel != null && chatChannel.getName().equalsIgnoreCase(this.globalChannel.getName())) 
+                || (this.staffChannel != null && chatChannel.getName().equalsIgnoreCase(this.staffChannel.getName()))) {
+                return;
+            }
             this.channelRegistry.register(chatChannel.getName(), chatChannel);
         }
     }
