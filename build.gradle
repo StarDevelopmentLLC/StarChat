@@ -27,7 +27,7 @@ publishing {
 }
 
 group 'com.github.StarDevelopmentLLC'
-version '0.1.4'
+version '0.1.5'
 
 processResources {
     filesMatching("*.yml") {
@@ -55,6 +55,7 @@ shadowJar {
     relocate('com.stardevllc.eventbus', 'com.stardevllc.starchat.eventbus')
     relocate('com.stardevllc.observable', 'com.stardevllc.starchat.observable')
     relocate('com.stardevllc.starlib', 'com.stardevllc.starchat.starlib')
+    relocate('com.stardevllc.hierarchy', 'com.stardevllc.starchat.hierarchy')
 
     minimize()
 }
@@ -67,11 +68,12 @@ dependencies {
     implementation 'com.github.StarDevelopmentLLC:cmdflags:0.1.0'
     implementation 'com.github.StarDevelopmentLLC:colors:0.1.4'
     implementation 'com.github.StarDevelopmentLLC:config:0.1.3'
-    implementation 'com.github.StarDevelopmentLLC:property:0.1.4'
+    implementation 'com.github.StarDevelopmentLLC:property:0.1.5'
     implementation 'com.github.StarDevelopmentLLC:time:0.1.0'
-    implementation 'com.github.StarDevelopmentLLC:actors:0.1.1'
+    implementation 'com.github.StarDevelopmentLLC:actors:0.1.3'
     implementation 'com.github.StarDevelopmentLLC:registry:0.1.0'
     implementation 'com.github.StarDevelopmentLLC:helper:0.1.1'
+//    implementation 'com.github.StarDevelopmentLLC:hierarchy:0.1.0'
 }
 
 java {

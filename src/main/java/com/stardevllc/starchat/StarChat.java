@@ -8,6 +8,8 @@ import com.stardevllc.starchat.channels.ChatChannel;
 import com.stardevllc.starchat.channels.GlobalChannel;
 import com.stardevllc.starchat.channels.StaffChannel;
 import com.stardevllc.starchat.commands.*;
+import com.stardevllc.starchat.handler.DisplayNameHandler;
+import com.stardevllc.starchat.handler.VaultDisplayNameHandler;
 import com.stardevllc.starchat.hooks.VaultHook;
 import com.stardevllc.starchat.listener.PlayerListener;
 import com.stardevllc.starchat.placeholder.DefaultPlaceholders;
@@ -34,19 +36,11 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.function.Function;
 
 public class StarChat extends JavaPlugin implements Listener {
     private static StarChat instance;
 
-    public static final Function<Player, String> vaultDisplayNameFunction = player -> {
-        VaultHook vc = getInstance().getVaultHook();
-        if (vc == null) {
-            return null;
-        }
-
-        return vc.getChat().getPlayerPrefix(player) + player.getName() + vc.getChat().getPlayerSuffix(player);
-    };
+    private static DisplayNameHandler defaultDisplayNameHandler = new VaultDisplayNameHandler();
     
     private SpaceRegistry spaceRegistry;
     private ChannelRegistry channelRegistry;
@@ -132,6 +126,14 @@ public class StarChat extends JavaPlugin implements Listener {
         starChatCmd.setTabCompleter(starChatCmdExecutor);
         
         getCommand("clearchat").setExecutor(new ClearChatCmd(this));
+    }
+    
+    public static DisplayNameHandler getDefaultDisplayNameHandler() {
+        return StarChat.defaultDisplayNameHandler;
+    }
+    
+    public static void setDefaultDisplayNameHandler(DisplayNameHandler displayNameHandler) {
+        StarChat.defaultDisplayNameHandler = displayNameHandler;
     }
     
     public void saveMainConfig() {
@@ -245,6 +247,10 @@ public class StarChat extends JavaPlugin implements Listener {
             YamlConfig config = YamlConfig.loadConfiguration(file);
             String name = config.getString("name");
             ChatChannel chatChannel = new ChatChannel(this, name, file.toPath());
+            if ((this.globalChannel != null && chatChannel.getName().equalsIgnoreCase(this.globalChannel.getName())) 
+                || (this.staffChannel != null && chatChannel.getName().equalsIgnoreCase(this.staffChannel.getName()))) {
+                return;
+            }
             this.channelRegistry.register(chatChannel.getName(), chatChannel);
         }
     }

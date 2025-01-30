@@ -6,7 +6,6 @@ Add Discord Hook - Need a bot based api for plugins
 Add Symbol Shortcuts for Channels (Like the Nexus Reborn @ for staff chat)
 Hover and Click Event support and formatting (Requires adventure API change)
 Chat Filtering (Spam, caps, adverts)
-Cooldowns
 Broadcasting
 Mute chat
 Interactive placeholders like [item], pos, other things, make configurable/expandable

@@ -9,6 +9,7 @@ import com.stardevllc.converter.string.StringConverters;
 import com.stardevllc.helper.ReflectionHelper;
 import com.stardevllc.observable.Property;
 import com.stardevllc.property.BooleanProperty;
+import com.stardevllc.property.ObjectProperty;
 import com.stardevllc.property.StringProperty;
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.channels.ChatChannel;
@@ -30,6 +31,7 @@ import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 public class StarChatAdminCmd implements TabExecutor {
 
@@ -145,7 +147,7 @@ public class StarChatAdminCmd implements TabExecutor {
                 
                 if (args.length == 3) {
                     // /starchat channel <name> <option>
-                    completions.addAll(List.of("delete", "set"));
+                    completions.addAll(List.of("delete", "set", "mute", "unmute"));
                     arg = args[2].toLowerCase();
                 } else if (args[2].equalsIgnoreCase("set")) {
                     // /starchat channel <name> set <property> <value>
@@ -464,25 +466,40 @@ public class StarChatAdminCmd implements TabExecutor {
                 return true;
             }
 
-            if (!(args.length > 4)) {
+            if (!(args.length > 2)) {
                 StarColors.coloredMessage(sender, "&cUsage: /" + label + " " + args[0] + " " + args[1] + " <subcommand> <arguments>");
                 return true;
             }
 
-            StringBuilder sb = new StringBuilder();
-            for (int i = 4; i < args.length; i++) {
-                sb.append(args[i]).append(" ");
-            }
-
-            String value = sb.toString().trim();
-
             if (args[2].equalsIgnoreCase("set")) {
+                if (!(args.length > 4)) {
+                    StarColors.coloredMessage(sender, "&cUsage: /" + label + " " + args[0] + " " + args[1] + " <subcommand> <arguments>");
+                    return true;
+                }
+
+                StringBuilder sb = new StringBuilder();
+                for (int i = 4; i < args.length; i++) {
+                    sb.append(args[i]).append(" ");
+                }
+
+                String value = sb.toString().trim();
+                
                 Property<?> property;
                 try {
-                    Field classField = ReflectionHelper.getClassField(chatChannel.getClass(), args[3]);
+                    Field classField = null;
+                    Set<Field> classFields = ReflectionHelper.getClassFields(chatChannel.getClass());
+
+                    for (Field field : classFields) {
+                        if (field.getName().equalsIgnoreCase(args[3])) {
+                            classField = field;
+                            break;
+                        }
+                    }
+                    
+                    classField.setAccessible(true);
                     property = (Property<?>) classField.get(chatChannel);
-                } catch (IllegalAccessException e) {
-                    StarColors.coloredMessage(sender, "You provided an invalid key name.");
+                } catch (IllegalAccessException | NullPointerException e) {
+                    StarColors.coloredMessage(sender, "&cYou provided an invalid setting name.");
                     return true;
                 }
 
@@ -491,16 +508,55 @@ public class StarChatAdminCmd implements TabExecutor {
                     return true;
                 }
 
-                if (property instanceof StringProperty stringProperty) {
-                    stringProperty.set(value);
-                } else if (property instanceof BooleanProperty booleanProperty) {
-                    booleanProperty.set(StringConverters.getConverter(boolean.class).convertTo(value));
-                } else {
-                    StarColors.coloredMessage(sender, "Unsupported Property Value Type, contact the developer to add support.");
-                    return true;
+                switch (property) {
+                    case StringProperty stringProperty -> stringProperty.set(value);
+                    case BooleanProperty booleanProperty ->
+                            booleanProperty.set(StringConverters.getConverter(boolean.class).convertTo(value));
+                    case ObjectProperty<?> objectProperty -> {
+                        if (objectProperty.getName().equalsIgnoreCase("mutedBy")) {
+                            ((ObjectProperty<Actor>) objectProperty).set(Actor.create(value));
+                        }
+                    }
+                    default -> {
+                        StarColors.coloredMessage(sender, "&cUnsupported Property Value Type, contact the developer to add support.");
+                        return true;
+                    }
                 }
 
                 StarColors.coloredMessage(sender, pluginConfig.getString("messages.command.admin.channel.set.success").replace("{channel}", chatChannel.getName()).replace("{key}", property.getName()).replace("{value}", property.getValue() + ""));
+            } else if (args[2].equalsIgnoreCase("mute")) {
+                if (!sender.hasPermission("starchat.command.admin.channel.mute")) {
+                    StarColors.coloredMessage(sender, pluginConfig.getString("messages.command.nopermission"));
+                    return true;
+                }
+                
+                if (chatChannel.isMuted()) {
+                    StarColors.coloredMessage(sender, "&cThat channel is already muted.");
+                    return true;
+                }
+                
+                Actor actor = Actor.create(sender);
+                
+                StringBuilder rb = new StringBuilder();
+                for (int i = 3; i < args.length; i++) {
+                    rb.append(args[i]).append(" ");
+                }
+                
+                String reason = rb.toString().trim();
+                chatChannel.mute(actor, reason);
+            } else if (args[2].equalsIgnoreCase("unmute")) {
+                if (!sender.hasPermission("starchat.command.admin.channel.unmute")) {
+                    StarColors.coloredMessage(sender, pluginConfig.getString("messages.command.nopermission"));
+                    return true;
+                }
+                
+                if (!chatChannel.isMuted()) {
+                    StarColors.coloredMessage(sender, "&cThat channel is not muted.");
+                    return true;
+                }
+
+                Actor actor = Actor.create(sender);
+                chatChannel.unmute(actor);
             } else {
                 StarColors.coloredMessage(sender, "&cInvalid sub command.");
                 return true;

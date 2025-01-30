@@ -3,9 +3,11 @@ package com.stardevllc.starchat.rooms;
 import com.stardevllc.actors.Actor;
 import com.stardevllc.colors.StarColors;
 import com.stardevllc.property.BooleanProperty;
+import com.stardevllc.property.ObjectProperty;
 import com.stardevllc.property.StringProperty;
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.context.ChatContext;
+import com.stardevllc.starchat.handler.DisplayNameHandler;
 import com.stardevllc.starchat.space.ChatSpace;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -17,7 +19,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.function.Function;
 
 @SuppressWarnings("EqualsBetweenInconvertibleTypes")
 public class ChatRoom implements ChatSpace {
@@ -28,7 +29,15 @@ public class ChatRoom implements ChatSpace {
     protected final BooleanProperty useColorPermissions;
     protected final StringProperty senderFormat;
     protected final StringProperty systemFormat;
-    protected Function<Player, String> displayNameHandler;
+
+    protected final BooleanProperty muted;
+    protected final ObjectProperty<Actor> mutedBy;
+    protected final StringProperty muteReason;
+    protected final StringProperty muteFormat;
+    protected final StringProperty unmuteFormat;
+    protected final StringProperty muteErrorFormat;
+    
+    protected DisplayNameHandler displayNameHandler;
     
     protected Actor owner;
     protected Map<UUID, RoomMember> members = new HashMap<>();
@@ -40,6 +49,12 @@ public class ChatRoom implements ChatSpace {
         this.useColorPermissions = new BooleanProperty(this, "useColorPermissions", false);
         this.senderFormat = new StringProperty(this, "senderFormat", "");
         this.systemFormat = new StringProperty(this, "systemFormat", "");
+        this.muted = new BooleanProperty(this, "muted", false);
+        this.mutedBy = new ObjectProperty<>(this, "mutedby", null);
+        this.muteReason = new StringProperty(this, "muteReason", "");
+        this.muteFormat = new StringProperty(this, "muteFormat", "");
+        this.unmuteFormat = new StringProperty(this, "unmuteFormat", "");
+        this.muteErrorFormat = new StringProperty(this, "muteErrorFormat", "");
     }
     
     public ChatRoom(JavaPlugin plugin, String name) {
@@ -48,11 +63,14 @@ public class ChatRoom implements ChatSpace {
 
     @Override
     public void sendMessage(ChatContext context) {
-        String displayName;
+        String displayName, prefix, playerName, suffix;
         String message;
 
         if (context.getSender() == null) {
             displayName = "";
+            playerName = "";
+            prefix = "";
+            suffix = "";
             message = StarColors.color(context.getMessage());
         } else {
             if (!canSendMessages(context.getSender())) {
@@ -60,6 +78,19 @@ public class ChatRoom implements ChatSpace {
             }
 
             CommandSender sender = context.getSender();
+            
+            if (isMuted()) {
+                if (!sender.hasPermission("starchat.room.bypass.mute")) {
+                    if (sender instanceof Player player) {
+                        RoomMember roomMember = this.members.get(player.getUniqueId());
+                        if (!roomMember.hasPermission(DefaultPermissions.BYPASS_MUTE)) {
+                            String msg = this.muteErrorFormat.get().replace("{roomName}", this.name.get()).replace("{actor}", this.mutedBy.get().getName());
+                            StarColors.coloredMessage(player, msg);
+                            return;
+                        }
+                    }
+                }
+            }
 
             if (context.getChatEvent() != null && context.getChatEvent().isCancelled()) {
                 if (!sender.hasPermission("starchat.room.bypass.cancelledevent")) {
@@ -77,9 +108,16 @@ public class ChatRoom implements ChatSpace {
             
             if (context.getSender() instanceof ConsoleCommandSender) {
                 displayName = StarChat.getInstance().getConsoleNameFormat();
+                playerName = "";
+                prefix = "";
+                suffix = "";
             } else {
                 Player player = (Player) context.getSender();
-                displayName = Objects.requireNonNullElse(this.displayNameHandler, StarChat.vaultDisplayNameFunction).apply(player);
+                DisplayNameHandler handler = Objects.requireNonNullElse(this.displayNameHandler, StarChat.getDefaultDisplayNameHandler());
+                displayName = handler.getDisplayName(player);
+                prefix = handler.getPrefix(player);
+                playerName = handler.getName(player);
+                suffix = handler.getSuffix(player);
             }
         }
 
@@ -88,7 +126,7 @@ public class ChatRoom implements ChatSpace {
             format = StarColors.color(systemFormat.get().replace("{message}", message));
         } else {
             if (context.getSender() instanceof Player player) {
-                format = StarColors.color(StarChat.getInstance().getPlaceholderHandler().setPlaceholders(player, senderFormat.get().replace("{displayname}", displayName))).replace("{message}", message);
+                format = StarColors.color(StarChat.getInstance().getPlaceholderHandler().setPlaceholders(player, senderFormat.get().replace("{displayname}", displayName).replace("{prefix}", prefix).replace("{name}", playerName).replace("{suffix}", suffix))).replace("{message}", message);
             } else {
                 format = StarColors.color(senderFormat.get().replace("{displayname}", displayName)).replace("{message}", message);
             }
@@ -154,6 +192,33 @@ public class ChatRoom implements ChatSpace {
     @Override
     public boolean supportsCooldowns() {
         return false;
+    }
+
+    @Override
+    public boolean isMuted() {
+        return this.muted.get();
+    }
+
+    @Override
+    public void mute(Actor actor, String reason) {
+        if (!this.muted.get()) {
+            this.muted.set(true);
+            this.mutedBy.set(actor);
+            this.muteReason.set(reason);
+            String msg = this.muteFormat.get().replace("{channelName}", this.name.get()).replace("{actor}", this.mutedBy.get().getName());
+            sendMessage(new ChatContext(msg));
+        }
+    }
+
+    @Override
+    public void unmute(Actor actor) {
+        if (this.muted.get()) {
+            this.muted.set(false);
+            this.mutedBy.set(null);
+            this.muteReason.set(null);
+            String msg = this.unmuteFormat.get().replace("{channelName}", this.name.get()).replace("{actor}", this.mutedBy.get().getName());
+            sendMessage(new ChatContext(msg));
+        }
     }
 
     public boolean isOwner(UUID uuid) {

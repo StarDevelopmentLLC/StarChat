@@ -1,5 +1,6 @@
 package com.stardevllc.starchat.space;
 
+import com.stardevllc.actors.Actor;
 import com.stardevllc.starchat.context.ChatContext;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -13,4 +14,9 @@ public interface ChatSpace {
     JavaPlugin getPlugin();
     
     boolean supportsCooldowns();
+    
+    boolean isMuted();
+    
+    void mute(Actor actor, String reason);
+    void unmute(Actor actor);
 }
