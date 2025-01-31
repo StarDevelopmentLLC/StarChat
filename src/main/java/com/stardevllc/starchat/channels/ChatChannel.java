@@ -179,20 +179,20 @@ public class ChatChannel implements ChatSpace {
         this.muted.set(true);
         this.mutedBy.set(actor);
         this.muteReason.set(reason);
-        String muteMsg = this.muteFormat.get();
-        muteMsg = muteMsg.replace("{channelName}", this.name.get());
-        muteMsg = muteMsg.replace("{actor}", actor.getName());
-        sendMessage(new ChatContext(muteMsg));
     }
 
     public void unmute(Actor actor) {
         this.muted.set(false);
         this.mutedBy.set(null);
         this.muteReason.set(null);
-        String unmuteMsg = this.unmuteFormat.get();
-        unmuteMsg = unmuteMsg.replace("{channelName}", this.name.get());
-        unmuteMsg = unmuteMsg.replace("{actor}", actor.getName());
-        sendMessage(new ChatContext(unmuteMsg));
+    }
+
+    public String getMuteFormat() {
+        return muteFormat.get();
+    }
+
+    public String getUnmuteFormat() {
+        return unmuteFormat.get();
     }
 
     @Override

@@ -27,7 +27,7 @@ publishing {
 }
 
 group 'com.github.StarDevelopmentLLC'
-version '0.1.7'
+version '0.1.8'
 
 processResources {
     filesMatching("*.yml") {
