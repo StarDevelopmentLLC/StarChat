@@ -36,9 +36,9 @@ public class ChatRoom implements ChatSpace {
     protected final StringProperty muteFormat;
     protected final StringProperty unmuteFormat;
     protected final StringProperty muteErrorFormat;
-    
+
     protected DisplayNameHandler displayNameHandler;
-    
+
     protected Actor owner;
     protected Map<UUID, RoomMember> members = new HashMap<>();
 
@@ -56,7 +56,7 @@ public class ChatRoom implements ChatSpace {
         this.unmuteFormat = new StringProperty(this, "unmuteFormat", "");
         this.muteErrorFormat = new StringProperty(this, "muteErrorFormat", "");
     }
-    
+
     public ChatRoom(JavaPlugin plugin, String name) {
         this(plugin, Actor.of(plugin), name);
     }
@@ -78,7 +78,7 @@ public class ChatRoom implements ChatSpace {
             }
 
             CommandSender sender = context.getSender();
-            
+
             if (isMuted()) {
                 if (!sender.hasPermission("starchat.room.bypass.mute")) {
                     if (sender instanceof Player player) {
@@ -105,7 +105,7 @@ public class ChatRoom implements ChatSpace {
             } else {
                 message = StarColors.color(message);
             }
-            
+
             if (context.getSender() instanceof ConsoleCommandSender) {
                 displayName = StarChat.getInstance().getConsoleNameFormat();
                 playerName = "";
@@ -147,14 +147,14 @@ public class ChatRoom implements ChatSpace {
         if (owner.equals(sender)) {
             return true;
         }
-        
+
         if (sender instanceof Player player) {
             RoomMember member = this.members.get(player.getUniqueId());
             if (member != null) {
                 return member.hasPermission(DefaultPermissions.SEND_MESSAGES);
             }
         }
-        
+
         return false;
     }
 
@@ -170,7 +170,7 @@ public class ChatRoom implements ChatSpace {
                 return member.hasPermission(DefaultPermissions.VIEW_MESSAGES);
             }
         }
-        
+
         return false;
     }
 
@@ -201,34 +201,26 @@ public class ChatRoom implements ChatSpace {
 
     @Override
     public void mute(Actor actor, String reason) {
-        if (!this.muted.get()) {
-            this.muted.set(true);
-            this.mutedBy.set(actor);
-            this.muteReason.set(reason);
-            String msg = this.muteFormat.get().replace("{channelName}", this.name.get()).replace("{actor}", this.mutedBy.get().getName());
-            sendMessage(new ChatContext(msg));
-        }
+        this.muted.set(true);
+        this.mutedBy.set(actor);
+        this.muteReason.set(reason);
     }
 
     @Override
     public void unmute(Actor actor) {
-        if (this.muted.get()) {
-            this.muted.set(false);
-            this.mutedBy.set(null);
-            this.muteReason.set(null);
-            String msg = this.unmuteFormat.get().replace("{channelName}", this.name.get()).replace("{actor}", this.mutedBy.get().getName());
-            sendMessage(new ChatContext(msg));
-        }
+        this.muted.set(false);
+        this.mutedBy.set(null);
+        this.muteReason.set(null);
     }
 
     public boolean isOwner(UUID uuid) {
         if (owner.isPlayer()) {
             return owner.equals(uuid);
         }
-        
+
         return false;
     }
-    
+
     public boolean isMember(UUID uuid) {
         if (isOwner(uuid)) {
             return true;
