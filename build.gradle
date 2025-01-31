@@ -27,7 +27,7 @@ publishing {
 }
 
 group 'com.github.StarDevelopmentLLC'
-version '0.1.6'
+version '0.1.7'
 
 processResources {
     filesMatching("*.yml") {
@@ -46,7 +46,7 @@ shadowJar {
 //    relocate('com.stardevllc.cmdflags', 'com.stardevllc.starchat.cmdflags')
 //    relocate('com.stardevllc.colors', 'com.stardevllc.starchat.colors')
 //    relocate('com.stardevllc.config', 'com.stardevllc.starchat.config')
-    relocate('org.yaml', 'com.stardevllc.starchat.config.snakeyaml')
+//    relocate('org.yaml', 'com.stardevllc.starchat.config.snakeyaml')
 //    relocate('com.stardevllc.property', 'com.stardevllc.starchat.property')
 //    relocate('com.stardevllc.time', 'com.stardevllc.starchat.time')
 //    relocate('com.stardevllc.actors', 'com.stardevllc.starchat.actors')
