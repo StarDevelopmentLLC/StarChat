@@ -3,7 +3,7 @@ package com.stardevllc.starchat.commands;
 import com.stardevllc.actors.Actor;
 import com.stardevllc.cmdflags.CmdFlags;
 import com.stardevllc.cmdflags.Flag;
-import com.stardevllc.cmdflags.ParseResult;
+import com.stardevllc.cmdflags.FlagResult;
 import com.stardevllc.cmdflags.type.PresenceFlag;
 import com.stardevllc.colors.StarColors;
 import com.stardevllc.starchat.StarChat;
@@ -37,7 +37,7 @@ public class MessageCmd implements TabExecutor {
             return true;
         }
 
-        ParseResult flagResult = flags.parse(args);
+        FlagResult flagResult = flags.parse(args);
         args = flagResult.args();
         
         if (!(args.length >= 2)) {

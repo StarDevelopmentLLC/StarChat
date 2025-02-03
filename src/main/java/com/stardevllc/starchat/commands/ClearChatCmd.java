@@ -2,7 +2,7 @@ package com.stardevllc.starchat.commands;
 
 import com.stardevllc.cmdflags.CmdFlags;
 import com.stardevllc.cmdflags.Flag;
-import com.stardevllc.cmdflags.ParseResult;
+import com.stardevllc.cmdflags.FlagResult;
 import com.stardevllc.cmdflags.type.ComplexFlag;
 import com.stardevllc.cmdflags.type.PresenceFlag;
 import com.stardevllc.colors.StarColors;
@@ -41,7 +41,7 @@ public class ClearChatCmd implements CommandExecutor {
             return true;
         }
 
-        ParseResult flagResult = flags.parse(args);
+        FlagResult flagResult = flags.parse(args);
 
         int lineAmount;
         if (flagResult.getValue(LINE_AMOUNT) != null) {

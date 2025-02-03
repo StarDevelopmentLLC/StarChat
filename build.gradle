@@ -62,7 +62,7 @@ dependencies {
     compileOnly 'com.github.MilkBowl:VaultAPI:1.7.1'
     compileOnly 'me.clip:placeholderapi:2.11.6'
     implementation 'com.github.StarDevelopmentLLC:converter:0.1.0'
-    implementation 'com.github.StarDevelopmentLLC:cmdflags:0.1.0'
+    implementation 'com.github.StarDevelopmentLLC:cmdflags:0.1.2'
     implementation 'com.github.StarDevelopmentLLC:colors:0.1.4'
     implementation 'com.github.StarDevelopmentLLC:config:0.1.4'
     implementation 'com.github.StarDevelopmentLLC:property:0.1.5'
