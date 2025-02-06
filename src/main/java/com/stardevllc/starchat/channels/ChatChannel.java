@@ -48,7 +48,7 @@ public class ChatChannel implements ChatSpace {
     protected final StringProperty unmuteFormat;
     protected final StringProperty muteErrorFormat;
     protected final StringProperty muteBypassPermission;
-    
+
     protected DisplayNameHandler displayNameHandler;
 
     protected final LongProperty cooldownLength;
@@ -56,7 +56,7 @@ public class ChatChannel implements ChatSpace {
     protected Map<UUID, Long> lastMessage = new HashMap<>();
 
     protected static final TimeFormat TIME_FORMAT = new TimeFormat("%*#0h%%*#0m%%*#0s%");
-    
+
     public ChatChannel(JavaPlugin plugin, String name, Path filePath) {
         this.plugin = plugin;
         this.file = new File(filePath.toFile().getAbsolutePath());
@@ -220,9 +220,7 @@ public class ChatChannel implements ChatSpace {
             }
 
             if (context.getChatEvent() != null && context.getChatEvent().isCancelled()) {
-                if (!sender.hasPermission("starchat.channel.bypass.cancelledevent")) {
-                    return;
-                }
+                return;
             }
 
             message = context.getMessage();
