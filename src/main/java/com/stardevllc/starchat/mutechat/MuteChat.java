@@ -1,6 +1,7 @@
 package com.stardevllc.starchat.mutechat;
 
 import com.stardevllc.actors.Actor;
+import com.stardevllc.colors.StarColors;
 import com.stardevllc.observable.collections.ObservableHashSet;
 import com.stardevllc.observable.collections.ObservableSet;
 import com.stardevllc.property.BooleanProperty;
@@ -49,7 +50,7 @@ public class MuteChat {
                     iterator.remove();
                 } else {
                     members.addAll(chatSpace.getMembers());
-                    
+
                     if (e.newValue()) {
                         chatSpace.mute(actor.get(), reason.get());
                     } else {
@@ -64,13 +65,15 @@ public class MuteChat {
             } else {
                 format = plugin.getMainConfig().getString("globalmute.format.unmute");
             }
-            
-            format = format.replace("{actor}", actor.getName());
+
+            format = format.replace("{actor}", actor.get().getName());
             if (reason.get() != null && !reason.get().isEmpty()) {
                 format = format.replace("{reason}", "for " + reason.get());
             } else {
                 format = format.replace("{reason}", "");
             }
+
+            format = StarColors.color(format);
 
             for (Actor member : members) {
                 member.sendMessage(format);
@@ -85,7 +88,9 @@ public class MuteChat {
                     return;
                 }
                 
-                chatSpace.mute(actor.get(), reason.get());
+                if (this.isMuted()) {
+                    chatSpace.mute(actor.get(), reason.get());
+                }
             } else if (e.removed() != null) {
                 String spaceName = (String) e.removed();
                 ChatSpace chatSpace = plugin.getSpaceRegistry().get(spaceName);
@@ -93,7 +98,9 @@ public class MuteChat {
                     return;
                 }
                 
-                chatSpace.unmute(null);
+                if (this.isMuted()) {
+                    chatSpace.unmute(null);
+                }
             }
         });
     }

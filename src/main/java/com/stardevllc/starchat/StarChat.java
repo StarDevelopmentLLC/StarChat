@@ -135,6 +135,7 @@ public class StarChat extends JavaPlugin implements Listener {
         starChatCmd.setTabCompleter(starChatCmdExecutor);
         
         getCommand("clearchat").setExecutor(new ClearChatCmd(this));
+        getCommand("mutechat").setExecutor(new MuteChatCmd(this));
     }
 
     public MuteChat getMuteChat() {
@@ -205,7 +206,7 @@ public class StarChat extends JavaPlugin implements Listener {
         mainConfig.addDefault("globalmute.actor", "", "The one who muted the chat");
         mainConfig.addDefault("globalmute.reason", "", "The reason provided for the global mute");
         mainConfig.addDefault("globalmute.format.mute", "&c{actor} has muted the chat.", "{actor} is the one who muted the chat", "{reason} is the reason provided. Note: the word for will be added before the reason to account for no reason provided");
-        mainConfig.addDefault("globalmute.format.unmute", "&a{actor} has unmuted the chat.");
+        mainConfig.addDefault("globalmute.format.unmute", "&a{actor} has unmuted the chat.", "{actor} is the one who muted the chat", "{reason} is the reason provided. Note: the word for will be added before the reason to account for no reason provided");
         mainConfig.addDefault("globalmute.spaces", List.of(), "The spaces included in the global mute");
         
         mainConfig.addDefault("messages.command.nopermission", "&cYou do not have permission to use that command.");

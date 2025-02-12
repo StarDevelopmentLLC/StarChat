@@ -191,91 +191,97 @@ public class ChatChannel implements ChatSpace {
 
     @Override
     public void sendMessage(ChatContext context) {
-        SpaceChatEvent spaceChatEvent = new SpaceChatEvent(this, context);
-        Bukkit.getPluginManager().callEvent(spaceChatEvent);
-        
-        if (spaceChatEvent.isCancelled()) {
-            return;
-        }
-        
-        String displayName, prefix, playerName, suffix;
-        String message;
+        Bukkit.getScheduler().runTask(plugin, () -> {
+            SpaceChatEvent spaceChatEvent = new SpaceChatEvent(this, context);
+            Bukkit.getPluginManager().callEvent(spaceChatEvent);
 
-        if (context.getSender() == null) {
-            displayName = "";
-            playerName = "";
-            prefix = "";
-            suffix = "";
-            message = StarColors.color(context.getMessage());
-        } else {
-            if (!canSendMessages(context.getSender())) {
+            if (spaceChatEvent.isCancelled()) {
                 return;
             }
 
-            CommandSender sender = context.getSender();
+            String displayName, prefix, playerName, suffix;
+            String message;
 
-            if (this.isMuted()) {
-                if (!sender.hasPermission(this.muteBypassPermission.get())) {
-                    String msg = this.muteErrorFormat.get();
-                    msg = msg.replace("{channelName}", this.name.get());
-                    msg = msg.replace("{actor}", mutedBy.get().getName());
-                    StarColors.coloredMessage(sender, msg);
-                    return;
-                }
-            }
-
-            if (sender instanceof Player player) {
-                if (!sender.hasPermission("starchat.channel." + getName().toLowerCase() + ".bypasscooldown")) {
-                    long lastMessage = this.lastMessage.getOrDefault(player.getUniqueId(), 0L);
-                    if (lastMessage != 0L) {
-                        if (System.currentTimeMillis() < lastMessage + cooldownLength.get()) {
-                            StarColors.coloredMessage(player, "&cYou must wait " + TIME_FORMAT.format(lastMessage + cooldownLength.get() - System.currentTimeMillis()) + " before you can chat again.");
-                            return;
-                        }
-                    }
-                }
-            }
-
-            message = context.getMessage();
-
-            if (this.useColorPermissions.get()) {
-                message = StarColors.color(context.getSender(), message);
-            } else {
-                message = StarColors.color(message);
-            }
-
-            if (context.getSender() instanceof ConsoleCommandSender) {
-                displayName = StarChat.getInstance().getConsoleNameFormat();
+            if (context.getSender() == null) {
+                displayName = "";
                 playerName = "";
                 prefix = "";
                 suffix = "";
+                message = StarColors.color(context.getMessage());
             } else {
-                Player player = (Player) context.getSender();
-                DisplayNameHandler handler = Objects.requireNonNullElse(this.displayNameHandler, StarChat.getDefaultDisplayNameHandler());
-                displayName = handler.getDisplayName(player);
-                playerName = handler.getName(player);
-                prefix = handler.getPrefix(player);
-                suffix = handler.getSuffix(player);
-            }
-        }
+                if (!canSendMessages(context.getSender())) {
+                    return;
+                }
 
-        String format;
-        if (context.getSender() == null) {
-            format = StarColors.color(systemFormat.get().replace("{message}", message));
-        } else {
-            if (context.getSender() instanceof ConsoleCommandSender) {
-                format = StarColors.color(senderFormat.get().replace("{displayname}", displayName)).replace("{message}", message);
+                CommandSender sender = context.getSender();
+
+                if (this.isMuted()) {
+                    if (!sender.hasPermission(this.muteBypassPermission.get())) {
+                        String msg = this.muteErrorFormat.get();
+                        msg = msg.replace("{channelName}", this.name.get());
+                        if (mutedBy.get() == null) {
+                            msg = msg.replace("{actor}", "CONSOLE");
+                        } else {
+                            msg = msg.replace("{actor}", mutedBy.get().getName());
+                        }
+                        StarColors.coloredMessage(sender, msg);
+                        return;
+                    }
+                }
+
+                if (sender instanceof Player player) {
+                    if (!sender.hasPermission("starchat.channel." + getName().toLowerCase() + ".bypasscooldown")) {
+                        long lastMessage = this.lastMessage.getOrDefault(player.getUniqueId(), 0L);
+                        if (lastMessage != 0L) {
+                            if (System.currentTimeMillis() < lastMessage + cooldownLength.get()) {
+                                StarColors.coloredMessage(player, "&cYou must wait " + TIME_FORMAT.format(lastMessage + cooldownLength.get() - System.currentTimeMillis()) + " before you can chat again.");
+                                return;
+                            }
+                        }
+                    }
+                }
+
+                message = context.getMessage();
+
+                if (this.useColorPermissions.get()) {
+                    message = StarColors.color(context.getSender(), message);
+                } else {
+                    message = StarColors.color(message);
+                }
+
+                if (context.getSender() instanceof ConsoleCommandSender) {
+                    displayName = StarChat.getInstance().getConsoleNameFormat();
+                    playerName = "";
+                    prefix = "";
+                    suffix = "";
+                } else {
+                    Player player = (Player) context.getSender();
+                    DisplayNameHandler handler = Objects.requireNonNullElse(this.displayNameHandler, StarChat.getDefaultDisplayNameHandler());
+                    displayName = handler.getDisplayName(player);
+                    playerName = handler.getName(player);
+                    prefix = handler.getPrefix(player);
+                    suffix = handler.getSuffix(player);
+                }
+            }
+
+            String format;
+            if (context.getSender() == null) {
+                format = StarColors.color(systemFormat.get().replace("{message}", message));
             } else {
-                Player player = (Player) context.getSender();
-                format = StarColors.color(StarChat.getInstance().getPlaceholderHandler().setPlaceholders(player, senderFormat.get().replace("{displayname}", displayName).replace("{prefix}", prefix).replace("{name}", playerName).replace("{suffix}", suffix))).replace("{message}", message);
+                if (context.getSender() instanceof ConsoleCommandSender) {
+                    format = StarColors.color(senderFormat.get().replace("{displayname}", displayName)).replace("{message}", message);
+                } else {
+                    Player player = (Player) context.getSender();
+                    format = StarColors.color(StarChat.getInstance().getPlaceholderHandler().setPlaceholders(player, senderFormat.get().replace("{displayname}", displayName).replace("{prefix}", prefix).replace("{name}", playerName).replace("{suffix}", suffix))).replace("{message}", message);
+                }
             }
-        }
 
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            if (canViewMessages(player)) {
-                player.sendMessage(format);
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                if (canViewMessages(player)) {
+                    player.sendMessage(format);
+                }
             }
-        }
+        });
     }
 
     @Override

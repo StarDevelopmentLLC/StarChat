@@ -32,8 +32,12 @@ public class MuteChatCmd implements CommandExecutor {
         if (!reason.isEmpty()) {
             reason.deleteCharAt(reason.length() - 1);
         }
-
-        plugin.getMuteChat().mute(actor, reason.toString());
+        
+        if (!plugin.getMuteChat().isMuted()) {
+            plugin.getMuteChat().mute(actor, reason.toString());
+        } else {
+            plugin.getMuteChat().unmute();
+        }
         return true;
     }
 }
