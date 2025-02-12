@@ -8,6 +8,7 @@ import com.stardevllc.property.LongProperty;
 import com.stardevllc.property.ObjectProperty;
 import com.stardevllc.property.StringProperty;
 import com.stardevllc.starchat.StarChat;
+import com.stardevllc.starchat.api.SpaceChatEvent;
 import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.handler.DisplayNameHandler;
 import com.stardevllc.starchat.obserable.ConfigChangeListener;
@@ -190,6 +191,13 @@ public class ChatChannel implements ChatSpace {
 
     @Override
     public void sendMessage(ChatContext context) {
+        SpaceChatEvent spaceChatEvent = new SpaceChatEvent(this, context);
+        Bukkit.getPluginManager().callEvent(spaceChatEvent);
+        
+        if (spaceChatEvent.isCancelled()) {
+            return;
+        }
+        
         String displayName, prefix, playerName, suffix;
         String message;
 
@@ -226,10 +234,6 @@ public class ChatChannel implements ChatSpace {
                         }
                     }
                 }
-            }
-
-            if (context.getChatEvent() != null && context.getChatEvent().isCancelled()) {
-                return;
             }
 
             message = context.getMessage();
