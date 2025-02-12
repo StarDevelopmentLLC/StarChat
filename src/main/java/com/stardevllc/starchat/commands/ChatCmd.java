@@ -117,6 +117,8 @@ public class ChatCmd implements TabExecutor {
                 }
             }
         }
+        
+        channels.addAll(plugin.getChatSelectors().keySet());
 
         Collections.sort(channels);
         return channels;
