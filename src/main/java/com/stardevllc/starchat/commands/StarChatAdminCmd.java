@@ -13,6 +13,7 @@ import com.stardevllc.property.ObjectProperty;
 import com.stardevllc.property.StringProperty;
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.channels.ChatChannel;
+import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.placeholder.DefaultPlaceholders;
 import com.stardevllc.starchat.placeholder.PAPIExpansion;
 import com.stardevllc.starchat.placeholder.PAPIPlaceholders;
@@ -544,6 +545,10 @@ public class StarChatAdminCmd implements TabExecutor {
                 
                 String reason = rb.toString().trim();
                 chatChannel.mute(actor, reason);
+                String muteMsg = chatChannel.getMuteFormat();
+                muteMsg = muteMsg.replace("{channelName}", chatChannel.getName());
+                muteMsg = muteMsg.replace("{actor}", actor.getName());
+                chatChannel.sendMessage(new ChatContext(muteMsg));
             } else if (args[2].equalsIgnoreCase("unmute")) {
                 if (!sender.hasPermission("starchat.command.admin.channel.unmute")) {
                     StarColors.coloredMessage(sender, pluginConfig.getString("messages.command.nopermission"));
@@ -557,6 +562,10 @@ public class StarChatAdminCmd implements TabExecutor {
 
                 Actor actor = Actor.create(sender);
                 chatChannel.unmute(actor);
+                String unmuteMsg = chatChannel.getUnmuteFormat();
+                unmuteMsg = unmuteMsg.replace("{channelName}", chatChannel.getName());
+                unmuteMsg = unmuteMsg.replace("{actor}", actor.getName());
+                chatChannel.sendMessage(new ChatContext(unmuteMsg));
             } else {
                 StarColors.coloredMessage(sender, "&cInvalid sub command.");
                 return true;

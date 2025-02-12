@@ -6,6 +6,7 @@ import com.stardevllc.property.BooleanProperty;
 import com.stardevllc.property.ObjectProperty;
 import com.stardevllc.property.StringProperty;
 import com.stardevllc.starchat.StarChat;
+import com.stardevllc.starchat.api.SpaceChatEvent;
 import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.handler.DisplayNameHandler;
 import com.stardevllc.starchat.space.ChatSpace;
@@ -15,10 +16,7 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 @SuppressWarnings("EqualsBetweenInconvertibleTypes")
 public class ChatRoom implements ChatSpace {
@@ -36,9 +34,9 @@ public class ChatRoom implements ChatSpace {
     protected final StringProperty muteFormat;
     protected final StringProperty unmuteFormat;
     protected final StringProperty muteErrorFormat;
-    
+
     protected DisplayNameHandler displayNameHandler;
-    
+
     protected Actor owner;
     protected Map<UUID, RoomMember> members = new HashMap<>();
 
@@ -50,96 +48,101 @@ public class ChatRoom implements ChatSpace {
         this.senderFormat = new StringProperty(this, "senderFormat", "");
         this.systemFormat = new StringProperty(this, "systemFormat", "");
         this.muted = new BooleanProperty(this, "muted", false);
-        this.mutedBy = new ObjectProperty<>(this, "mutedby", null);
+        this.mutedBy = new ObjectProperty<>(Actor.class, this, "mutedby", null);
         this.muteReason = new StringProperty(this, "muteReason", "");
         this.muteFormat = new StringProperty(this, "muteFormat", "");
         this.unmuteFormat = new StringProperty(this, "unmuteFormat", "");
         this.muteErrorFormat = new StringProperty(this, "muteErrorFormat", "");
     }
-    
+
     public ChatRoom(JavaPlugin plugin, String name) {
         this(plugin, Actor.of(plugin), name);
     }
 
     @Override
     public void sendMessage(ChatContext context) {
-        String displayName, prefix, playerName, suffix;
-        String message;
-
-        if (context.getSender() == null) {
-            displayName = "";
-            playerName = "";
-            prefix = "";
-            suffix = "";
-            message = StarColors.color(context.getMessage());
-        } else {
-            if (!canSendMessages(context.getSender())) {
-                return;
-            }
-
-            CommandSender sender = context.getSender();
+        Bukkit.getScheduler().runTask(plugin, () -> {
+            SpaceChatEvent spaceChatEvent = new SpaceChatEvent(this, context);
+            Bukkit.getPluginManager().callEvent(spaceChatEvent);
             
-            if (isMuted()) {
-                if (!sender.hasPermission("starchat.room.bypass.mute")) {
-                    if (sender instanceof Player player) {
-                        RoomMember roomMember = this.members.get(player.getUniqueId());
-                        if (!roomMember.hasPermission(DefaultPermissions.BYPASS_MUTE)) {
-                            String msg = this.muteErrorFormat.get().replace("{roomName}", this.name.get()).replace("{actor}", this.mutedBy.get().getName());
-                            StarColors.coloredMessage(player, msg);
-                            return;
-                        }
-                    }
-                }
-            }
+            String displayName, prefix, playerName, suffix;
+            String message;
 
-            if (context.getChatEvent() != null && context.getChatEvent().isCancelled()) {
-                if (!sender.hasPermission("starchat.room.bypass.cancelledevent")) {
-                    return;
-                }
-            }
-
-            message = context.getMessage();
-
-            if (this.useColorPermissions.get()) {
-                message = StarColors.color(context.getSender(), message);
-            } else {
-                message = StarColors.color(message);
-            }
-            
-            if (context.getSender() instanceof ConsoleCommandSender) {
-                displayName = StarChat.getInstance().getConsoleNameFormat();
+            if (context.getSender() == null) {
+                displayName = "";
                 playerName = "";
                 prefix = "";
                 suffix = "";
+                message = StarColors.color(context.getMessage());
             } else {
-                Player player = (Player) context.getSender();
-                DisplayNameHandler handler = Objects.requireNonNullElse(this.displayNameHandler, StarChat.getDefaultDisplayNameHandler());
-                displayName = handler.getDisplayName(player);
-                prefix = handler.getPrefix(player);
-                playerName = handler.getName(player);
-                suffix = handler.getSuffix(player);
-            }
-        }
+                if (!canSendMessages(context.getSender())) {
+                    return;
+                }
 
-        String format;
-        if (context.getSender() == null) {
-            format = StarColors.color(systemFormat.get().replace("{message}", message));
-        } else {
-            if (context.getSender() instanceof Player player) {
-                format = StarColors.color(StarChat.getInstance().getPlaceholderHandler().setPlaceholders(player, senderFormat.get().replace("{displayname}", displayName).replace("{prefix}", prefix).replace("{name}", playerName).replace("{suffix}", suffix))).replace("{message}", message);
-            } else {
-                format = StarColors.color(senderFormat.get().replace("{displayname}", displayName)).replace("{message}", message);
-            }
-        }
+                CommandSender sender = context.getSender();
 
-        for (UUID uuid : this.members.keySet()) {
-            Player player = Bukkit.getPlayer(uuid);
-            if (player != null) {
-                if (canViewMessages(player)) {
-                    player.sendMessage(format);
+                if (isMuted()) {
+                    if (!sender.hasPermission("starchat.room.bypass.mute")) {
+                        if (sender instanceof Player player) {
+                            RoomMember roomMember = this.members.get(player.getUniqueId());
+                            if (!roomMember.hasPermission(DefaultPermissions.BYPASS_MUTE)) {
+                                String msg = this.muteErrorFormat.get().replace("{roomName}", this.name.get()).replace("{actor}", this.mutedBy.get().getName());
+                                StarColors.coloredMessage(player, msg);
+                                return;
+                            }
+                        }
+                    }
+                }
+
+                if (context.getChatEvent() != null && context.getChatEvent().isCancelled()) {
+                    if (!sender.hasPermission("starchat.room.bypass.cancelledevent")) {
+                        return;
+                    }
+                }
+
+                message = context.getMessage();
+
+                if (this.useColorPermissions.get()) {
+                    message = StarColors.color(context.getSender(), message);
+                } else {
+                    message = StarColors.color(message);
+                }
+
+                if (context.getSender() instanceof ConsoleCommandSender) {
+                    displayName = StarChat.getInstance().getConsoleNameFormat();
+                    playerName = "";
+                    prefix = "";
+                    suffix = "";
+                } else {
+                    Player player = (Player) context.getSender();
+                    DisplayNameHandler handler = Objects.requireNonNullElse(this.displayNameHandler, StarChat.getDefaultDisplayNameHandler());
+                    displayName = handler.getDisplayName(player);
+                    prefix = handler.getPrefix(player);
+                    playerName = handler.getName(player);
+                    suffix = handler.getSuffix(player);
                 }
             }
-        }
+
+            String format;
+            if (context.getSender() == null) {
+                format = StarColors.color(systemFormat.get().replace("{message}", message));
+            } else {
+                if (context.getSender() instanceof Player player) {
+                    format = StarColors.color(StarChat.getInstance().getPlaceholderHandler().setPlaceholders(player, senderFormat.get().replace("{displayname}", displayName).replace("{prefix}", prefix).replace("{name}", playerName).replace("{suffix}", suffix))).replace("{message}", message);
+                } else {
+                    format = StarColors.color(senderFormat.get().replace("{displayname}", displayName)).replace("{message}", message);
+                }
+            }
+
+            for (UUID uuid : this.members.keySet()) {
+                Player player = Bukkit.getPlayer(uuid);
+                if (player != null) {
+                    if (canViewMessages(player)) {
+                        player.sendMessage(format);
+                    }
+                }
+            }
+        });
     }
 
     @Override
@@ -147,14 +150,14 @@ public class ChatRoom implements ChatSpace {
         if (owner.equals(sender)) {
             return true;
         }
-        
+
         if (sender instanceof Player player) {
             RoomMember member = this.members.get(player.getUniqueId());
             if (member != null) {
                 return member.hasPermission(DefaultPermissions.SEND_MESSAGES);
             }
         }
-        
+
         return false;
     }
 
@@ -170,7 +173,7 @@ public class ChatRoom implements ChatSpace {
                 return member.hasPermission(DefaultPermissions.VIEW_MESSAGES);
             }
         }
-        
+
         return false;
     }
 
@@ -201,34 +204,39 @@ public class ChatRoom implements ChatSpace {
 
     @Override
     public void mute(Actor actor, String reason) {
-        if (!this.muted.get()) {
-            this.muted.set(true);
-            this.mutedBy.set(actor);
-            this.muteReason.set(reason);
-            String msg = this.muteFormat.get().replace("{channelName}", this.name.get()).replace("{actor}", this.mutedBy.get().getName());
-            sendMessage(new ChatContext(msg));
-        }
+        this.muted.set(true);
+        this.mutedBy.set(actor);
+        this.muteReason.set(reason);
     }
 
     @Override
     public void unmute(Actor actor) {
-        if (this.muted.get()) {
-            this.muted.set(false);
-            this.mutedBy.set(null);
-            this.muteReason.set(null);
-            String msg = this.unmuteFormat.get().replace("{channelName}", this.name.get()).replace("{actor}", this.mutedBy.get().getName());
-            sendMessage(new ChatContext(msg));
+        this.muted.set(false);
+        this.mutedBy.set(null);
+        this.muteReason.set(null);
+    }
+
+    @Override
+    public Set<Actor> getMembers() {
+        Set<Actor> members = new HashSet<>();
+        for (UUID uuid : this.members.keySet()) {
+            Player player = Bukkit.getPlayer(uuid);
+            if (player != null) {
+                members.add(Actor.of(player));
+            }
         }
+
+        return members;
     }
 
     public boolean isOwner(UUID uuid) {
         if (owner.isPlayer()) {
             return owner.equals(uuid);
         }
-        
+
         return false;
     }
-    
+
     public boolean isMember(UUID uuid) {
         if (isOwner(uuid)) {
             return true;

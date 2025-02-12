@@ -3,12 +3,15 @@ package com.stardevllc.starchat.channels;
 import com.stardevllc.actors.Actor;
 import com.stardevllc.colors.StarColors;
 import com.stardevllc.config.file.yaml.YamlConfig;
-import com.stardevllc.observable.ChangeEvent;
-import com.stardevllc.observable.ChangeListener;
-import com.stardevllc.property.*;
+import com.stardevllc.property.BooleanProperty;
+import com.stardevllc.property.LongProperty;
+import com.stardevllc.property.ObjectProperty;
+import com.stardevllc.property.StringProperty;
 import com.stardevllc.starchat.StarChat;
+import com.stardevllc.starchat.api.SpaceChatEvent;
 import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.handler.DisplayNameHandler;
+import com.stardevllc.starchat.obserable.ConfigChangeListener;
 import com.stardevllc.starchat.space.ChatSpace;
 import com.stardevllc.time.TimeFormat;
 import com.stardevllc.time.TimeParser;
@@ -21,10 +24,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 public class ChatChannel implements ChatSpace {
     protected transient File file; //The main file for the config.
@@ -46,7 +46,7 @@ public class ChatChannel implements ChatSpace {
     protected final StringProperty unmuteFormat;
     protected final StringProperty muteErrorFormat;
     protected final StringProperty muteBypassPermission;
-    
+
     protected DisplayNameHandler displayNameHandler;
 
     protected final LongProperty cooldownLength;
@@ -54,24 +54,6 @@ public class ChatChannel implements ChatSpace {
     protected Map<UUID, Long> lastMessage = new HashMap<>();
 
     protected static final TimeFormat TIME_FORMAT = new TimeFormat("%*#0h%%*#0m%%*#0s%");
-
-    class ConfigChangeListener<T> implements ChangeListener<T> {
-        private final String path;
-
-        public ConfigChangeListener(String path) {
-            this.path = path;
-        }
-
-        @Override
-        public void changed(ChangeEvent<T> e) {
-            config.set(path, e.newValue());
-            try {
-                config.save(file);
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-        }
-    }
 
     public ChatChannel(JavaPlugin plugin, String name, Path filePath) {
         this.plugin = plugin;
@@ -93,20 +75,20 @@ public class ChatChannel implements ChatSpace {
 
         this.name.addListener(e -> config.set("name", e.newValue()));
         this.viewPermission = new StringProperty(this, "viewPermission", this.config.getString("permissions.view"));
-        this.viewPermission.addListener(new ConfigChangeListener<>("permissions.view"));
+        this.viewPermission.addListener(new ConfigChangeListener<>(file, config, "permissions.view"));
         this.sendPermission = new StringProperty(this, "sendPermission", this.config.getString("permissions.send"));
-        this.sendPermission.addListener(new ConfigChangeListener<>("permissions.send"));
+        this.sendPermission.addListener(new ConfigChangeListener<>(file, config, "permissions.send"));
         this.senderFormat = new StringProperty(this, "senderFormat", this.config.getString("formats.sender"));
-        this.senderFormat.addListener(new ConfigChangeListener<>("formats.sender"));
+        this.senderFormat.addListener(new ConfigChangeListener<>(file, config, "formats.sender"));
         this.systemFormat = new StringProperty(this, "systemFormat", this.config.getString("formats.system"));
-        this.systemFormat.addListener(new ConfigChangeListener<>("formats.system"));
+        this.systemFormat.addListener(new ConfigChangeListener<>(file, config, "formats.system"));
         this.useColorPermissions = new BooleanProperty(this, "useColorPermissions", config.getBoolean("settings.usecolorpermissions"));
-        this.useColorPermissions.addListener(new ConfigChangeListener<>("settings.usecolorpermissions"));
+        this.useColorPermissions.addListener(new ConfigChangeListener<>(file, config, "settings.usecolorpermissions"));
         this.cooldownLength = new LongProperty(this, "cooldownLength", new TimeParser().parseTime(config.getString("settings.cooldownlength")));
-        this.cooldownLength.addListener(e -> new ConfigChangeListener<>("settings.cooldownlength"));
+        this.cooldownLength.addListener(e -> new ConfigChangeListener<>(file, config, "settings.cooldownlength"));
         this.muted = new BooleanProperty(this, "muted", this.config.getBoolean("mute.enabled"));
-        this.muted.addListener(new ConfigChangeListener<>("mute.enabled"));
-        this.mutedBy = new ObjectProperty<>(this, "mutedby", Actor.create(this.config.getString("mute.actor")));
+        this.muted.addListener(new ConfigChangeListener<>(file, config, "mute.enabled"));
+        this.mutedBy = new ObjectProperty<>(Actor.class, this, "mutedby", Actor.create(this.config.getString("mute.actor")));
         this.mutedBy.addListener(changeEvent -> {
             if (changeEvent.newValue() == null) {
                 config.set("mute.actor", "");
@@ -115,15 +97,15 @@ public class ChatChannel implements ChatSpace {
             }
         });
         this.muteReason = new StringProperty(this, "muteReason", this.config.getString("mute.reason"));
-        this.muteReason.addListener(new ConfigChangeListener<>("mute.reason"));
+        this.muteReason.addListener(new ConfigChangeListener<>(file, config, "mute.reason"));
         this.muteFormat = new StringProperty(this, "muteFormat", this.config.getString("mute.formats.on_mute"));
-        this.muteFormat.addListener(new ConfigChangeListener<>("mute.formats.on_mute"));
+        this.muteFormat.addListener(new ConfigChangeListener<>(file, config, "mute.formats.on_mute"));
         this.unmuteFormat = new StringProperty(this, "unmuteFormat", this.config.getString("mute.formats.on_unmute"));
-        this.unmuteFormat.addListener(new ConfigChangeListener<>("mute.formats.on_unmute"));
+        this.unmuteFormat.addListener(new ConfigChangeListener<>(file, config, "mute.formats.on_unmute"));
         this.muteErrorFormat = new StringProperty(this, "muteErrorFormat", this.config.getString("mute.formats.muted_error"));
-        this.muteErrorFormat.addListener(new ConfigChangeListener<>("mute.formats.muted_error"));
+        this.muteErrorFormat.addListener(new ConfigChangeListener<>(file, config, "mute.formats.muted_error"));
         this.muteBypassPermission = new StringProperty(this, "muteBypassPermission", this.config.getString("mute.bypass_permission"));
-        this.muteBypassPermission.addListener(new ConfigChangeListener<>("mute.bypass_permission"));
+        this.muteBypassPermission.addListener(new ConfigChangeListener<>(file, config, "mute.bypass_permission"));
     }
 
     protected void createDefaults() {
@@ -179,108 +161,127 @@ public class ChatChannel implements ChatSpace {
         this.muted.set(true);
         this.mutedBy.set(actor);
         this.muteReason.set(reason);
-        String muteMsg = this.muteFormat.get();
-        muteMsg = muteMsg.replace("{channelName}", this.name.get());
-        muteMsg = muteMsg.replace("{actor}", actor.getName());
-        sendMessage(new ChatContext(muteMsg));
     }
 
     public void unmute(Actor actor) {
         this.muted.set(false);
         this.mutedBy.set(null);
         this.muteReason.set(null);
-        String unmuteMsg = this.unmuteFormat.get();
-        unmuteMsg = unmuteMsg.replace("{channelName}", this.name.get());
-        unmuteMsg = unmuteMsg.replace("{actor}", actor.getName());
-        sendMessage(new ChatContext(unmuteMsg));
+    }
+
+    @Override
+    public Set<Actor> getMembers() {
+        Set<Actor> members = new HashSet<>();
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (canViewMessages(player)) {
+                members.add(Actor.of(player));
+            }
+        }
+        
+        return members;
+    }
+
+    public String getMuteFormat() {
+        return muteFormat.get();
+    }
+
+    public String getUnmuteFormat() {
+        return unmuteFormat.get();
     }
 
     @Override
     public void sendMessage(ChatContext context) {
-        String displayName, prefix, playerName, suffix;
-        String message;
+        Bukkit.getScheduler().runTask(plugin, () -> {
+            SpaceChatEvent spaceChatEvent = new SpaceChatEvent(this, context);
+            Bukkit.getPluginManager().callEvent(spaceChatEvent);
 
-        if (context.getSender() == null) {
-            displayName = "";
-            playerName = "";
-            prefix = "";
-            suffix = "";
-            message = StarColors.color(context.getMessage());
-        } else {
-            if (!canSendMessages(context.getSender())) {
+            if (spaceChatEvent.isCancelled()) {
                 return;
             }
 
-            CommandSender sender = context.getSender();
+            String displayName, prefix, playerName, suffix;
+            String message;
 
-            if (this.isMuted()) {
-                if (!sender.hasPermission(this.muteBypassPermission.get())) {
-                    String msg = this.muteErrorFormat.get();
-                    msg = msg.replace("{channelName}", this.name.get());
-                    msg = msg.replace("{actor}", mutedBy.get().getName());
-                    StarColors.coloredMessage(sender, msg);
-                    return;
-                }
-            }
-
-            if (sender instanceof Player player) {
-                if (!sender.hasPermission("starchat.channel." + getName().toLowerCase() + ".bypasscooldown")) {
-                    long lastMessage = this.lastMessage.getOrDefault(player.getUniqueId(), 0L);
-                    if (lastMessage != 0L) {
-                        if (System.currentTimeMillis() < lastMessage + cooldownLength.get()) {
-                            StarColors.coloredMessage(player, "&cYou must wait " + TIME_FORMAT.format(lastMessage + cooldownLength.get() - System.currentTimeMillis()) + " before you can chat again.");
-                            return;
-                        }
-                    }
-                }
-            }
-
-            if (context.getChatEvent() != null && context.getChatEvent().isCancelled()) {
-                if (!sender.hasPermission("starchat.channel.bypass.cancelledevent")) {
-                    return;
-                }
-            }
-
-            message = context.getMessage();
-
-            if (this.useColorPermissions.get()) {
-                message = StarColors.color(context.getSender(), message);
-            } else {
-                message = StarColors.color(message);
-            }
-
-            if (context.getSender() instanceof ConsoleCommandSender) {
-                displayName = StarChat.getInstance().getConsoleNameFormat();
+            if (context.getSender() == null) {
+                displayName = "";
                 playerName = "";
                 prefix = "";
                 suffix = "";
+                message = StarColors.color(context.getMessage());
             } else {
-                Player player = (Player) context.getSender();
-                DisplayNameHandler handler = Objects.requireNonNullElse(this.displayNameHandler, StarChat.getDefaultDisplayNameHandler());
-                displayName = handler.getDisplayName(player);
-                playerName = handler.getName(player);
-                prefix = handler.getPrefix(player);
-                suffix = handler.getSuffix(player);
-            }
-        }
+                if (!canSendMessages(context.getSender())) {
+                    return;
+                }
 
-        String format;
-        if (context.getSender() == null) {
-            format = StarColors.color(systemFormat.get().replace("{message}", message));
-        } else {
-            if (context.getSender() instanceof ConsoleCommandSender) {
-                format = StarColors.color(senderFormat.get().replace("{displayname}", displayName)).replace("{message}", message);
+                CommandSender sender = context.getSender();
+
+                if (this.isMuted()) {
+                    if (!sender.hasPermission(this.muteBypassPermission.get())) {
+                        String msg = this.muteErrorFormat.get();
+                        msg = msg.replace("{channelName}", this.name.get());
+                        if (mutedBy.get() == null) {
+                            msg = msg.replace("{actor}", "CONSOLE");
+                        } else {
+                            msg = msg.replace("{actor}", mutedBy.get().getName());
+                        }
+                        StarColors.coloredMessage(sender, msg);
+                        return;
+                    }
+                }
+
+                if (sender instanceof Player player) {
+                    if (!sender.hasPermission("starchat.channel." + getName().toLowerCase() + ".bypasscooldown")) {
+                        long lastMessage = this.lastMessage.getOrDefault(player.getUniqueId(), 0L);
+                        if (lastMessage != 0L) {
+                            if (System.currentTimeMillis() < lastMessage + cooldownLength.get()) {
+                                StarColors.coloredMessage(player, "&cYou must wait " + TIME_FORMAT.format(lastMessage + cooldownLength.get() - System.currentTimeMillis()) + " before you can chat again.");
+                                return;
+                            }
+                        }
+                    }
+                }
+
+                message = context.getMessage();
+
+                if (this.useColorPermissions.get()) {
+                    message = StarColors.color(context.getSender(), message);
+                } else {
+                    message = StarColors.color(message);
+                }
+
+                if (context.getSender() instanceof ConsoleCommandSender) {
+                    displayName = StarChat.getInstance().getConsoleNameFormat();
+                    playerName = "";
+                    prefix = "";
+                    suffix = "";
+                } else {
+                    Player player = (Player) context.getSender();
+                    DisplayNameHandler handler = Objects.requireNonNullElse(this.displayNameHandler, StarChat.getDefaultDisplayNameHandler());
+                    displayName = handler.getDisplayName(player);
+                    playerName = handler.getName(player);
+                    prefix = handler.getPrefix(player);
+                    suffix = handler.getSuffix(player);
+                }
+            }
+
+            String format;
+            if (context.getSender() == null) {
+                format = StarColors.color(systemFormat.get().replace("{message}", message));
             } else {
-                Player player = (Player) context.getSender();
-                format = StarColors.color(StarChat.getInstance().getPlaceholderHandler().setPlaceholders(player, senderFormat.get().replace("{displayname}", displayName).replace("{prefix}", prefix).replace("{name}", playerName).replace("{suffix}", suffix))).replace("{message}", message);
+                if (context.getSender() instanceof ConsoleCommandSender) {
+                    format = StarColors.color(senderFormat.get().replace("{displayname}", displayName)).replace("{message}", message);
+                } else {
+                    Player player = (Player) context.getSender();
+                    format = StarColors.color(StarChat.getInstance().getPlaceholderHandler().setPlaceholders(player, senderFormat.get().replace("{displayname}", displayName).replace("{prefix}", prefix).replace("{name}", playerName).replace("{suffix}", suffix))).replace("{message}", message);
+                }
             }
-        }
 
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            if (canViewMessages(player)) {
-                player.sendMessage(format);
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                if (canViewMessages(player)) {
+                    player.sendMessage(format);
+                }
             }
-        }
+        });
     }
 
     @Override

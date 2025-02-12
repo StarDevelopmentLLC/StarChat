@@ -2,7 +2,7 @@ package com.stardevllc.starchat.commands;
 
 import com.stardevllc.actors.Actor;
 import com.stardevllc.actors.PlayerActor;
-import com.stardevllc.cmdflags.ParseResult;
+import com.stardevllc.cmdflags.FlagResult;
 import com.stardevllc.colors.StarColors;
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.context.ChatContext;
@@ -31,7 +31,7 @@ public class ReplyCmd implements TabExecutor {
             return true;
         }
 
-        ParseResult flagResult = flags.parse(args);
+        FlagResult flagResult = flags.parse(args);
         args = flagResult.args();
         
         if (args.length == 0) {

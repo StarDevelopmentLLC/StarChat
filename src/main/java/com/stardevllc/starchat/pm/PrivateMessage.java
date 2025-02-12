@@ -10,6 +10,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Objects;
+import java.util.Set;
 
 public class PrivateMessage implements ChatSpace {
 
@@ -102,6 +103,11 @@ public class PrivateMessage implements ChatSpace {
     @Override
     public void unmute(Actor actor) {
 
+    }
+
+    @Override
+    public Set<Actor> getMembers() {
+        return Set.of(actor1, actor2);
     }
 
     public Actor getActor1() {
