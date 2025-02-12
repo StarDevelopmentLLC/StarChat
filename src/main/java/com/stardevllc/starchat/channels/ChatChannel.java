@@ -90,7 +90,7 @@ public class ChatChannel implements ChatSpace {
         this.cooldownLength.addListener(e -> new ConfigChangeListener<>(file, config, "settings.cooldownlength"));
         this.muted = new BooleanProperty(this, "muted", this.config.getBoolean("mute.enabled"));
         this.muted.addListener(new ConfigChangeListener<>(file, config, "mute.enabled"));
-        this.mutedBy = new ObjectProperty<>(this, "mutedby", Actor.create(this.config.getString("mute.actor")));
+        this.mutedBy = new ObjectProperty<>(Actor.class, this, "mutedby", Actor.create(this.config.getString("mute.actor")));
         this.mutedBy.addListener(changeEvent -> {
             if (changeEvent.newValue() == null) {
                 config.set("mute.actor", "");

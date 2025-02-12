@@ -50,7 +50,7 @@ public class ChatRoom implements ChatSpace {
         this.senderFormat = new StringProperty(this, "senderFormat", "");
         this.systemFormat = new StringProperty(this, "systemFormat", "");
         this.muted = new BooleanProperty(this, "muted", false);
-        this.mutedBy = new ObjectProperty<>(this, "mutedby", null);
+        this.mutedBy = new ObjectProperty<>(Actor.class, this, "mutedby", null);
         this.muteReason = new StringProperty(this, "muteReason", "");
         this.muteFormat = new StringProperty(this, "muteFormat", "");
         this.unmuteFormat = new StringProperty(this, "unmuteFormat", "");
