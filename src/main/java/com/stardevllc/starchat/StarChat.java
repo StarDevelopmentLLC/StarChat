@@ -100,6 +100,10 @@ public class StarChat extends JavaPlugin implements Listener {
         determinePlaceholderHandler();
         
         muteChat = new MuteChat(this);
+        
+        if (this.globalChannel != null) {
+            muteChat.addSpaceToMute(this.globalChannel);
+        }
 
         ServicesManager servicesManager = getServer().getServicesManager();
         servicesManager.register(SpaceRegistry.class, spaceRegistry, this, ServicePriority.Highest);
