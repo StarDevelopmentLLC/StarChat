@@ -12,6 +12,7 @@ import com.stardevllc.starchat.handler.DisplayNameHandler;
 import com.stardevllc.starchat.handler.VaultDisplayNameHandler;
 import com.stardevllc.starchat.hooks.VaultHook;
 import com.stardevllc.starchat.listener.PlayerListener;
+import com.stardevllc.starchat.mutechat.MuteChat;
 import com.stardevllc.starchat.placeholder.DefaultPlaceholders;
 import com.stardevllc.starchat.placeholder.PAPIExpansion;
 import com.stardevllc.starchat.placeholder.PAPIPlaceholders;
@@ -57,6 +58,7 @@ public class StarChat extends JavaPlugin implements Listener {
     private Set<PrivateMessage> privateMessages = new HashSet<>();
     private Map<UUID, PrivateMessage> lastMessage = new HashMap<>();
     private PrivateMessage consoleLastMessage;
+    private MuteChat muteChat;
 
     @Override
     public void onEnable() {
@@ -96,12 +98,15 @@ public class StarChat extends JavaPlugin implements Listener {
         loadDefaultChannels();
         loadChannels();
         determinePlaceholderHandler();
+        
+        muteChat = new MuteChat(this);
 
         ServicesManager servicesManager = getServer().getServicesManager();
         servicesManager.register(SpaceRegistry.class, spaceRegistry, this, ServicePriority.Highest);
         servicesManager.register(ChannelRegistry.class, channelRegistry, this, ServicePriority.Highest);
         servicesManager.register(RoomRegistry.class, roomRegistry, this, ServicePriority.Highest);
         servicesManager.register(FocusRegistry.class, playerChatSelection, this, ServicePriority.Highest);
+        servicesManager.register(MuteChat.class, muteChat, this, ServicePriority.Highest);
         
         getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
 
@@ -127,7 +132,11 @@ public class StarChat extends JavaPlugin implements Listener {
         
         getCommand("clearchat").setExecutor(new ClearChatCmd(this));
     }
-    
+
+    public MuteChat getMuteChat() {
+        return muteChat;
+    }
+
     public static DisplayNameHandler getDefaultDisplayNameHandler() {
         return StarChat.defaultDisplayNameHandler;
     }
@@ -187,6 +196,13 @@ public class StarChat extends JavaPlugin implements Listener {
         mainConfig.addDefault("clearchat.randomize-character-count", true, "This setting controls if the character count per line is randomized", "This will help prevent clients from combining lines that are the same into one line.");
         mainConfig.addDefault("clearchat.bypass-permission", "starchat.clearchat.bypass", "This allows you to customize the bypass permission.", "If you set this to an empty string, the clear chat command will ignore checking for permission bypass.");
         
+        mainConfig.addDefault("globalmute.enabled", false, "The current setting if the global chat is muted or not");
+        mainConfig.addDefault("globalmute.actor", "", "The one who muted the chat");
+        mainConfig.addDefault("globalmute.reason", "", "The reason provided for the global mute");
+        mainConfig.addDefault("globalmute.format.mute", "&c{actor} has muted the chat.", "{actor} is the one who muted the chat", "{reason} is the reason provided. Note: the word for will be added before the reason to account for no reason provided");
+        mainConfig.addDefault("globalmute.format.unmute", "&a{actor} has unmuted the chat.");
+        mainConfig.addDefault("globalmute.spaces", List.of(), "The spaces included in the global mute");
+        
         mainConfig.addDefault("messages.command.nopermission", "&cYou do not have permission to use that command.");
         mainConfig.addDefault("messages.command.onlyplayers", "&cOnly players can use that command.");
         mainConfig.addDefault("messages.chatspace.notexist", "&cSorry but {PROVIDED} is not a valid chat space.");
@@ -215,11 +231,7 @@ public class StarChat extends JavaPlugin implements Listener {
         mainConfig.addDefault("messages.command.clearchat.immune", "&aThe chat has been cleared by &e{actor} &abut you are immune.");
         mainConfig.addDefault("messages.command.clearchat.success", "&aThe chat has been cleared by &e{actor}");
 
-        try {
-            mainConfig.save(this.mainConfigFile);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        this.saveMainConfig();
     }
     
     private void determinePlaceholderHandler() {
@@ -423,5 +435,9 @@ public class StarChat extends JavaPlugin implements Listener {
 
     public static StarChat getInstance() {
         return instance;
+    }
+
+    public File getMainConfigFile() {
+        return this.mainConfigFile;
     }
 }
