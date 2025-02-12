@@ -23,10 +23,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 public class ChatChannel implements ChatSpace {
     protected transient File file; //The main file for the config.
@@ -169,6 +166,18 @@ public class ChatChannel implements ChatSpace {
         this.muted.set(false);
         this.mutedBy.set(null);
         this.muteReason.set(null);
+    }
+
+    @Override
+    public Set<Actor> getMembers() {
+        Set<Actor> members = new HashSet<>();
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (canViewMessages(player)) {
+                members.add(Actor.of(player));
+            }
+        }
+        
+        return members;
     }
 
     public String getMuteFormat() {
