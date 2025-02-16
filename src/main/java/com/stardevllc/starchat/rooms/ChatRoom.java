@@ -65,6 +65,11 @@ public class ChatRoom implements ChatSpace {
             SpaceChatEvent spaceChatEvent = new SpaceChatEvent(this, context);
             Bukkit.getPluginManager().callEvent(spaceChatEvent);
             
+            if (spaceChatEvent.isCancelled()) {
+                plugin.getLogger().info("The SpaceChatEvent for chatroom " + getName() + " was cancelled");
+                return;
+            }
+            
             String displayName, prefix, playerName, suffix;
             String message;
 
@@ -76,6 +81,7 @@ public class ChatRoom implements ChatSpace {
                 message = StarColors.color(context.getMessage());
             } else {
                 if (!canSendMessages(context.getSender())) {
+                    plugin.getLogger().info("The sender " + context.getSender().getName() + " cannot chat in " + getName());
                     return;
                 }
 
@@ -91,12 +97,6 @@ public class ChatRoom implements ChatSpace {
                                 return;
                             }
                         }
-                    }
-                }
-
-                if (context.getChatEvent() != null && context.getChatEvent().isCancelled()) {
-                    if (!sender.hasPermission("starchat.room.bypass.cancelledevent")) {
-                        return;
                     }
                 }
 
