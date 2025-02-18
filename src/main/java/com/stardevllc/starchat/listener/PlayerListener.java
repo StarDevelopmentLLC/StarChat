@@ -3,6 +3,7 @@ package com.stardevllc.starchat.listener;
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.space.ChatSpace;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -22,7 +23,7 @@ public class PlayerListener implements Listener {
 
         ChatSpace chatSpace = plugin.getPlayerFocus(player);
 
-        chatSpace.sendMessage(new ChatContext(e));
+        Bukkit.getScheduler().runTask(plugin, () -> chatSpace.sendMessage(new ChatContext(e)));
         e.setCancelled(true);
     }
 }

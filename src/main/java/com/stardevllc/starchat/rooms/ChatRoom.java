@@ -61,88 +61,86 @@ public class ChatRoom implements ChatSpace {
 
     @Override
     public void sendMessage(ChatContext context) {
-        Bukkit.getScheduler().runTask(plugin, () -> {
-            SpaceChatEvent spaceChatEvent = new SpaceChatEvent(this, context);
-            Bukkit.getPluginManager().callEvent(spaceChatEvent);
-            
-            if (spaceChatEvent.isCancelled()) {
-                plugin.getLogger().info("The SpaceChatEvent for chatroom " + getName() + " was cancelled");
+        SpaceChatEvent spaceChatEvent = new SpaceChatEvent(this, context);
+        Bukkit.getPluginManager().callEvent(spaceChatEvent);
+
+        if (spaceChatEvent.isCancelled()) {
+            plugin.getLogger().info("The SpaceChatEvent for chatroom " + getName() + " was cancelled");
+            return;
+        }
+
+        String displayName, prefix, playerName, suffix;
+        String message;
+
+        if (context.getSender() == null) {
+            displayName = "";
+            playerName = "";
+            prefix = "";
+            suffix = "";
+            message = StarColors.color(context.getMessage());
+        } else {
+            if (!canSendMessages(context.getSender())) {
+                plugin.getLogger().info("The sender " + context.getSender().getName() + " cannot chat in " + getName());
                 return;
             }
-            
-            String displayName, prefix, playerName, suffix;
-            String message;
 
-            if (context.getSender() == null) {
-                displayName = "";
-                playerName = "";
-                prefix = "";
-                suffix = "";
-                message = StarColors.color(context.getMessage());
-            } else {
-                if (!canSendMessages(context.getSender())) {
-                    plugin.getLogger().info("The sender " + context.getSender().getName() + " cannot chat in " + getName());
-                    return;
-                }
+            CommandSender sender = context.getSender();
 
-                CommandSender sender = context.getSender();
-
-                if (isMuted()) {
-                    if (!sender.hasPermission("starchat.room.bypass.mute")) {
-                        if (sender instanceof Player player) {
-                            RoomMember roomMember = this.members.get(player.getUniqueId());
-                            if (!roomMember.hasPermission(DefaultPermissions.BYPASS_MUTE)) {
-                                String msg = this.muteErrorFormat.get().replace("{roomName}", this.name.get()).replace("{actor}", this.mutedBy.get().getName());
-                                StarColors.coloredMessage(player, msg);
-                                return;
-                            }
+            if (isMuted()) {
+                if (!sender.hasPermission("starchat.room.bypass.mute")) {
+                    if (sender instanceof Player player) {
+                        RoomMember roomMember = this.members.get(player.getUniqueId());
+                        if (!roomMember.hasPermission(DefaultPermissions.BYPASS_MUTE)) {
+                            String msg = this.muteErrorFormat.get().replace("{roomName}", this.name.get()).replace("{actor}", this.mutedBy.get().getName());
+                            StarColors.coloredMessage(player, msg);
+                            return;
                         }
                     }
                 }
-
-                message = context.getMessage();
-
-                if (this.useColorPermissions.get()) {
-                    message = StarColors.color(context.getSender(), message);
-                } else {
-                    message = StarColors.color(message);
-                }
-
-                if (context.getSender() instanceof ConsoleCommandSender) {
-                    displayName = StarChat.getInstance().getConsoleNameFormat();
-                    playerName = "";
-                    prefix = "";
-                    suffix = "";
-                } else {
-                    Player player = (Player) context.getSender();
-                    DisplayNameHandler handler = Objects.requireNonNullElse(this.displayNameHandler, StarChat.getDefaultDisplayNameHandler());
-                    displayName = handler.getDisplayName(player);
-                    prefix = handler.getPrefix(player);
-                    playerName = handler.getName(player);
-                    suffix = handler.getSuffix(player);
-                }
             }
 
-            String format;
-            if (context.getSender() == null) {
-                format = StarColors.color(systemFormat.get().replace("{message}", message));
+            message = context.getMessage();
+
+            if (this.useColorPermissions.get()) {
+                message = StarColors.color(context.getSender(), message);
             } else {
-                if (context.getSender() instanceof Player player) {
-                    format = StarColors.color(StarChat.getInstance().getPlaceholderHandler().setPlaceholders(player, senderFormat.get().replace("{displayname}", displayName).replace("{prefix}", prefix).replace("{name}", playerName).replace("{suffix}", suffix))).replace("{message}", message);
-                } else {
-                    format = StarColors.color(senderFormat.get().replace("{displayname}", displayName)).replace("{message}", message);
-                }
+                message = StarColors.color(message);
             }
 
-            for (UUID uuid : this.members.keySet()) {
-                Player player = Bukkit.getPlayer(uuid);
-                if (player != null) {
-                    if (canViewMessages(player)) {
-                        player.sendMessage(format);
-                    }
+            if (context.getSender() instanceof ConsoleCommandSender) {
+                displayName = StarChat.getInstance().getConsoleNameFormat();
+                playerName = "";
+                prefix = "";
+                suffix = "";
+            } else {
+                Player player = (Player) context.getSender();
+                DisplayNameHandler handler = Objects.requireNonNullElse(this.displayNameHandler, StarChat.getDefaultDisplayNameHandler());
+                displayName = handler.getDisplayName(player);
+                prefix = handler.getPrefix(player);
+                playerName = handler.getName(player);
+                suffix = handler.getSuffix(player);
+            }
+        }
+
+        String format;
+        if (context.getSender() == null) {
+            format = StarColors.color(systemFormat.get().replace("{message}", message));
+        } else {
+            if (context.getSender() instanceof Player player) {
+                format = StarColors.color(StarChat.getInstance().getPlaceholderHandler().setPlaceholders(player, senderFormat.get().replace("{displayname}", displayName).replace("{prefix}", prefix).replace("{name}", playerName).replace("{suffix}", suffix))).replace("{message}", message);
+            } else {
+                format = StarColors.color(senderFormat.get().replace("{displayname}", displayName)).replace("{message}", message);
+            }
+        }
+
+        for (UUID uuid : this.members.keySet()) {
+            Player player = Bukkit.getPlayer(uuid);
+            if (player != null) {
+                if (canViewMessages(player)) {
+                    player.sendMessage(format);
                 }
             }
-        });
+        }
     }
 
     @Override
