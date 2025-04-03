@@ -1,8 +1,8 @@
 package com.stardevllc.starchat.commands;
 
-import com.stardevllc.actors.Actor;
-import com.stardevllc.colors.StarColors;
 import com.stardevllc.starchat.StarChat;
+import com.stardevllc.starcore.StarColors;
+import com.stardevllc.starcore.actors.Actor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;

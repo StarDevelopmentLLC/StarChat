@@ -1,7 +1,5 @@
 package com.stardevllc.starchat.rooms;
 
-import com.stardevllc.actors.Actor;
-import com.stardevllc.colors.StarColors;
 import com.stardevllc.property.BooleanProperty;
 import com.stardevllc.property.ObjectProperty;
 import com.stardevllc.property.StringProperty;
@@ -10,6 +8,8 @@ import com.stardevllc.starchat.api.SpaceChatEvent;
 import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.handler.DisplayNameHandler;
 import com.stardevllc.starchat.space.ChatSpace;
+import com.stardevllc.starcore.StarColors;
+import com.stardevllc.starcore.actors.Actor;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;

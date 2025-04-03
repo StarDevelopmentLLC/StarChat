@@ -1,7 +1,5 @@
 package com.stardevllc.starchat.channels;
 
-import com.stardevllc.actors.Actor;
-import com.stardevllc.colors.StarColors;
 import com.stardevllc.config.file.yaml.YamlConfig;
 import com.stardevllc.property.BooleanProperty;
 import com.stardevllc.property.LongProperty;
@@ -13,6 +11,8 @@ import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.handler.DisplayNameHandler;
 import com.stardevllc.starchat.obserable.ConfigChangeListener;
 import com.stardevllc.starchat.space.ChatSpace;
+import com.stardevllc.starcore.StarColors;
+import com.stardevllc.starcore.actors.Actor;
 import com.stardevllc.time.TimeFormat;
 import com.stardevllc.time.TimeParser;
 import org.bukkit.Bukkit;

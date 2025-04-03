@@ -1,12 +1,10 @@
 package com.stardevllc.starchat.commands;
 
-import com.stardevllc.cmdflags.CmdFlags;
-import com.stardevllc.cmdflags.Flag;
-import com.stardevllc.cmdflags.FlagResult;
-import com.stardevllc.cmdflags.type.ComplexFlag;
-import com.stardevllc.cmdflags.type.PresenceFlag;
-import com.stardevllc.colors.StarColors;
 import com.stardevllc.starchat.StarChat;
+import com.stardevllc.starcore.StarColors;
+import com.stardevllc.starcore.cmdflags.*;
+import com.stardevllc.starcore.cmdflags.type.ComplexFlag;
+import com.stardevllc.starcore.cmdflags.type.PresenceFlag;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;

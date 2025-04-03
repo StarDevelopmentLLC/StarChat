@@ -1,6 +1,5 @@
 package com.stardevllc.starchat.commands;
 
-import com.stardevllc.colors.StarColors;
 import com.stardevllc.config.file.yaml.YamlConfig;
 import com.stardevllc.starchat.ChatSelector;
 import com.stardevllc.starchat.StarChat;
@@ -8,6 +7,7 @@ import com.stardevllc.starchat.channels.ChatChannel;
 import com.stardevllc.starchat.registry.ChannelRegistry;
 import com.stardevllc.starchat.rooms.ChatRoom;
 import com.stardevllc.starchat.space.ChatSpace;
+import com.stardevllc.starcore.StarColors;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
