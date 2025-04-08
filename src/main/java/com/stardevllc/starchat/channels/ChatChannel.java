@@ -29,10 +29,10 @@ import java.util.*;
 public class ChatChannel implements ChatSpace {
     protected transient File file; //The main file for the config.
     protected transient YamlConfig config; //Config to store information as channels are mainly config/command controlled, transient modifier allows StarData to ignore this field without having to depend on StarData directly
-
+    
     protected final LongProperty id;
     protected final JavaPlugin plugin;
-
+    
     protected final StringProperty name;
     protected final StringProperty viewPermission;
     protected final StringProperty sendPermission;
@@ -46,33 +46,33 @@ public class ChatChannel implements ChatSpace {
     protected final StringProperty unmuteFormat;
     protected final StringProperty muteErrorFormat;
     protected final StringProperty muteBypassPermission;
-
+    
     protected DisplayNameHandler displayNameHandler;
-
+    
     protected final LongProperty cooldownLength;
-
+    
     protected Map<UUID, Long> lastMessage = new HashMap<>();
-
+    
     protected static final TimeFormat TIME_FORMAT = new TimeFormat("%*#0h%%*#0m%%*#0s%");
-
+    
     public ChatChannel(JavaPlugin plugin, String name, Path filePath) {
         this.plugin = plugin;
         this.file = new File(filePath.toFile().getAbsolutePath());
-
+        
         if (!this.file.exists()) {
             try {
                 file.createNewFile();
             } catch (IOException e) {
             }
         }
-
+        
         this.config = YamlConfig.loadConfiguration(this.file);
-
+        
         this.id = new LongProperty(this, "id", 0);
         this.name = new StringProperty(this, "name", name);
-
+        
         createDefaults();
-
+        
         this.name.addListener(e -> config.set("name", e.newValue()));
         this.viewPermission = new StringProperty(this, "viewPermission", this.config.getString("permissions.view"));
         this.viewPermission.addListener(new ConfigChangeListener<>(file, config, "permissions.view"));
@@ -107,7 +107,7 @@ public class ChatChannel implements ChatSpace {
         this.muteBypassPermission = new StringProperty(this, "muteBypassPermission", this.config.getString("mute.bypass_permission"));
         this.muteBypassPermission.addListener(new ConfigChangeListener<>(file, config, "mute.bypass_permission"));
     }
-
+    
     protected void createDefaults() {
         config.addDefault("name", this.name.get(), "The name of the channel.", "It is recommended to not change this name in the file and instead use commands.");
         config.addDefault("formats.sender", "", "The format used when a Player or the Console sends a chat message in this channel.");
@@ -123,52 +123,52 @@ public class ChatChannel implements ChatSpace {
         config.addDefault("mute.formats.on_unmute", "&cThe {channelName} channel has been unmuted by {actor}", "The format used when the channel is unmuted");
         config.addDefault("mute.formats.muted_error", "&cYou cannot speak in {channelName} as it has been muted by {actor}", "The format sent to players that are trying to talk in the channel while it is muted");
         config.addDefault("mute.bypass_permission", "starchat." + this.name.get() + ".mute.bypass", "The permission where those with this permission can bypass the channel mute");
-
+        
         try {
             config.save(file);
         } catch (IOException e) {
         }
     }
-
+    
     public YamlConfig getConfig() {
         return config;
     }
-
+    
     public File getFile() {
         return file;
     }
-
+    
     public void saveConfig() {
         try {
             config.save(file);
         } catch (IOException e) {
         }
     }
-
+    
     public String getViewPermission() {
         return viewPermission.get();
     }
-
+    
     public String getSendPermission() {
         return sendPermission.get();
     }
-
+    
     public void mute(Actor actor) {
         mute(actor, null);
     }
-
+    
     public void mute(Actor actor, String reason) {
         this.muted.set(true);
         this.mutedBy.set(actor);
         this.muteReason.set(reason);
     }
-
+    
     public void unmute(Actor actor) {
         this.muted.set(false);
         this.mutedBy.set(null);
         this.muteReason.set(null);
     }
-
+    
     @Override
     public Set<Actor> getMembers() {
         Set<Actor> members = new HashSet<>();
@@ -177,30 +177,36 @@ public class ChatChannel implements ChatSpace {
                 members.add(Actor.of(player));
             }
         }
-
+        
         return members;
     }
-
+    
     public String getMuteFormat() {
         return muteFormat.get();
     }
-
+    
     public String getUnmuteFormat() {
         return unmuteFormat.get();
     }
-
+    
     @Override
     public void sendMessage(ChatContext context) {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (canViewMessages(player)) {
+                context.getRecipients().add(player.getUniqueId());
+            }
+        }
+        
         SpaceChatEvent spaceChatEvent = new SpaceChatEvent(this, context);
         Bukkit.getPluginManager().callEvent(spaceChatEvent);
-
+        
         if (spaceChatEvent.isCancelled()) {
             return;
         }
-
+        
         String displayName, prefix, playerName, suffix;
         String message;
-
+        
         if (context.getSender() == null) {
             displayName = "";
             playerName = "";
@@ -211,9 +217,9 @@ public class ChatChannel implements ChatSpace {
             if (!canSendMessages(context.getSender())) {
                 return;
             }
-
+            
             CommandSender sender = context.getSender();
-
+            
             if (this.isMuted()) {
                 if (!sender.hasPermission(this.muteBypassPermission.get())) {
                     String msg = this.muteErrorFormat.get();
@@ -227,7 +233,7 @@ public class ChatChannel implements ChatSpace {
                     return;
                 }
             }
-
+            
             if (sender instanceof Player player) {
                 if (!sender.hasPermission("starchat.channel." + getName().toLowerCase() + ".bypasscooldown")) {
                     long lastMessage = this.lastMessage.getOrDefault(player.getUniqueId(), 0L);
@@ -239,15 +245,15 @@ public class ChatChannel implements ChatSpace {
                     }
                 }
             }
-
+            
             message = context.getMessage();
-
+            
             if (this.useColorPermissions.get()) {
                 message = StarColors.color(context.getSender(), message);
             } else {
                 message = StarColors.color(message);
             }
-
+            
             if (context.getSender() instanceof ConsoleCommandSender) {
                 displayName = StarChat.getInstance().getConsoleNameFormat();
                 playerName = "";
@@ -262,7 +268,7 @@ public class ChatChannel implements ChatSpace {
                 suffix = handler.getSuffix(player);
             }
         }
-
+        
         String format;
         if (context.getSender() == null) {
             format = StarColors.color(systemFormat.get().replace("{message}", message));
@@ -274,14 +280,15 @@ public class ChatChannel implements ChatSpace {
                 format = StarColors.color(StarChat.getInstance().getPlaceholderHandler().setPlaceholders(player, senderFormat.get().replace("{displayname}", displayName).replace("{prefix}", prefix).replace("{name}", playerName).replace("{suffix}", suffix))).replace("{message}", message);
             }
         }
-
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            if (canViewMessages(player)) {
+        
+        for (UUID recipient : context.getRecipients()) {
+            Player player = Bukkit.getPlayer(recipient);
+            if (player != null) {
                 player.sendMessage(format);
             }
         }
     }
-
+    
     @Override
     public boolean canSendMessages(CommandSender sender) {
         if (sender != null) {
@@ -293,7 +300,7 @@ public class ChatChannel implements ChatSpace {
         }
         return false;
     }
-
+    
     @Override
     public boolean canViewMessages(CommandSender sender) {
         if (sender != null) {
@@ -305,72 +312,72 @@ public class ChatChannel implements ChatSpace {
         }
         return false;
     }
-
+    
     @Override
     public String getName() {
         return name.get();
     }
-
+    
     @Override
     public long getId() {
         return id.get();
     }
-
+    
     @Override
     public JavaPlugin getPlugin() {
         return plugin;
     }
-
+    
     @Override
     public boolean supportsCooldowns() {
         return true;
     }
-
+    
     @Override
     public boolean isMuted() {
         return this.muted.getValue();
     }
-
+    
     public DisplayNameHandler getDisplayNameHandler() {
         return displayNameHandler;
     }
-
+    
     public void setDisplayNameHandler(DisplayNameHandler displayNameHandler) {
         this.displayNameHandler = displayNameHandler;
     }
-
+    
     public void setName(String name) {
         this.name.set(name);
     }
-
+    
     public void setSenderFormat(String senderFormat) {
         this.senderFormat.set(senderFormat);
     }
-
+    
     public void setSystemFormat(String systemFormat) {
         this.systemFormat.set(systemFormat);
     }
-
+    
     public void setViewPermission(String viewPermission) {
         this.viewPermission.set(viewPermission);
     }
-
+    
     public void setSendPermission(String sendPermission) {
         this.sendPermission.set(sendPermission);
     }
-
+    
     public String getSenderFormat() {
         return senderFormat.get();
     }
-
+    
     public String getSystemFormat() {
         return systemFormat.get();
     }
-
+    
     public boolean isUseColorPermissions() {
         return useColorPermissions.get();
     }
-
+    
     public void setFile(File newFile) {
         this.file = newFile;
         this.config = YamlConfig.loadConfiguration(file);
