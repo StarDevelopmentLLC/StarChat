@@ -22,24 +22,24 @@ import java.util.*;
 public class ChatRoom implements ChatSpace {
     protected long id;
     protected JavaPlugin plugin;
-
+    
     protected final StringProperty name;
     protected final BooleanProperty useColorPermissions;
     protected final StringProperty senderFormat;
     protected final StringProperty systemFormat;
-
+    
     protected final BooleanProperty muted;
     protected final ObjectProperty<Actor> mutedBy;
     protected final StringProperty muteReason;
     protected final StringProperty muteFormat;
     protected final StringProperty unmuteFormat;
     protected final StringProperty muteErrorFormat;
-
+    
     protected DisplayNameHandler displayNameHandler;
-
+    
     protected Actor owner;
     protected Map<UUID, RoomMember> members = new HashMap<>();
-
+    
     public ChatRoom(JavaPlugin plugin, Actor owner, String name) {
         this.plugin = plugin;
         this.owner = owner;
@@ -54,24 +54,32 @@ public class ChatRoom implements ChatSpace {
         this.unmuteFormat = new StringProperty(this, "unmuteFormat", "");
         this.muteErrorFormat = new StringProperty(this, "muteErrorFormat", "");
     }
-
+    
     public ChatRoom(JavaPlugin plugin, String name) {
         this(plugin, Actor.of(plugin), name);
     }
-
+    
     @Override
     public void sendMessage(ChatContext context) {
+        for (UUID uuid : this.members.keySet()) {
+            Player player = Bukkit.getPlayer(uuid);
+            if (player != null) {
+                if (canViewMessages(player)) {
+                    context.getRecipients().add(uuid);
+                }
+            }
+        }
+        
         SpaceChatEvent spaceChatEvent = new SpaceChatEvent(this, context);
         Bukkit.getPluginManager().callEvent(spaceChatEvent);
-
+        
         if (spaceChatEvent.isCancelled()) {
-            plugin.getLogger().info("The SpaceChatEvent for chatroom " + getName() + " was cancelled");
             return;
         }
-
+        
         String displayName, prefix, playerName, suffix;
         String message;
-
+        
         if (context.getSender() == null) {
             displayName = "";
             playerName = "";
@@ -83,9 +91,9 @@ public class ChatRoom implements ChatSpace {
                 plugin.getLogger().info("The sender " + context.getSender().getName() + " cannot chat in " + getName());
                 return;
             }
-
+            
             CommandSender sender = context.getSender();
-
+            
             if (isMuted()) {
                 if (!sender.hasPermission("starchat.room.bypass.mute")) {
                     if (sender instanceof Player player) {
@@ -98,15 +106,15 @@ public class ChatRoom implements ChatSpace {
                     }
                 }
             }
-
+            
             message = context.getMessage();
-
+            
             if (this.useColorPermissions.get()) {
                 message = StarColors.color(context.getSender(), message);
             } else {
                 message = StarColors.color(message);
             }
-
+            
             if (context.getSender() instanceof ConsoleCommandSender) {
                 displayName = StarChat.getInstance().getConsoleNameFormat();
                 playerName = "";
@@ -121,7 +129,7 @@ public class ChatRoom implements ChatSpace {
                 suffix = handler.getSuffix(player);
             }
         }
-
+        
         String format;
         if (context.getSender() == null) {
             format = StarColors.color(systemFormat.get().replace("{message}", message));
@@ -132,88 +140,86 @@ public class ChatRoom implements ChatSpace {
                 format = StarColors.color(senderFormat.get().replace("{displayname}", displayName)).replace("{message}", message);
             }
         }
-
-        for (UUID uuid : this.members.keySet()) {
+        
+        for (UUID uuid : context.getRecipients()) {
             Player player = Bukkit.getPlayer(uuid);
             if (player != null) {
-                if (canViewMessages(player)) {
-                    player.sendMessage(format);
-                }
+                player.sendMessage(format);
             }
         }
     }
-
+    
     @Override
     public boolean canSendMessages(CommandSender sender) {
         if (owner.equals(sender)) {
             return true;
         }
-
+        
         if (sender instanceof Player player) {
             RoomMember member = this.members.get(player.getUniqueId());
             if (member != null) {
                 return member.hasPermission(DefaultPermissions.SEND_MESSAGES);
             }
         }
-
+        
         return false;
     }
-
+    
     @Override
     public boolean canViewMessages(CommandSender sender) {
         if (owner.equals(sender)) {
             return true;
         }
-
+        
         if (sender instanceof Player player) {
             RoomMember member = this.members.get(player.getUniqueId());
             if (member != null) {
                 return member.hasPermission(DefaultPermissions.VIEW_MESSAGES);
             }
         }
-
+        
         return false;
     }
-
+    
     @Override
     public String getName() {
         return name.get();
     }
-
+    
     @Override
     public long getId() {
         return id;
     }
-
+    
     @Override
     public JavaPlugin getPlugin() {
         return plugin;
     }
-
+    
     @Override
     public boolean supportsCooldowns() {
         return false;
     }
-
+    
     @Override
     public boolean isMuted() {
         return this.muted.get();
     }
-
+    
     @Override
     public void mute(Actor actor, String reason) {
         this.muted.set(true);
         this.mutedBy.set(actor);
         this.muteReason.set(reason);
     }
-
+    
     @Override
     public void unmute(Actor actor) {
         this.muted.set(false);
         this.mutedBy.set(null);
         this.muteReason.set(null);
     }
-
+    
     @Override
     public Set<Actor> getMembers() {
         Set<Actor> members = new HashSet<>();
@@ -223,35 +229,35 @@ public class ChatRoom implements ChatSpace {
                 members.add(Actor.of(player));
             }
         }
-
+        
         return members;
     }
-
+    
     public boolean isOwner(UUID uuid) {
         if (owner.isPlayer()) {
             return owner.equals(uuid);
         }
-
+        
         return false;
     }
-
+    
     public boolean isMember(UUID uuid) {
         if (isOwner(uuid)) {
             return true;
         }
         return members.containsKey(uuid);
     }
-
+    
     public void changeOwner(Actor newOwner) {
         this.owner = newOwner;
     }
-
+    
     public RoomMember addMember(UUID uniqueId, RoomPermission... permissions) {
         RoomMember member = new RoomMember(uniqueId, permissions);
         this.members.put(uniqueId, member);
         return member;
     }
-
+    
     public void removeMember(UUID member) {
         this.members.remove(member);
     }
