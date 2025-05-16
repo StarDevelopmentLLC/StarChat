@@ -1,10 +1,10 @@
 package com.stardevllc.starchat.channels;
 
 import com.stardevllc.config.file.yaml.YamlConfig;
-import com.stardevllc.property.BooleanProperty;
-import com.stardevllc.property.LongProperty;
-import com.stardevllc.property.ObjectProperty;
-import com.stardevllc.property.StringProperty;
+import com.stardevllc.observable.property.BooleanProperty;
+import com.stardevllc.observable.property.LongProperty;
+import com.stardevllc.observable.property.ObjectProperty;
+import com.stardevllc.observable.property.StringProperty;
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.api.SpaceChatEvent;
 import com.stardevllc.starchat.context.ChatContext;

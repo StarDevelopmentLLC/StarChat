@@ -2,9 +2,9 @@ package com.stardevllc.starchat.mutechat;
 
 import com.stardevllc.observable.collections.ObservableHashSet;
 import com.stardevllc.observable.collections.ObservableSet;
-import com.stardevllc.property.BooleanProperty;
-import com.stardevllc.property.ObjectProperty;
-import com.stardevllc.property.StringProperty;
+import com.stardevllc.observable.property.BooleanProperty;
+import com.stardevllc.observable.property.ObjectProperty;
+import com.stardevllc.observable.property.StringProperty;
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.obserable.ConfigChangeListener;
 import com.stardevllc.starchat.space.ChatSpace;

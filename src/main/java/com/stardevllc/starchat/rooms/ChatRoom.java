@@ -1,8 +1,8 @@
 package com.stardevllc.starchat.rooms;
 
-import com.stardevllc.property.BooleanProperty;
-import com.stardevllc.property.ObjectProperty;
-import com.stardevllc.property.StringProperty;
+import com.stardevllc.observable.property.BooleanProperty;
+import com.stardevllc.observable.property.ObjectProperty;
+import com.stardevllc.observable.property.StringProperty;
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.api.SpaceChatEvent;
 import com.stardevllc.starchat.context.ChatContext;

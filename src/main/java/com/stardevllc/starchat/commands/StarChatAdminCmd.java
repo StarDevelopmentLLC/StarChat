@@ -4,9 +4,9 @@ import com.stardevllc.config.file.yaml.YamlConfig;
 import com.stardevllc.converter.string.StringConverters;
 import com.stardevllc.helper.ReflectionHelper;
 import com.stardevllc.observable.Property;
-import com.stardevllc.property.BooleanProperty;
-import com.stardevllc.property.ObjectProperty;
-import com.stardevllc.property.StringProperty;
+import com.stardevllc.observable.property.BooleanProperty;
+import com.stardevllc.observable.property.ObjectProperty;
+import com.stardevllc.observable.property.StringProperty;
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.channels.ChatChannel;
 import com.stardevllc.starchat.context.ChatContext;
@@ -33,6 +33,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
 public class StarChatAdminCmd implements TabExecutor {
 
@@ -45,7 +46,7 @@ public class StarChatAdminCmd implements TabExecutor {
     }
 
     public List<String> onTabComplete(CommandSender sender, Command cmd, String alias, String[] args) {
-        if (!(sender.hasPermission("starchat.command.admin"))) {
+        if (!sender.hasPermission("starchat.command.admin")) {
             return null;
         }
 
@@ -100,8 +101,8 @@ public class StarChatAdminCmd implements TabExecutor {
             completions.removeIf(option -> !sender.hasPermission("starchat.command.admin.list." + option));
 
             arg = args[1].toLowerCase();
-        } else if (args[0].equalsIgnoreCase("setplayerchatfocus") || args[0].equalsIgnoreCase("setplayerfocus") || args[0].equalsIgnoreCase("setfocus")) {
-            if (!(sender.hasPermission("starchat.command.admin.setplayerchatfocus"))) {
+        } else if (Stream.of("setplayerchatfocus", "setplayerfocus", "setfocus").anyMatch(s -> args[0].equalsIgnoreCase(s))) {
+            if (!sender.hasPermission("starchat.command.admin.setplayerchatfocus")) {
                 return null;
             }
 
@@ -117,7 +118,7 @@ public class StarChatAdminCmd implements TabExecutor {
                 arg = args[2].toLowerCase();
             }
         } else if (args[0].equalsIgnoreCase("channel")) {
-            if (!(sender.hasPermission("starchat.command.admin.channel"))) {
+            if (!sender.hasPermission("starchat.command.admin.channel")) {
                 return null;
             }
 
@@ -131,7 +132,7 @@ public class StarChatAdminCmd implements TabExecutor {
                 arg = args[1].toLowerCase();
                 noSort = true;
             } else if (args[1].equalsIgnoreCase("create")) {
-                if (!(sender.hasPermission("starchat.command.admin.channel.create"))) {
+                if (!sender.hasPermission("starchat.command.admin.channel.create")) {
                     return null;
                 }
 
@@ -179,7 +180,7 @@ public class StarChatAdminCmd implements TabExecutor {
     }
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        if (!(sender.hasPermission("starchat.command.admin"))) {
+        if (!sender.hasPermission("starchat.command.admin")) {
             StarColors.coloredMessage(sender, pluginConfig.getString("messages.command.nopermission"));
             return true;
         }
@@ -372,7 +373,7 @@ public class StarChatAdminCmd implements TabExecutor {
                 listConversations(sender);
             }
         } else if (args[0].equalsIgnoreCase("setplayerchatfocus") || args[0].equalsIgnoreCase("setplayerfocus") || args[0].equalsIgnoreCase("setfocus")) {
-            if (!(sender.hasPermission("starchat.command.admin.setplayerchatfocus"))) {
+            if (!sender.hasPermission("starchat.command.admin.setplayerchatfocus")) {
                 StarColors.coloredMessage(sender, pluginConfig.getString("messages.command.nopermission"));
                 return true;
             }
@@ -410,7 +411,7 @@ public class StarChatAdminCmd implements TabExecutor {
             StarColors.coloredMessage(sender, "&eYou set &b" + targetPlayer.getName() + "'s &echat focus to &d" + chatChannel.getName());
             StarColors.coloredMessage(targetPlayer, "&eYour chat focus was changed to &d" + chatChannel.getName() + " &eby &b" + Actor.create(sender).getName());
         } else if (args[0].equalsIgnoreCase("channel")) {
-            if (!(sender.hasPermission("starchat.command.admin.channel"))) {
+            if (!sender.hasPermission("starchat.command.admin.channel")) {
                 StarColors.coloredMessage(sender, pluginConfig.getString("messages.command.nopermission"));
                 return true;
             }
@@ -421,7 +422,7 @@ public class StarChatAdminCmd implements TabExecutor {
             }
 
             if (args[1].equalsIgnoreCase("create")) {
-                if (!(sender.hasPermission("starchat.command.admin.channel.create"))) {
+                if (!sender.hasPermission("starchat.command.admin.channel.create")) {
                     StarColors.coloredMessage(sender, pluginConfig.getString("messages.command.nopermission"));
                     return true;
                 }
@@ -445,9 +446,9 @@ public class StarChatAdminCmd implements TabExecutor {
                 StarColors.coloredMessage(sender, "&cThat is not a registered chat channel.");
                 return true;
             }
-
+            
             if (args[2].equalsIgnoreCase("delete")) {
-                if (!(sender.hasPermission("starchat.command.admin.channel.delete"))) {
+                if (!sender.hasPermission("starchat.command.admin.channel.delete")) {
                     StarColors.coloredMessage(sender, pluginConfig.getString("messages.command.nopermission"));
                     return true;
                 }
@@ -464,11 +465,6 @@ public class StarChatAdminCmd implements TabExecutor {
 
             if (!chatChannel.getPlugin().getName().equalsIgnoreCase(plugin.getName())) {
                 StarColors.coloredMessage(sender, "&cYou can only modify chat channels owned by StarChat.");
-                return true;
-            }
-
-            if (!(args.length > 2)) {
-                StarColors.coloredMessage(sender, "&cUsage: /" + label + " " + args[0] + " " + args[1] + " <subcommand> <arguments>");
                 return true;
             }
 

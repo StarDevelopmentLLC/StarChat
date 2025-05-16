@@ -1,6 +1,6 @@
 package com.stardevllc.starchat.pm;
 
-import com.stardevllc.property.StringProperty;
+import com.stardevllc.observable.property.StringProperty;
 import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.handler.DisplayNameHandler;
 import com.stardevllc.starchat.space.ChatSpace;
