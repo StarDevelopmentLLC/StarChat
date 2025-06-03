@@ -8,8 +8,8 @@ import com.stardevllc.observable.property.StringProperty;
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.obserable.ConfigChangeListener;
 import com.stardevllc.starchat.space.ChatSpace;
-import com.stardevllc.starcore.StarColors;
-import com.stardevllc.starcore.actors.Actor;
+import com.stardevllc.starcore.api.StarColors;
+import com.stardevllc.starcore.api.actors.Actor;
 
 import java.util.*;
 

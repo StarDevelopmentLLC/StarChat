@@ -21,7 +21,7 @@ import com.stardevllc.starchat.registry.FocusRegistry;
 import com.stardevllc.starchat.registry.RoomRegistry;
 import com.stardevllc.starchat.registry.SpaceRegistry;
 import com.stardevllc.starchat.space.ChatSpace;
-import com.stardevllc.starcore.actors.*;
+import com.stardevllc.starcore.api.actors.*;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;

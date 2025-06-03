@@ -4,8 +4,8 @@ import com.stardevllc.observable.property.StringProperty;
 import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.handler.DisplayNameHandler;
 import com.stardevllc.starchat.space.ChatSpace;
-import com.stardevllc.starcore.StarColors;
-import com.stardevllc.starcore.actors.Actor;
+import com.stardevllc.starcore.api.StarColors;
+import com.stardevllc.starcore.api.actors.Actor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
