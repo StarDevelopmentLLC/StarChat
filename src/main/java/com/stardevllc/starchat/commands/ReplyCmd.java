@@ -43,7 +43,7 @@ public class ReplyCmd implements TabExecutor {
         Actor senderActor = Actor.create(sender);
         Actor targetActor = Actor.create(args[0]);
         
-        if (targetActor != null && !senderActor.canSee(targetActor)) {
+        if (targetActor != null && !senderActor.canSee(targetActor) && !senderActor.hasPermission("starchat.privatemessage.visibility.bypass")) {
             sender.sendMessage(StarColors.color("&cInvalid target. Are they offline?"));
             return true;
         }
@@ -77,7 +77,7 @@ public class ReplyCmd implements TabExecutor {
                 targetActor = privateMessage.getActor1();
             }
             
-            if (!senderActor.canSee(targetActor)) {
+            if (!senderActor.canSee(targetActor) && !senderActor.hasPermission("starchat.privatemessage.visibility.bypass")) {
                 StarColors.coloredMessage(sender, "&cInvalid target. Are they offline?");
                 return true;
             }
