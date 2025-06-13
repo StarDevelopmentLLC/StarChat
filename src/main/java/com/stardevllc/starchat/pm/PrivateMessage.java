@@ -6,11 +6,11 @@ import com.stardevllc.starchat.handler.DisplayNameHandler;
 import com.stardevllc.starchat.space.ChatSpace;
 import com.stardevllc.starcore.api.StarColors;
 import com.stardevllc.starcore.api.actors.Actor;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 public class PrivateMessage implements ChatSpace {
 
@@ -30,14 +30,19 @@ public class PrivateMessage implements ChatSpace {
         this.actor1 = actor1;
         this.actor2 = actor2;
     }
-
+    
     @Override
-    public void sendMessage(ChatContext chatContext) {
+    public void sendToConsole(String message) {
+        Bukkit.getServer().getLogger().info("[private: " + getName() + "] " + StarColors.stripColor(message));
+    }
+    
+    @Override
+    public void sendMessage(ChatContext context) {
         Actor senderActor;
         Actor targetActor;
         
-        CommandSender sender = chatContext.getSender();
-        String message = chatContext.getMessage();
+        CommandSender sender = context.getSender();
+        String message = context.getMessage();
 
         if (actor1.equals(sender)) {
             senderActor = actor1;
@@ -54,6 +59,8 @@ public class PrivateMessage implements ChatSpace {
 
         String senderMsg = format.replace("{from}", "me").replace("{to}", targetActor.getName());
         String targetMsg = format.replace("{from}", senderActor.getName()).replace("{to}", "me");
+        
+        context.setFinalMessage(format.replace("{from}", senderActor.getName()).replace("{to}", targetActor.getName()));
         
         senderActor.sendMessage(StarColors.color(senderMsg));
         targetActor.sendMessage(StarColors.color(targetMsg));

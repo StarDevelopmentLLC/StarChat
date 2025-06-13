@@ -78,8 +78,10 @@ public class ReplyCmd implements TabExecutor {
         for (int i = msgStart; i < args.length; i++) {
             msgBuilder.append(args[i]).append(" ");
         }
-
-        privateMessage.sendMessage(new ChatContext(sender, msgBuilder.toString().trim()));
+        
+        ChatContext context = new ChatContext(sender, msgBuilder.toString().trim());
+        privateMessage.sendMessage(context);
+        privateMessage.sendToConsole(context.getFinalMessage());
         plugin.assignLastMessage(sender, msgBuilder, privateMessage, senderActor, targetActor);
         if (flagResult.isPresent(FOCUS)) {
             if (sender instanceof Player player) {

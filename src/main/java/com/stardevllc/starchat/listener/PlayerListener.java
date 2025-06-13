@@ -23,7 +23,11 @@ public class PlayerListener implements Listener {
 
         ChatSpace chatSpace = plugin.getPlayerFocus(player);
 
-        Bukkit.getScheduler().runTask(plugin, () -> chatSpace.sendMessage(new ChatContext(e)));
+        Bukkit.getScheduler().runTask(plugin, () -> {
+            ChatContext context = new ChatContext(e);
+            chatSpace.sendMessage(context);
+            chatSpace.sendToConsole(context.getFinalMessage());
+        });
         e.setCancelled(true);
     }
 }

@@ -13,7 +13,7 @@ public class ChatContext {
 
     private final Source source;
     private CommandSender sender;
-    private String message;
+    private String message, finalMessage;
     private AsyncPlayerChatEvent chatEvent;
     private final Set<UUID> recipients = new HashSet<>();
     
@@ -88,5 +88,13 @@ public class ChatContext {
         }
         
         return null;
+    }
+    
+    public String getFinalMessage() {
+        return finalMessage;
+    }
+    
+    public void setFinalMessage(String finalMessage) {
+        this.finalMessage = finalMessage;
     }
 }

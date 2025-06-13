@@ -23,4 +23,6 @@ public interface ChatSpace {
     void unmute(Actor actor);
     
     Set<Actor> getMembers();
+    
+    void sendToConsole(String message);
 }

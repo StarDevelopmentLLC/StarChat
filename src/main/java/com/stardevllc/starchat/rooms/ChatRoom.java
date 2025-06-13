@@ -141,14 +141,14 @@ public class ChatRoom implements ChatSpace {
             }
         }
         
+        context.setFinalMessage(format);
+        
         for (UUID uuid : context.getRecipients()) {
             Player player = Bukkit.getPlayer(uuid);
             if (player != null) {
                 player.sendMessage(format);
             }
         }
-        
-        Bukkit.getConsoleSender().sendMessage("[" + getName() + "] " + StarColors.stripColor(format));
     }
     
     @Override
@@ -233,6 +233,11 @@ public class ChatRoom implements ChatSpace {
         }
         
         return members;
+    }
+    
+    @Override
+    public void sendToConsole(String message) {
+        Bukkit.getServer().getLogger().info("[room: " + getName() + "] " + StarColors.stripColor(message));
     }
     
     public boolean isOwner(UUID uuid) {

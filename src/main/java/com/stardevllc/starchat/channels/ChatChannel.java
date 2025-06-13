@@ -181,6 +181,11 @@ public class ChatChannel implements ChatSpace {
         return members;
     }
     
+    @Override
+    public void sendToConsole(String message) {
+        Bukkit.getServer().getLogger().info("[channel: " + getName() + "] " + StarColors.stripColor(message));
+    }
+    
     public String getMuteFormat() {
         return muteFormat.get();
     }
@@ -281,14 +286,14 @@ public class ChatChannel implements ChatSpace {
             }
         }
         
+        context.setFinalMessage(format);
+        
         for (UUID recipient : context.getRecipients()) {
             Player player = Bukkit.getPlayer(recipient);
             if (player != null) {
                 player.sendMessage(format);
             }
         }
-        
-        Bukkit.getConsoleSender().sendMessage("[" + getName() + "] " + StarColors.stripColor(format));
     }
     
     @Override
