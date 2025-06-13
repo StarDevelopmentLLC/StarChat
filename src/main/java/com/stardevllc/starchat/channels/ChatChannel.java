@@ -287,6 +287,8 @@ public class ChatChannel implements ChatSpace {
                 player.sendMessage(format);
             }
         }
+        
+        Bukkit.getConsoleSender().sendMessage("[" + getName() + "] " + StarColors.stripColor(format));
     }
     
     @Override
