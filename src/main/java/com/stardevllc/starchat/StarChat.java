@@ -213,6 +213,7 @@ public class StarChat extends JavaPlugin implements Listener {
         mainConfig.addDefault("messages.channel.nosendpermission", "&cYou do not have permission to send messages in {CHANNEL}.");
         mainConfig.addDefault("messages.room.notamember", "&cYou are not a member of {ROOM}");
         mainConfig.addDefault("messages.command.chat.setfocus", "&eYou set your chat focus to &b{SPACE}.");
+        mainConfig.addDefault("messages.command.invalidtarget", "&cInvalid target. Are they offline?");
         mainConfig.addDefault("messages.command.admin.savesuccess", "&aSaved config.yml successfully.");
         mainConfig.addDefault("messages.command.admin.reloadsuccess", "&aReloaded successfully.");
         mainConfig.addDefault("messages.command.admin.setconsolename", "&eYou set the new console name format to &r{NEWNAME}");
@@ -234,7 +235,11 @@ public class StarChat extends JavaPlugin implements Listener {
         mainConfig.addDefault("messages.command.admin.channel.set.success", "&eYou set &b{channel}&e's &a{key} &eto &d{value}");
         mainConfig.addDefault("messages.command.clearchat.immune", "&aThe chat has been cleared by &e{actor} &abut you are immune.");
         mainConfig.addDefault("messages.command.clearchat.success", "&aThe chat has been cleared by &e{actor}");
-
+        mainConfig.addDefault("messages.command.clearchat.noflagpermission", "&cYou do not have permission to use the -{flag} flag, defaulting to config value");
+        mainConfig.addDefault("messages.command.reply.noopenconversation", "&cYou do not have a conversation open with {target}");
+        mainConfig.addDefault("messages.command.reply.noactiveconversations", "&cYou do not have any active conversations.");
+        
+        
         this.saveMainConfig();
     }
     

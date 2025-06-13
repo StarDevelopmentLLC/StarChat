@@ -47,7 +47,7 @@ public class MessageCmd implements TabExecutor {
         Actor targetActor = Actor.create(args[0]);
         
         if (targetActor == null || !senderActor.canSee(targetActor) && !senderActor.hasPermission("starchat.privatemessage.visibility.bypass")) {
-            sender.sendMessage(StarColors.color("&cInvalid target. Are they offline?"));
+            sender.sendMessage(StarColors.color(plugin.getMainConfig().getString("messages.command.invalidtarget")));
             return true;
         }
         

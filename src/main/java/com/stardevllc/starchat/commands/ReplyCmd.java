@@ -44,7 +44,7 @@ public class ReplyCmd implements TabExecutor {
         Actor targetActor = Actor.create(args[0]);
         
         if (targetActor != null && !senderActor.canSee(targetActor) && !senderActor.hasPermission("starchat.privatemessage.visibility.bypass")) {
-            sender.sendMessage(StarColors.color("&cInvalid target. Are they offline?"));
+            sender.sendMessage(StarColors.color(plugin.getMainConfig().getString("messages.command.invalidtarget")));
             return true;
         }
 
@@ -54,7 +54,7 @@ public class ReplyCmd implements TabExecutor {
         if (targetActor != null) {
             privateMessage = plugin.getPrivateMessage(senderActor, targetActor);
             if (privateMessage == null) {
-                sender.sendMessage(StarColors.color("&cYou do not have a conversation open with " + targetActor.getName()));
+                sender.sendMessage(StarColors.color(plugin.getMainConfig().getString("messages.command.reply.noopenconversation").replace("{target}", targetActor.getName())));
                 return true;
             }
             msgStart = 1;
@@ -66,7 +66,7 @@ public class ReplyCmd implements TabExecutor {
             }
 
             if (privateMessage == null) {
-                StarColors.coloredMessage(sender, "&cYou do not have any active conversations.");
+                StarColors.coloredMessage(sender, plugin.getMainConfig().getString("messages.command.reply.noactiveconversations"));
                 return true;
             }
 
@@ -78,7 +78,7 @@ public class ReplyCmd implements TabExecutor {
             }
             
             if (!senderActor.canSee(targetActor) && !senderActor.hasPermission("starchat.privatemessage.visibility.bypass")) {
-                StarColors.coloredMessage(sender, "&cInvalid target. Are they offline?");
+                StarColors.coloredMessage(sender, plugin.getMainConfig().getString("messages.command.invalidtarget"));
                 return true;
             }
 

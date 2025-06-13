@@ -40,13 +40,15 @@ public class ClearChatCmd implements CommandExecutor {
         }
 
         FlagResult flagResult = flags.parse(args);
+        
+        String noFlagPermMessage = plugin.getMainConfig().getString("messages.command.clearchat.noflagpermission");
 
         int lineAmount;
         if (flagResult.getValue(LINE_AMOUNT) != null) {
             if (sender.hasPermission("starchat.clearchat.flags.amount")) {
                 lineAmount = Integer.parseInt((String) flagResult.getValue(LINE_AMOUNT));
             } else {
-                StarColors.coloredMessage(sender, "&cYou do not have permission to use the -" + LINE_AMOUNT.id() + " flag, defaulting to config value");
+                StarColors.coloredMessage(sender, noFlagPermMessage.replace("{flag}", LINE_AMOUNT.id()));
                 lineAmount = plugin.getMainConfig().getInt("clearchat.lineamount");
             }
         } else {
@@ -58,7 +60,7 @@ public class ClearChatCmd implements CommandExecutor {
             if (sender.hasPermission("starchat.clearchat.flags.character")) {
                 lineChar = (String) flagResult.getValue(LINE_CHARACTER);
             } else {
-                StarColors.coloredMessage(sender, "&cYou do not have permission to use the -" + LINE_CHARACTER.id() + " flag, defaulting to config value");
+                StarColors.coloredMessage(sender, noFlagPermMessage.replace("{flag}", LINE_CHARACTER.id()));
                 lineChar = plugin.getMainConfig().getString("clearchat.character");
             }
         } else {
@@ -70,7 +72,7 @@ public class ClearChatCmd implements CommandExecutor {
             if (sender.hasPermission("starchat.clearchat.flags.randomize")) {
                 randomizeChar = true;
             } else {
-                StarColors.coloredMessage(sender, "&cYou do not have permission to use the -" + RANDOMIZE.id() + " flag, defaulting to config value");
+                StarColors.coloredMessage(sender, noFlagPermMessage.replace("{flag}", RANDOMIZE.id()));
                 randomizeChar = plugin.getMainConfig().getBoolean("clearchat.randomize-character-count");
             }
         } else {
@@ -94,7 +96,7 @@ public class ClearChatCmd implements CommandExecutor {
             if (sender.hasPermission("starchat.clearchat.flags.bypassoverride")) {
                 bypassOverride = true;
             } else {
-                StarColors.coloredMessage(sender, "&cYou do not have permission to use the -" + BYPASS_OVERRIDE.id() + " flag, ignoring");
+                StarColors.coloredMessage(sender, noFlagPermMessage.replace("{flag}", BYPASS_OVERRIDE.id()));
                 bypassOverride = false;
             }
         } else {
