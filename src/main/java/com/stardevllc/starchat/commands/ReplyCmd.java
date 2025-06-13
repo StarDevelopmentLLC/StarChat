@@ -26,7 +26,7 @@ public class ReplyCmd implements TabExecutor {
     }
     
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        if (!(sender.hasPermission("starchat.command.reply"))) {
+        if (!sender.hasPermission("starchat.command.reply")) {
             StarColors.coloredMessage(sender, plugin.getMainConfig().getString("messages.command.nopermission"));
             return true;
         }
@@ -42,6 +42,11 @@ public class ReplyCmd implements TabExecutor {
 
         Actor senderActor = Actor.create(sender);
         Actor targetActor = Actor.create(args[0]);
+        
+        if (targetActor != null && !senderActor.canSee(targetActor)) {
+            sender.sendMessage(StarColors.color("&cInvalid target. Are they offline?"));
+            return true;
+        }
 
         PrivateMessage privateMessage;
         
@@ -65,10 +70,16 @@ public class ReplyCmd implements TabExecutor {
                 return true;
             }
 
+            
             if (privateMessage.getActor1().equals(senderActor)) {
                 targetActor = privateMessage.getActor2();
             } else {
                 targetActor = privateMessage.getActor1();
+            }
+            
+            if (!senderActor.canSee(targetActor)) {
+                StarColors.coloredMessage(sender, "&cInvalid target. Are they offline?");
+                return true;
             }
 
             msgStart = 0;
@@ -94,7 +105,7 @@ public class ReplyCmd implements TabExecutor {
     }
     
     public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
-        if (!(sender.hasPermission("starchat.command.reply"))) {
+        if (!sender.hasPermission("starchat.command.reply")) {
             return null;
         }
 

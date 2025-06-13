@@ -30,7 +30,7 @@ public class MessageCmd implements TabExecutor {
     }
     
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        if (!(sender.hasPermission("starchat.command.message"))) {
+        if (!sender.hasPermission("starchat.command.message")) {
             StarColors.coloredMessage(sender, plugin.getMainConfig().getString("messages.command.nopermission"));
             return true;
         }
@@ -46,8 +46,8 @@ public class MessageCmd implements TabExecutor {
         Actor senderActor = Actor.create(sender);
         Actor targetActor = Actor.create(args[0]);
 
-        if (targetActor == null) {
-            sender.sendMessage(StarColors.color("&cInvalid target. They must be online, or the console."));
+        if (targetActor == null || !senderActor.canSee(targetActor)) {
+            sender.sendMessage(StarColors.color("&cInvalid target. Are they offline?"));
             return true;
         }
 
