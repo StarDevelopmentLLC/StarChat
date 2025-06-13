@@ -28,7 +28,7 @@ public class ChatCmd implements TabExecutor {
     }
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        if (!(sender.hasPermission("starchat.command.chat"))) {
+        if (!sender.hasPermission("starchat.command.chat")) {
             StarColors.coloredMessage(sender, plugin.getMainConfig().getString("messages.command.nopermission"));
             return true;
         }
@@ -93,7 +93,7 @@ public class ChatCmd implements TabExecutor {
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
-        if (!(sender.hasPermission("starchat.command.chat"))) {
+        if (!sender.hasPermission("starchat.command.chat")) {
             return null;
         }
 

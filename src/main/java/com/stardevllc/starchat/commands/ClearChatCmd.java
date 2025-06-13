@@ -34,7 +34,7 @@ public class ClearChatCmd implements CommandExecutor {
     
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        if (!(sender.hasPermission("starchat.clearchat"))) {
+        if (!sender.hasPermission("starchat.clearchat")) {
             StarColors.coloredMessage(sender, plugin.getMainConfig().getString("messages.command.nopermission"));
             return true;
         }
