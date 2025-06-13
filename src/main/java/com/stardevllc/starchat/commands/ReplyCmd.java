@@ -120,9 +120,13 @@ public class ReplyCmd implements TabExecutor {
             }
             
             if (lastMessage.getActor1().equals(player)) {
-                return List.of(lastMessage.getActor2().getName());
+                if (lastMessage.getActor1().canSee(lastMessage.getActor2()) || lastMessage.getActor1().hasPermission("starchat.privatemessage.visibility.bypass")) {
+                    return List.of(lastMessage.getActor2().getName());
+                }
             } else {
-                return List.of(lastMessage.getActor1().getName());
+                if (lastMessage.getActor2().canSee(lastMessage.getActor1()) || lastMessage.getActor2().hasPermission("starchat.privatemessage.visibility.bypass")) {
+                    return List.of(lastMessage.getActor1().getName());
+                }
             }
         } else if (args.length >= 2) {
             return List.of("<message>");

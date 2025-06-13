@@ -22,9 +22,9 @@ public class MessageCmd implements TabExecutor {
     private StarChat plugin;
     
     protected static final Flag FOCUS = new PresenceFlag("f", "FOCUS");
-
+    
     protected static final CmdFlags flags = new CmdFlags(FOCUS);
-
+    
     public MessageCmd(StarChat plugin) {
         this.plugin = plugin;
     }
@@ -34,7 +34,7 @@ public class MessageCmd implements TabExecutor {
             StarColors.coloredMessage(sender, plugin.getMainConfig().getString("messages.command.nopermission"));
             return true;
         }
-
+        
         FlagResult flagResult = flags.parse(args);
         args = flagResult.args();
         
@@ -42,21 +42,21 @@ public class MessageCmd implements TabExecutor {
             sender.sendMessage(StarColors.color("&cUsage: /" + label + " <target> <message>"));
             return true;
         }
-
+        
         Actor senderActor = Actor.create(sender);
         Actor targetActor = Actor.create(args[0]);
-
+        
         if (targetActor == null || !senderActor.canSee(targetActor) && !senderActor.hasPermission("starchat.privatemessage.visibility.bypass")) {
             sender.sendMessage(StarColors.color("&cInvalid target. Are they offline?"));
             return true;
         }
-
+        
         PrivateMessage privateMessage = plugin.getPrivateMessage(senderActor, targetActor);
         if (privateMessage == null) {
             privateMessage = new PrivateMessage(plugin, senderActor, targetActor, plugin.getMainConfig().getString("private-msg-format"));
             plugin.addPrivateMessage(privateMessage);
         }
-
+        
         StringBuilder msgBuilder = new StringBuilder();
         for (int i = 1; i < args.length; i++) {
             msgBuilder.append(args[i]).append(" ");
@@ -77,7 +77,7 @@ public class MessageCmd implements TabExecutor {
     }
     
     public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
-        if (!(sender.hasPermission("starchat.command.message"))) {
+        if (!sender.hasPermission("starchat.command.message")) {
             return null;
         }
         
@@ -91,12 +91,14 @@ public class MessageCmd implements TabExecutor {
             List<String> players = new LinkedList<>();
             for (Player p : Bukkit.getOnlinePlayers()) {
                 if (!p.getUniqueId().equals(player.getUniqueId())) {
-                    players.add(p.getName());
+                    if (!player.canSee(p) && !player.hasPermission("starchat.privatemessage.visibility.bypass")) {
+                        players.add(p.getName());
+                    }
                 }
             }
-
+            
             players.removeIf(playerName -> !playerName.toLowerCase().startsWith(target));
-
+            
             Collections.sort(players);
             return players;
         } else if (args.length >= 2) {
