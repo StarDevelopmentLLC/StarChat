@@ -33,7 +33,7 @@ public class PrivateMessage implements ChatSpace {
     
     @Override
     public void sendToConsole(String message) {
-        Bukkit.getServer().getLogger().info("[private: " + getName() + "] " + StarColors.stripColor(message));
+        Bukkit.getServer().getLogger().info("[private] " + StarColors.stripColor(message));
     }
     
     @Override
