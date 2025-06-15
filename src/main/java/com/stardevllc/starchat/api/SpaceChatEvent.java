@@ -16,7 +16,6 @@ public class SpaceChatEvent extends Event implements Cancellable {
     private final ChatContext context;
 
     public SpaceChatEvent(ChatSpace chatSpace, ChatContext context) {
-        super(true);
         this.chatSpace = chatSpace;
         this.context = context;
     }
