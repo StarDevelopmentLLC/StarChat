@@ -2,6 +2,7 @@ package com.stardevllc.starchat.api;
 
 import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.space.ChatSpace;
+import org.bukkit.Bukkit;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
@@ -16,6 +17,7 @@ public class SpaceChatEvent extends Event implements Cancellable {
     private final ChatContext context;
 
     public SpaceChatEvent(ChatSpace chatSpace, ChatContext context) {
+        super(!Bukkit.isPrimaryThread());
         this.chatSpace = chatSpace;
         this.context = context;
     }
