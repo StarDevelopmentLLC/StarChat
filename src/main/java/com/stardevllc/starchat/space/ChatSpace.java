@@ -1,7 +1,7 @@
 package com.stardevllc.starchat.space;
 
 import com.stardevllc.starchat.context.ChatContext;
-import com.stardevllc.starcore.api.actors.Actor;
+import com.stardevllc.starmclib.actors.Actor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 

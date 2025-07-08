@@ -9,7 +9,7 @@ import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.handler.DisplayNameHandler;
 import com.stardevllc.starchat.space.ChatSpace;
 import com.stardevllc.starcore.api.StarColors;
-import com.stardevllc.starcore.api.actors.Actor;
+import com.stardevllc.starmclib.actors.Actor;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;

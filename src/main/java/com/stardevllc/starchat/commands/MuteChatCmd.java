@@ -2,7 +2,7 @@ package com.stardevllc.starchat.commands;
 
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starcore.api.StarColors;
-import com.stardevllc.starcore.api.actors.Actor;
+import com.stardevllc.starmclib.actors.Actor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;

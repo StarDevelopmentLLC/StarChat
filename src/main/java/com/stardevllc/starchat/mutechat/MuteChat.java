@@ -9,7 +9,7 @@ import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.obserable.ConfigChangeListener;
 import com.stardevllc.starchat.space.ChatSpace;
 import com.stardevllc.starcore.api.StarColors;
-import com.stardevllc.starcore.api.actors.Actor;
+import com.stardevllc.starmclib.actors.Actor;
 
 import java.util.*;
 
