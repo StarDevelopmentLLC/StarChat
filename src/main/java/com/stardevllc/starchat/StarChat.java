@@ -1,42 +1,32 @@
 package com.stardevllc.starchat;
 
 import com.stardevllc.config.file.yaml.YamlConfig;
-import com.stardevllc.starchat.channels.ChatChannel;
-import com.stardevllc.starchat.channels.GlobalChannel;
-import com.stardevllc.starchat.channels.StaffChannel;
+import com.stardevllc.starchat.channels.*;
 import com.stardevllc.starchat.commands.*;
 import com.stardevllc.starchat.handler.DisplayNameHandler;
 import com.stardevllc.starchat.handler.VaultDisplayNameHandler;
 import com.stardevllc.starchat.hooks.VaultHook;
 import com.stardevllc.starchat.listener.PlayerListener;
 import com.stardevllc.starchat.mutechat.MuteChat;
-import com.stardevllc.starchat.placeholder.DefaultPlaceholders;
-import com.stardevllc.starchat.placeholder.PAPIExpansion;
-import com.stardevllc.starchat.placeholder.PAPIPlaceholders;
-import com.stardevllc.starchat.placeholder.PlaceholderHandler;
+import com.stardevllc.starchat.placeholder.*;
 import com.stardevllc.starchat.pm.PrivateChatSelector;
 import com.stardevllc.starchat.pm.PrivateMessage;
-import com.stardevllc.starchat.registry.ChannelRegistry;
-import com.stardevllc.starchat.registry.FocusRegistry;
-import com.stardevllc.starchat.registry.RoomRegistry;
-import com.stardevllc.starchat.registry.SpaceRegistry;
+import com.stardevllc.starchat.registry.*;
 import com.stardevllc.starchat.space.ChatSpace;
 import com.stardevllc.starmclib.actors.*;
+import com.stardevllc.starmclib.plugin.ExtendedJavaPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.ServicePriority;
-import org.bukkit.plugin.ServicesManager;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.plugin.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
-public class StarChat extends JavaPlugin implements Listener {
+public class StarChat extends ExtendedJavaPlugin implements Listener {
     private static StarChat instance;
 
     private static DisplayNameHandler defaultDisplayNameHandler = new VaultDisplayNameHandler();
@@ -268,8 +258,8 @@ public class StarChat extends JavaPlugin implements Listener {
             YamlConfig config = YamlConfig.loadConfiguration(file);
             String name = config.getString("name");
             ChatChannel chatChannel = new ChatChannel(this, name, file.toPath());
-            if ((this.globalChannel != null && chatChannel.getName().equalsIgnoreCase(this.globalChannel.getName())) 
-                || (this.staffChannel != null && chatChannel.getName().equalsIgnoreCase(this.staffChannel.getName()))) {
+            if (this.globalChannel != null && chatChannel.getName().equalsIgnoreCase(this.globalChannel.getName()) 
+                || this.staffChannel != null && chatChannel.getName().equalsIgnoreCase(this.staffChannel.getName())) {
                 return;
             }
             this.channelRegistry.register(chatChannel.getName(), chatChannel);

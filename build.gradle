@@ -26,7 +26,7 @@ publishing {
 }
 
 group 'com.github.StarDevelopmentLLC'
-version '0.3.0'
+version '0.4.0'
 
 processResources {
     filesMatching("*.yml") {
@@ -42,11 +42,10 @@ dependencies {
     compileOnly 'org.spigotmc:spigot-api:1.21.7-R0.1-SNAPSHOT'
     compileOnly 'com.github.MilkBowl:VaultAPI:1.7.1'
     compileOnly 'me.clip:placeholderapi:2.11.6'
-//    compileOnly 'com.github.StarDevelopmentLLC:StarCore:0.5.4'
-    compileOnly 'com.github.StarDevelopmentLLC:StarMCLib:0.1.2'
-    compileOnly 'com.github.StarDevelopmentLLC:StarCoreAPI:0.3.0'
+    compileOnly 'com.github.StarDevelopmentLLC:StarCore:0.8.0'
+    compileOnly 'com.github.StarDevelopmentLLC:StarMCLib:0.2.0'
     compileOnly 'com.github.StarDevelopmentLLC:config:0.1.4'
-    compileOnly 'com.github.StarDevelopmentLLC:StarLib:0.9.0'
+    compileOnly 'com.github.StarDevelopmentLLC:StarLib:0.10.1'
 }
 
 java {
