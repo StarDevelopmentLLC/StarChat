@@ -7,8 +7,9 @@ repositories {
     mavenLocal()
     mavenCentral()
     maven {
-        url = 'https://www.jitpack.io'
+        url = 'https://repo.stardevllc.com/releases'
     }
+    maven { url 'https://jitpack.io' }
     maven {
         url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
     }
@@ -18,6 +19,17 @@ repositories {
 }
 
 publishing {
+    repositories {
+        maven {
+            name="stardev"
+            url="https://repo.stardevllc.com/releases"
+            credentials(PasswordCredentials)
+            authentication {
+                basic(BasicAuthentication)
+            }
+        }
+    }
+    
     publications {
         maven(MavenPublication) {
             from components.java
@@ -25,7 +37,7 @@ publishing {
     }
 }
 
-group 'com.github.StarDevelopmentLLC'
+group 'com.stardevllc'
 version '0.4.0'
 
 processResources {
@@ -42,10 +54,10 @@ dependencies {
     compileOnly 'org.spigotmc:spigot-api:1.21.7-R0.1-SNAPSHOT'
     compileOnly 'com.github.MilkBowl:VaultAPI:1.7.1'
     compileOnly 'me.clip:placeholderapi:2.11.6'
-    compileOnly 'com.github.StarDevelopmentLLC:StarCore:0.8.0'
-    compileOnly 'com.github.StarDevelopmentLLC:StarMCLib:0.2.0'
-    compileOnly 'com.github.StarDevelopmentLLC:config:0.1.4'
-    compileOnly 'com.github.StarDevelopmentLLC:StarLib:0.10.1'
+    compileOnly 'com.stardevllc:StarLib:0.10.1'
+    compileOnly 'com.stardevllc:StarMCLib:0.2.0'
+    compileOnly 'com.stardevllc:StarCore:0.8.3'
+    compileOnly 'com.stardevllc:config:0.1.4'
 }
 
 java {
@@ -56,3 +68,4 @@ java {
 
 tasks.compileJava.dependsOn(clean)
 tasks.build.finalizedBy(publishToMavenLocal)
+tasks.build.finalizedBy(publish)
