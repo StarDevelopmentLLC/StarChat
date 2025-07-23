@@ -1,8 +1,8 @@
 package com.stardevllc.starchat.obserable;
 
 import com.stardevllc.config.file.yaml.YamlConfig;
-import com.stardevllc.observable.ChangeEvent;
-import com.stardevllc.observable.ChangeListener;
+import com.stardevllc.starlib.observable.ChangeEvent;
+import com.stardevllc.starlib.observable.ChangeListener;
 
 import java.io.File;
 import java.io.IOException;

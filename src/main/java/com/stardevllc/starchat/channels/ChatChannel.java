@@ -1,20 +1,17 @@
 package com.stardevllc.starchat.channels;
 
-import com.stardevllc.starcore.api.StarColors;
 import com.stardevllc.config.file.yaml.YamlConfig;
-import com.stardevllc.observable.property.BooleanProperty;
-import com.stardevllc.observable.property.LongProperty;
-import com.stardevllc.observable.property.ObjectProperty;
-import com.stardevllc.observable.property.StringProperty;
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.api.SpaceChatEvent;
 import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.handler.DisplayNameHandler;
 import com.stardevllc.starchat.obserable.ConfigChangeListener;
 import com.stardevllc.starchat.space.ChatSpace;
+import com.stardevllc.starcore.api.StarColors;
+import com.stardevllc.starlib.observable.property.*;
+import com.stardevllc.starlib.time.TimeFormat;
+import com.stardevllc.starlib.time.TimeParser;
 import com.stardevllc.starmclib.actors.Actor;
-import com.stardevllc.time.TimeFormat;
-import com.stardevllc.time.TimeParser;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;

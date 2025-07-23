@@ -1,12 +1,6 @@
 package com.stardevllc.starchat.commands;
 
 import com.stardevllc.config.file.yaml.YamlConfig;
-import com.stardevllc.converter.string.StringConverters;
-import com.stardevllc.helper.ReflectionHelper;
-import com.stardevllc.observable.Property;
-import com.stardevllc.observable.property.BooleanProperty;
-import com.stardevllc.observable.property.ObjectProperty;
-import com.stardevllc.observable.property.StringProperty;
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.channels.ChatChannel;
 import com.stardevllc.starchat.context.ChatContext;
@@ -17,6 +11,10 @@ import com.stardevllc.starchat.pm.PrivateMessage;
 import com.stardevllc.starchat.rooms.ChatRoom;
 import com.stardevllc.starcore.api.StarColors;
 import com.stardevllc.starcore.api.colors.ColorHandler;
+import com.stardevllc.starlib.converter.string.StringConverters;
+import com.stardevllc.starlib.helper.ReflectionHelper;
+import com.stardevllc.starlib.observable.Property;
+import com.stardevllc.starlib.observable.property.*;
 import com.stardevllc.starmclib.actors.Actor;
 import com.stardevllc.starmclib.actors.PlayerActor;
 import org.bukkit.Bukkit;

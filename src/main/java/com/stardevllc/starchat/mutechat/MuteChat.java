@@ -1,14 +1,12 @@
 package com.stardevllc.starchat.mutechat;
 
-import com.stardevllc.observable.collections.ObservableHashSet;
-import com.stardevllc.observable.collections.ObservableSet;
-import com.stardevllc.observable.property.BooleanProperty;
-import com.stardevllc.observable.property.ObjectProperty;
-import com.stardevllc.observable.property.StringProperty;
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.obserable.ConfigChangeListener;
 import com.stardevllc.starchat.space.ChatSpace;
 import com.stardevllc.starcore.api.StarColors;
+import com.stardevllc.starlib.observable.collections.ObservableHashSet;
+import com.stardevllc.starlib.observable.collections.ObservableSet;
+import com.stardevllc.starlib.observable.property.*;
 import com.stardevllc.starmclib.actors.Actor;
 
 import java.util.*;
@@ -82,7 +80,7 @@ public class MuteChat {
         
         this.spacesToMute.addListener(e -> {
             if (e.added() != null) {
-                String spaceName = (String) e.added();
+                String spaceName = e.added();
                 ChatSpace chatSpace = plugin.getSpaceRegistry().get(spaceName);
                 if (chatSpace == null) {
                     return;
@@ -92,7 +90,7 @@ public class MuteChat {
                     chatSpace.mute(actor.get(), reason.get());
                 }
             } else if (e.removed() != null) {
-                String spaceName = (String) e.removed();
+                String spaceName = e.removed();
                 ChatSpace chatSpace = plugin.getSpaceRegistry().get(spaceName);
                 if (chatSpace == null) {
                     return;
