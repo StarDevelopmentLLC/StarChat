@@ -1,6 +1,5 @@
 package com.stardevllc.starchat.channels;
 
-import com.stardevllc.config.file.yaml.YamlConfig;
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.api.SpaceChatEvent;
 import com.stardevllc.starchat.context.ChatContext;
@@ -8,6 +7,7 @@ import com.stardevllc.starchat.handler.DisplayNameHandler;
 import com.stardevllc.starchat.obserable.ConfigChangeListener;
 import com.stardevllc.starchat.space.ChatSpace;
 import com.stardevllc.starcore.api.StarColors;
+import com.stardevllc.starcore.config.Configuration;
 import com.stardevllc.starlib.observable.property.*;
 import com.stardevllc.starlib.time.TimeFormat;
 import com.stardevllc.starlib.time.TimeParser;
@@ -19,13 +19,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
 
 public class ChatChannel implements ChatSpace {
-    protected transient File file; //The main file for the config.
-    protected transient YamlConfig config; //Config to store information as channels are mainly config/command controlled, transient modifier allows StarData to ignore this field without having to depend on StarData directly
+    protected transient Configuration config;
     
     protected final LongProperty id;
     protected final JavaPlugin plugin;
@@ -54,16 +52,7 @@ public class ChatChannel implements ChatSpace {
     
     public ChatChannel(JavaPlugin plugin, String name, Path filePath) {
         this.plugin = plugin;
-        this.file = new File(filePath.toFile().getAbsolutePath());
-        
-        if (!this.file.exists()) {
-            try {
-                file.createNewFile();
-            } catch (IOException e) {
-            }
-        }
-        
-        this.config = YamlConfig.loadConfiguration(this.file);
+        this.config = new Configuration(new File(filePath.toFile().getAbsolutePath()));
         
         this.id = new LongProperty(this, "id", 0);
         this.name = new StringProperty(this, "name", name);
@@ -72,19 +61,19 @@ public class ChatChannel implements ChatSpace {
         
         this.name.addListener(e -> config.set("name", e.newValue()));
         this.viewPermission = new StringProperty(this, "viewPermission", this.config.getString("permissions.view"));
-        this.viewPermission.addListener(new ConfigChangeListener<>(file, config, "permissions.view"));
+        this.viewPermission.addListener(new ConfigChangeListener<>(config, "permissions.view"));
         this.sendPermission = new StringProperty(this, "sendPermission", this.config.getString("permissions.send"));
-        this.sendPermission.addListener(new ConfigChangeListener<>(file, config, "permissions.send"));
+        this.sendPermission.addListener(new ConfigChangeListener<>(config, "permissions.send"));
         this.senderFormat = new StringProperty(this, "senderFormat", this.config.getString("formats.sender"));
-        this.senderFormat.addListener(new ConfigChangeListener<>(file, config, "formats.sender"));
+        this.senderFormat.addListener(new ConfigChangeListener<>(config, "formats.sender"));
         this.systemFormat = new StringProperty(this, "systemFormat", this.config.getString("formats.system"));
-        this.systemFormat.addListener(new ConfigChangeListener<>(file, config, "formats.system"));
+        this.systemFormat.addListener(new ConfigChangeListener<>(config, "formats.system"));
         this.useColorPermissions = new BooleanProperty(this, "useColorPermissions", config.getBoolean("settings.usecolorpermissions"));
-        this.useColorPermissions.addListener(new ConfigChangeListener<>(file, config, "settings.usecolorpermissions"));
+        this.useColorPermissions.addListener(new ConfigChangeListener<>(config, "settings.usecolorpermissions"));
         this.cooldownLength = new LongProperty(this, "cooldownLength", new TimeParser().parseTime(config.getString("settings.cooldownlength")));
-        this.cooldownLength.addListener(e -> new ConfigChangeListener<>(file, config, "settings.cooldownlength"));
+        this.cooldownLength.addListener(e -> new ConfigChangeListener<>(config, "settings.cooldownlength"));
         this.muted = new BooleanProperty(this, "muted", this.config.getBoolean("mute.enabled"));
-        this.muted.addListener(new ConfigChangeListener<>(file, config, "mute.enabled"));
+        this.muted.addListener(new ConfigChangeListener<>(config, "mute.enabled"));
         this.mutedBy = new ObjectProperty<>(Actor.class, this, "mutedby", Actor.create(this.config.getString("mute.actor")));
         this.mutedBy.addListener(changeEvent -> {
             if (changeEvent.newValue() == null) {
@@ -94,15 +83,15 @@ public class ChatChannel implements ChatSpace {
             }
         });
         this.muteReason = new StringProperty(this, "muteReason", this.config.getString("mute.reason"));
-        this.muteReason.addListener(new ConfigChangeListener<>(file, config, "mute.reason"));
+        this.muteReason.addListener(new ConfigChangeListener<>(config, "mute.reason"));
         this.muteFormat = new StringProperty(this, "muteFormat", this.config.getString("mute.formats.on_mute"));
-        this.muteFormat.addListener(new ConfigChangeListener<>(file, config, "mute.formats.on_mute"));
+        this.muteFormat.addListener(new ConfigChangeListener<>(config, "mute.formats.on_mute"));
         this.unmuteFormat = new StringProperty(this, "unmuteFormat", this.config.getString("mute.formats.on_unmute"));
-        this.unmuteFormat.addListener(new ConfigChangeListener<>(file, config, "mute.formats.on_unmute"));
+        this.unmuteFormat.addListener(new ConfigChangeListener<>(config, "mute.formats.on_unmute"));
         this.muteErrorFormat = new StringProperty(this, "muteErrorFormat", this.config.getString("mute.formats.muted_error"));
-        this.muteErrorFormat.addListener(new ConfigChangeListener<>(file, config, "mute.formats.muted_error"));
+        this.muteErrorFormat.addListener(new ConfigChangeListener<>(config, "mute.formats.muted_error"));
         this.muteBypassPermission = new StringProperty(this, "muteBypassPermission", this.config.getString("mute.bypass_permission"));
-        this.muteBypassPermission.addListener(new ConfigChangeListener<>(file, config, "mute.bypass_permission"));
+        this.muteBypassPermission.addListener(new ConfigChangeListener<>(config, "mute.bypass_permission"));
     }
     
     protected void createDefaults() {
@@ -121,25 +110,15 @@ public class ChatChannel implements ChatSpace {
         config.addDefault("mute.formats.muted_error", "&cYou cannot speak in {channelName} as it has been muted by {actor}", "The format sent to players that are trying to talk in the channel while it is muted");
         config.addDefault("mute.bypass_permission", "starchat." + this.name.get() + ".mute.bypass", "The permission where those with this permission can bypass the channel mute");
         
-        try {
-            config.save(file);
-        } catch (IOException e) {
-        }
+        config.save();
     }
     
-    public YamlConfig getConfig() {
+    public Configuration getConfig() {
         return config;
     }
     
-    public File getFile() {
-        return file;
-    }
-    
     public void saveConfig() {
-        try {
-            config.save(file);
-        } catch (IOException e) {
-        }
+        config.save();
     }
     
     public String getViewPermission() {
@@ -383,7 +362,6 @@ public class ChatChannel implements ChatSpace {
     }
     
     public void setFile(File newFile) {
-        this.file = newFile;
-        this.config = YamlConfig.loadConfiguration(file);
+        this.config = new Configuration(newFile);
     }
 }

@@ -446,7 +446,7 @@ public class StarChatAdminCmd implements TabExecutor {
                     return true;
                 }
 
-                chatChannel.getFile().delete();
+                chatChannel.getConfig().delete();
                 plugin.getChannelRegistry().unregister(chatChannel.getName());
                 StarColors.coloredMessage(sender, "&eYou deleted the chat channel &b" + chatChannel.getName());
             }
@@ -616,17 +616,7 @@ public class StarChatAdminCmd implements TabExecutor {
             }
             
             plugin.getChannelRegistry().unregister(oldName);
-
-            File oldFile = plugin.getGlobalChannel().getFile();
-            File newFile = new File(oldFile.getParentFile(), newName + ".yml");
-
-            if (newFile.exists()) {
-                newFile.delete();
-            }
-
-            oldFile.renameTo(newFile);
-            
-            plugin.getGlobalChannel().setFile(newFile);
+            plugin.getGlobalChannel().getConfig().renameFile(newName);
             plugin.getGlobalChannel().setName(newName);
             plugin.getGlobalChannel().saveConfig();
             plugin.getMainConfig().set("global-channel-name", newName);

@@ -24,7 +24,7 @@ public class MuteChat {
         this.spacesToMute.addAll(spacesFromConfig);
         
         this.muted = new BooleanProperty(this, "muted", plugin.getMainConfig().getBoolean("globalmute.enabled"));
-        this.muted.addListener(new ConfigChangeListener<>(plugin.getMainConfigFile(), plugin.getMainConfig(), "globalmute.enabled"));
+        this.muted.addListener(new ConfigChangeListener<>(plugin.getMainConfig(), "globalmute.enabled"));
         this.actor = new ObjectProperty<>(Actor.class, this, "actor", Actor.create(plugin.getMainConfig().getString("globalmute.actor")));
         this.actor.addListener(changeEvent -> {
             if (changeEvent.newValue() == null) {
@@ -36,7 +36,7 @@ public class MuteChat {
             plugin.saveMainConfig();
         });
         this.reason = new StringProperty(this, "reason", plugin.getMainConfig().getString("globalmute.reason"));
-        this.reason.addListener(new ConfigChangeListener<>(plugin.getMainConfigFile(), plugin.getMainConfig(), "globalmute.reason"));
+        this.reason.addListener(new ConfigChangeListener<>(plugin.getMainConfig(), "globalmute.reason"));
 
         muted.addListener(e -> {
             Iterator<String> iterator = spacesToMute.iterator();

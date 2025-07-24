@@ -24,7 +24,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.*;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.*;
 
 public class StarChat extends ExtendedJavaPlugin implements Listener {
@@ -143,11 +142,7 @@ public class StarChat extends ExtendedJavaPlugin implements Listener {
         if (save) {
             saveMainConfig();
             for (ChatChannel channel : this.channelRegistry.getObjects().values()) {
-                try {
-                    channel.getConfig().save(channel.getFile());
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+                channel.getConfig().save();
             }
         }
         
