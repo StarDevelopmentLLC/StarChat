@@ -13,11 +13,12 @@ import com.stardevllc.starchat.pm.PrivateChatSelector;
 import com.stardevllc.starchat.pm.PrivateMessage;
 import com.stardevllc.starchat.registry.*;
 import com.stardevllc.starchat.space.ChatSpace;
+import com.stardevllc.starcore.config.Configuration;
+import com.stardevllc.starmclib.StarMCLib;
 import com.stardevllc.starmclib.actors.*;
 import com.stardevllc.starmclib.plugin.ExtendedJavaPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.*;
@@ -28,7 +29,7 @@ import java.util.*;
 
 public class StarChat extends ExtendedJavaPlugin implements Listener {
     private static StarChat instance;
-
+    
     private static DisplayNameHandler defaultDisplayNameHandler = new VaultDisplayNameHandler();
     
     private SpaceRegistry spaceRegistry;
@@ -37,8 +38,7 @@ public class StarChat extends ExtendedJavaPlugin implements Listener {
     private FocusRegistry playerChatSelection;
     
     private PlaceholderHandler placeholderHandler;
-    private File mainConfigFile;
-    private YamlConfig mainConfig;
+    private Configuration mainConfig;
     private ChatChannel globalChannel, staffChannel;
     private Map<String, ChatSelector> chatSelectors = new HashMap<>();
     private PAPIExpansion papiExpansion;
@@ -47,52 +47,60 @@ public class StarChat extends ExtendedJavaPlugin implements Listener {
     private Map<UUID, PrivateMessage> lastMessage = new HashMap<>();
     private PrivateMessage consoleLastMessage;
     private MuteChat muteChat;
-
+    
     @Override
     public void onEnable() {
         instance = this;
-        mainConfigFile = new File(getDataFolder(), "config.yml");
+        StarMCLib.registerPluginEventBus(getEventBus());
+        StarMCLib.registerPluginInjector(this, getInjector());
         
-        if (!mainConfigFile.exists()) {
-            if (!mainConfigFile.getParentFile().exists()) {
-                mainConfigFile.getParentFile().mkdirs();
-            }
-
-            try {
-                mainConfigFile.createNewFile();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
+        this.mainConfig = new Configuration(new File(getDataFolder(), "config.yml"));
+        getLogger().info("Initialized main config file");
         
-        mainConfig = YamlConfig.loadConfiguration(mainConfigFile);
-
         Plugin vaultPlugin = getServer().getPluginManager().getPlugin("Vault");
         if (vaultPlugin != null) {
+            getLogger().info("Found Vault plugin");
             if (vaultPlugin.isEnabled()) {
+                getLogger().info("Vault plugin is enabled");
                 vaultHook = new VaultHook(this);
+                getLogger().info("Initalized Vault Hook");
                 if (!vaultHook.setup()) {
                     vaultHook = null;
+                    getLogger().info("Vault Hook failed to hook into Vault itself. Check for errors");
+                } else {
+                    getLogger().info("Hooked into Vault successfully");
                 }
             }
         }
         
         spaceRegistry = new SpaceRegistry();
+        StarMCLib.GLOBAL_INJECTOR.setInstance(spaceRegistry);
+        getLogger().info("Initialized the SpaceRegistry");
         channelRegistry = new ChannelRegistry(this);
+        StarMCLib.GLOBAL_INJECTOR.setInstance(channelRegistry);
+        getLogger().info("Initialized the ChannelRegistry");
         roomRegistry = new RoomRegistry(this);
+        StarMCLib.GLOBAL_INJECTOR.setInstance(roomRegistry);
+        getLogger().info("Initialized the RoomRegistry");
         playerChatSelection = new FocusRegistry();
+        StarMCLib.GLOBAL_INJECTOR.setInstance(playerChatSelection);
+        getLogger().info("Initialized the FocusRegistry");
         
         generateDefaultConfigOptions();
+        getLogger().info("Generated default config options");
         loadDefaultChannels();
+        getLogger().info("Loaded Default Channels");
         loadChannels();
+        getLogger().info("Loaded other channels");
         determinePlaceholderHandler();
+        getLogger().info("Initialized Placeholder handler");
         
         muteChat = new MuteChat(this);
         
         if (this.globalChannel != null) {
             muteChat.addSpaceToMute(this.globalChannel);
         }
-
+        
         ServicesManager servicesManager = getServer().getServicesManager();
         servicesManager.register(SpaceRegistry.class, spaceRegistry, this, ServicePriority.Highest);
         servicesManager.register(ChannelRegistry.class, channelRegistry, this, ServicePriority.Highest);
@@ -101,29 +109,8 @@ public class StarChat extends ExtendedJavaPlugin implements Listener {
         servicesManager.register(MuteChat.class, muteChat, this, ServicePriority.Highest);
         
         getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
-
-        this.addSelector(new PrivateChatSelector());
-
-        PluginCommand chatCommand = getCommand("chat");
-        ChatCmd chatCmdExecutor = new ChatCmd(this);
-        chatCommand.setExecutor(chatCmdExecutor);
-        chatCommand.setTabCompleter(chatCmdExecutor);
-
-        PluginCommand messageCommand = getCommand("message");
-        MessageCmd msgCmdExecutor = new MessageCmd(this);
-        messageCommand.setExecutor(msgCmdExecutor);
-        messageCommand.setTabCompleter(msgCmdExecutor);
-        PluginCommand replyCommand = getCommand("reply");
-        ReplyCmd replyCmdExecutor = new ReplyCmd(this);
-        replyCommand.setExecutor(replyCmdExecutor);
-        replyCommand.setTabCompleter(replyCmdExecutor);
-        PluginCommand starChatCmd = getCommand("starchat");
-        StarChatAdminCmd starChatCmdExecutor = new StarChatAdminCmd(this);
-        starChatCmd.setExecutor(starChatCmdExecutor);
-        starChatCmd.setTabCompleter(starChatCmdExecutor);
         
-        getCommand("clearchat").setExecutor(new ClearChatCmd(this));
-        getCommand("mutechat").setExecutor(new MuteChatCmd(this));
+        this.addSelector(new PrivateChatSelector());
         
         registerCommand("chat", new ChatCmd());
         registerCommand("message", new MessageCmd());
@@ -133,12 +120,13 @@ public class StarChat extends ExtendedJavaPlugin implements Listener {
         registerCommand("mutechat", new MuteChatCmd());
         
         this.mainConfig.save();
+        getLogger().info("StarChat loading complete");
     }
-
+    
     public MuteChat getMuteChat() {
         return muteChat;
     }
-
+    
     public static DisplayNameHandler getDefaultDisplayNameHandler() {
         return StarChat.defaultDisplayNameHandler;
     }
@@ -148,34 +136,30 @@ public class StarChat extends ExtendedJavaPlugin implements Listener {
     }
     
     public void saveMainConfig() {
-        try {
-            mainConfig.save(this.mainConfigFile);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        mainConfig.save();
     }
-
+    
     public void reload(boolean save) {
         if (save) {
             saveMainConfig();
             for (ChatChannel channel : this.channelRegistry.getObjects().values()) {
                 try {
-                    channel.getConfig().save(mainConfigFile);
+                    channel.getConfig().save(channel.getFile());
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             }
         }
-
-        mainConfig = YamlConfig.loadConfiguration(this.mainConfigFile);
-
+        
+        mainConfig.reload();
+        
         Set<String> spacesToRemove = new HashSet<>();
         for (ChatSpace space : this.channelRegistry.getObjects().values()) {
             if (space.getPlugin().getName().equalsIgnoreCase(this.getName())) {
                 spacesToRemove.add(space.getName());
             }
         }
-
+        
         spacesToRemove.forEach(c -> this.channelRegistry.unregister(c));
         
         generateDefaultConfigOptions();
@@ -193,7 +177,7 @@ public class StarChat extends ExtendedJavaPlugin implements Listener {
         mainConfig.addDefault("use-staff-channel", true, "This allows you to control if the staff channel is used by default.", "Disabling this will not delete the file.", "If you leave the staff.yml file there, it will still register it though.", "This setting only controls if it is generated by default.");
         mainConfig.addDefault("use-global-channel", true, "This allows you to control if the global channel is used by default.", "Disabling this will not delelte the file.", "If you leave the global.yml file there, it will still register it though.", "This setting only controls if it is generated by default.");
         mainConfig.addDefault("global-channel-name", "global", "This allows you to customize the name of the global channel.", "If you want to change this and use the same settings, rename the file itself as well.");
-
+        
         mainConfig.addDefault("clearchat.lineamount", 60, "The amount of lines that will be sent to players to clear the chat.");
         mainConfig.addDefault("clearchat.character", " ", "The character used within the line.", "Please make sure that this character is one that is invisible to the Minecraft Client.");
         mainConfig.addDefault("clearchat.randomize-character-count", true, "This setting controls if the character count per line is randomized", "This will help prevent clients from combining lines that are the same into one line.");
@@ -267,19 +251,19 @@ public class StarChat extends ExtendedJavaPlugin implements Listener {
             YamlConfig config = YamlConfig.loadConfiguration(file);
             String name = config.getString("name");
             ChatChannel chatChannel = new ChatChannel(this, name, file.toPath());
-            if (this.globalChannel != null && chatChannel.getName().equalsIgnoreCase(this.globalChannel.getName()) 
-                || this.staffChannel != null && chatChannel.getName().equalsIgnoreCase(this.staffChannel.getName())) {
+            if (this.globalChannel != null && chatChannel.getName().equalsIgnoreCase(this.globalChannel.getName())
+                    || this.staffChannel != null && chatChannel.getName().equalsIgnoreCase(this.staffChannel.getName())) {
                 return;
             }
             this.channelRegistry.register(chatChannel.getName(), chatChannel);
         }
     }
-
+    
     private void loadDefaultChannels() {
         if (mainConfig.getBoolean("use-global-channel")) {
             loadGlobalChannel();
         }
-    
+        
         if (mainConfig.getBoolean("use-staff-channel")) {
             loadStaffChannel();
         }
@@ -301,74 +285,74 @@ public class StarChat extends ExtendedJavaPlugin implements Listener {
             this.globalChannel = null;
         }
     }
-
+    
     public void unloadStaffChannel() {
         if (staffChannel != null) {
             this.channelRegistry.unregister(staffChannel.getName());
             this.staffChannel = null;
         }
     }
-
+    
     public SpaceRegistry getSpaceRegistry() {
         return spaceRegistry;
     }
-
+    
     public PAPIExpansion getPapiExpansion() {
         return papiExpansion;
     }
-
+    
     public void setPapiExpansion(PAPIExpansion papiExpansion) {
         this.papiExpansion = papiExpansion;
     }
-
+    
     public PrivateMessage getLastMessage(UUID uuid) {
         return this.lastMessage.get(uuid);
     }
-
+    
     public ChannelRegistry getChannelRegistry() {
         return channelRegistry;
     }
-
+    
     public RoomRegistry getRoomRegistry() {
         return roomRegistry;
     }
-
+    
     public Map<String, ChatSelector> getChatSelectors() {
         return chatSelectors;
     }
-
+    
     public void assignLastMessage(CommandSender sender, StringBuilder msgBuilder, PrivateMessage privateMessage, Actor senderActor, Actor targetActor) {
         if (senderActor instanceof PlayerActor senderPlayerActor) {
             this.lastMessage.put(senderPlayerActor.getUniqueId(), privateMessage);
         } else if (senderActor instanceof ServerActor) {
             this.consoleLastMessage = privateMessage;
         }
-
+        
         if (targetActor instanceof PlayerActor targetPlayerActor) {
             this.lastMessage.put(targetPlayerActor.getUniqueId(), privateMessage);
         } else if (targetActor instanceof ServerActor) {
             this.consoleLastMessage = privateMessage;
         }
     }
-
+    
     public ChatChannel getGlobalChannel() {
         return globalChannel;
     }
-
+    
     public ChatSpace getPlayerFocus(Player player) {
         return this.playerChatSelection.getPlayerFocus(player);
     }
-
+    
     public void setPlayerFocus(Player player, ChatSpace chatSpace) {
 //        ChatSpace old = this.playerChatSelection.put(player.getUniqueId(), chatSpace);
 //        getLogger().info("Set " + player.getName() + "'s chat focus to " + chatSpace + ", old focus: " + old);
         this.playerChatSelection.setPlayerFocus(player.getUniqueId(), chatSpace);
     }
-
+    
     public Set<PrivateMessage> getPrivateMessages() {
         return privateMessages;
     }
-
+    
     public PrivateMessage getPrivateMessage(Actor actor1, Actor actor2) {
         for (PrivateMessage privateMessage : this.privateMessages) {
             boolean containsActor1 = privateMessage.getActor1().equals(actor1) || privateMessage.getActor2().equals(actor1);
@@ -377,10 +361,10 @@ public class StarChat extends ExtendedJavaPlugin implements Listener {
                 return privateMessage;
             }
         }
-
+        
         return null;
     }
-
+    
     public List<PrivateMessage> getPrivateMessages(Actor actor) {
         List<PrivateMessage> privateMessages = new ArrayList<>();
         for (PrivateMessage privateMessage : this.privateMessages) {
@@ -388,79 +372,75 @@ public class StarChat extends ExtendedJavaPlugin implements Listener {
                 privateMessages.add(privateMessage);
             }
         }
-
+        
         return privateMessages;
     }
-
-    public YamlConfig getMainConfig() {
+    
+    public Configuration getMainConfig() {
         return mainConfig;
     }
-
+    
     public void addSelector(ChatSelector selector) {
         this.chatSelectors.put(selector.getType().toLowerCase(), selector);
     }
-
+    
     public String getConsoleNameFormat() {
         return mainConfig.getString("console-name-format");
     }
-
+    
     public String getPrivateMessageFormat() {
         return mainConfig.getString("private-msg-format");
     }
-
+    
     public boolean isUsePlaceholderAPI() {
         return mainConfig.getBoolean("use-placeholder-api");
     }
-
+    
     public void setUsePlaceholderAPI(boolean usePlaceholderAPI) {
         mainConfig.set("use-placeholder-api", usePlaceholderAPI);
     }
-
+    
     public VaultHook getVaultHook() {
         return vaultHook;
     }
-
+    
     public ChatChannel getStaffChannel() {
         return staffChannel;
     }
-
+    
     public PlaceholderHandler getPlaceholderHandler() {
         return placeholderHandler;
     }
-
+    
     public boolean isUseColorPermissions() {
         return mainConfig.getBoolean("use-color-permissions");
     }
-
+    
     public void addPrivateMessage(PrivateMessage privateMessage) {
         this.privateMessages.add(privateMessage);
     }
-
+    
     public PrivateMessage getConsoleLastMessage() {
         return this.consoleLastMessage;
     }
-
+    
     public void setConsoleNameFormat(String consoleNameFormat) {
         mainConfig.set("console-name-format", consoleNameFormat);
     }
-
+    
     public void setPrivateMessageFormat(String privateMessageFormat) {
         mainConfig.set("private-message-format", privateMessageFormat);
     }
-
+    
     public void setPlaceholderHandler(PlaceholderHandler playerPlaceholders) {
         placeholderHandler = playerPlaceholders;
     }
-
+    
     public void setUseColorPermissions(boolean useColorPermissions) {
         mainConfig.set("use-color-permissions", useColorPermissions);
     }
-
+    
     public static StarChat getInstance() {
         return instance;
-    }
-
-    public File getMainConfigFile() {
-        return this.mainConfigFile;
     }
 }
