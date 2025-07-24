@@ -107,7 +107,7 @@ public class StarChat extends ExtendedJavaPlugin implements Listener {
         servicesManager.register(FocusRegistry.class, playerChatSelection, this, ServicePriority.Highest);
         servicesManager.register(MuteChat.class, muteChat, this, ServicePriority.Highest);
         
-        getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
+        registerListeners(new PlayerListener());
         
         this.addSelector(new PrivateChatSelector());
         
