@@ -1,8 +1,10 @@
 package com.stardevllc.starchat.listener;
 
 import com.stardevllc.starchat.StarChat;
+import com.stardevllc.starchat.api.SpaceChatEvent;
 import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.space.ChatSpace;
+import com.stardevllc.starcore.api.StarEvents;
 import com.stardevllc.starlib.dependency.Inject;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -28,5 +30,10 @@ public class PlayerListener implements Listener {
             chatSpace.sendToConsole(context.getFinalMessage());
         });
         e.setCancelled(true);
+    }
+    
+    @EventHandler
+    public void onSpaceChat(SpaceChatEvent e) {
+        StarEvents.callEvent(e);
     }
 }
