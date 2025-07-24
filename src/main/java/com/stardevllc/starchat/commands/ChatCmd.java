@@ -1,6 +1,5 @@
 package com.stardevllc.starchat.commands;
 
-import com.stardevllc.config.file.yaml.YamlConfig;
 import com.stardevllc.starchat.ChatSelector;
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.channels.ChatChannel;
@@ -8,6 +7,8 @@ import com.stardevllc.starchat.registry.ChannelRegistry;
 import com.stardevllc.starchat.rooms.ChatRoom;
 import com.stardevllc.starchat.space.ChatSpace;
 import com.stardevllc.starcore.api.StarColors;
+import com.stardevllc.starcore.config.Configuration;
+import com.stardevllc.starlib.dependency.Inject;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
@@ -19,17 +20,13 @@ import java.util.List;
 
 public class ChatCmd implements TabExecutor {
 
+    @Inject
     private StarChat plugin;
-    private YamlConfig pluginConfig;
-
-    public ChatCmd(StarChat plugin) {
-        this.plugin = plugin;
-        this.pluginConfig = plugin.getMainConfig();
-    }
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+        Configuration pluginConfig = plugin.getMainConfig();
         if (!sender.hasPermission("starchat.command.chat")) {
-            StarColors.coloredMessage(sender, plugin.getMainConfig().getString("messages.command.nopermission"));
+            StarColors.coloredMessage(sender, pluginConfig.getString("messages.command.nopermission"));
             return true;
         }
         
@@ -44,11 +41,10 @@ public class ChatCmd implements TabExecutor {
         }
 
         String channelName = args[0].toLowerCase();
-
-        ChatSpace chatSpace;
+        
         String nameOverride = "";
-
-        chatSpace = plugin.getChannelRegistry().get(channelName);
+        
+        ChatSpace chatSpace = plugin.getChannelRegistry().get(channelName);
         if (chatSpace == null) {
             chatSpace = plugin.getRoomRegistry().get(channelName);
         }

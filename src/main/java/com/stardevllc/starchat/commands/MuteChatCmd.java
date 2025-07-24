@@ -2,18 +2,16 @@ package com.stardevllc.starchat.commands;
 
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starcore.api.StarColors;
+import com.stardevllc.starlib.dependency.Inject;
 import com.stardevllc.starmclib.actors.Actor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
 public class MuteChatCmd implements CommandExecutor {
+    @Inject
     private StarChat plugin;
 
-    public MuteChatCmd(StarChat plugin) {
-        this.plugin = plugin;
-    }
-    
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (!sender.hasPermission("starchat.mutechat")) {

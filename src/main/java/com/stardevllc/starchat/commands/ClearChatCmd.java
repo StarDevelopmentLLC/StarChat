@@ -2,6 +2,7 @@ package com.stardevllc.starchat.commands;
 
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starcore.api.StarColors;
+import com.stardevllc.starlib.dependency.Inject;
 import com.stardevllc.starmclib.cmdflags.*;
 import com.stardevllc.starmclib.cmdflags.type.ComplexFlag;
 import com.stardevllc.starmclib.cmdflags.type.PresenceFlag;
@@ -26,11 +27,8 @@ public class ClearChatCmd implements CommandExecutor {
 
     private static final CmdFlags flags = new CmdFlags(RANDOMIZE, BYPASS_OVERRIDE, LINE_AMOUNT, LINE_CHARACTER);
 
+    @Inject
     private StarChat plugin;
-    
-    public ClearChatCmd(StarChat plugin) {
-        this.plugin = plugin;
-    }
     
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {

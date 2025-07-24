@@ -1,17 +1,16 @@
 package com.stardevllc.starchat.commands;
 
-import com.stardevllc.config.file.yaml.YamlConfig;
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.channels.ChatChannel;
 import com.stardevllc.starchat.context.ChatContext;
-import com.stardevllc.starchat.placeholder.DefaultPlaceholders;
-import com.stardevllc.starchat.placeholder.PAPIExpansion;
-import com.stardevllc.starchat.placeholder.PAPIPlaceholders;
+import com.stardevllc.starchat.placeholder.*;
 import com.stardevllc.starchat.pm.PrivateMessage;
 import com.stardevllc.starchat.rooms.ChatRoom;
 import com.stardevllc.starcore.api.StarColors;
 import com.stardevllc.starcore.api.colors.ColorHandler;
+import com.stardevllc.starcore.config.Configuration;
 import com.stardevllc.starlib.converter.string.StringConverters;
+import com.stardevllc.starlib.dependency.Inject;
 import com.stardevllc.starlib.helper.ReflectionHelper;
 import com.stardevllc.starlib.observable.Property;
 import com.stardevllc.starlib.observable.property.*;
@@ -19,30 +18,20 @@ import com.stardevllc.starmclib.actors.Actor;
 import com.stardevllc.starmclib.actors.PlayerActor;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabExecutor;
+import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import java.io.File;
 import java.lang.reflect.Field;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
 
 public class StarChatAdminCmd implements TabExecutor {
-
+    
+    @Inject
     private StarChat plugin;
-    private YamlConfig pluginConfig;
-
-    public StarChatAdminCmd(StarChat plugin) {
-        this.plugin = plugin;
-        this.pluginConfig = plugin.getMainConfig();
-    }
-
+    
     public List<String> onTabComplete(CommandSender sender, Command cmd, String alias, String[] args) {
         if (!sender.hasPermission("starchat.command.admin")) {
             return null;
@@ -178,6 +167,7 @@ public class StarChatAdminCmd implements TabExecutor {
     }
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+        Configuration pluginConfig = plugin.getMainConfig();
         if (!sender.hasPermission("starchat.command.admin")) {
             StarColors.coloredMessage(sender, pluginConfig.getString("messages.command.nopermission"));
             return true;
@@ -370,7 +360,7 @@ public class StarChatAdminCmd implements TabExecutor {
                 StarColors.coloredMessage(sender, pluginConfig.getString("messages.command.admin.list.conversations.header"));
                 listConversations(sender);
             }
-        } else if (args[0].equalsIgnoreCase("setplayerchatfocus") || args[0].equalsIgnoreCase("setplayerfocus") || args[0].equalsIgnoreCase("setfocus")) {
+        } else if (Stream.of("setplayerchatfocus", "setplayerfocus", "setfocus").anyMatch(string -> args[0].equalsIgnoreCase(string))) {
             if (!sender.hasPermission("starchat.command.admin.setplayerchatfocus")) {
                 StarColors.coloredMessage(sender, pluginConfig.getString("messages.command.nopermission"));
                 return true;

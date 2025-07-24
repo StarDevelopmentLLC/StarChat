@@ -4,6 +4,7 @@ import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.pm.PrivateMessage;
 import com.stardevllc.starcore.api.StarColors;
+import com.stardevllc.starlib.dependency.Inject;
 import com.stardevllc.starmclib.actors.Actor;
 import com.stardevllc.starmclib.actors.PlayerActor;
 import com.stardevllc.starmclib.cmdflags.FlagResult;
@@ -19,12 +20,9 @@ import static com.stardevllc.starchat.commands.MessageCmd.flags;
 
 public class ReplyCmd implements TabExecutor {
     
+    @Inject
     private StarChat plugin;
 
-    public ReplyCmd(StarChat plugin) {
-        this.plugin = plugin;
-    }
-    
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (!sender.hasPermission("starchat.command.reply")) {
             StarColors.coloredMessage(sender, plugin.getMainConfig().getString("messages.command.nopermission"));

@@ -124,6 +124,15 @@ public class StarChat extends ExtendedJavaPlugin implements Listener {
         
         getCommand("clearchat").setExecutor(new ClearChatCmd(this));
         getCommand("mutechat").setExecutor(new MuteChatCmd(this));
+        
+        registerCommand("chat", new ChatCmd());
+        registerCommand("message", new MessageCmd());
+        registerCommand("reply", new ReplyCmd());
+        registerCommand("starchat", new StarChatAdminCmd());
+        registerCommand("clearchat", new ClearChatCmd());
+        registerCommand("mutechat", new MuteChatCmd());
+        
+        this.mainConfig.save();
     }
 
     public MuteChat getMuteChat() {

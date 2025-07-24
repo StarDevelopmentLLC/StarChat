@@ -4,6 +4,7 @@ import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.pm.PrivateMessage;
 import com.stardevllc.starcore.api.StarColors;
+import com.stardevllc.starlib.dependency.Inject;
 import com.stardevllc.starmclib.actors.Actor;
 import com.stardevllc.starmclib.cmdflags.*;
 import com.stardevllc.starmclib.cmdflags.type.PresenceFlag;
@@ -19,15 +20,11 @@ import java.util.List;
 
 public class MessageCmd implements TabExecutor {
     
+    @Inject
     private StarChat plugin;
     
     protected static final Flag FOCUS = new PresenceFlag("f", "FOCUS");
-    
     protected static final CmdFlags flags = new CmdFlags(FOCUS);
-    
-    public MessageCmd(StarChat plugin) {
-        this.plugin = plugin;
-    }
     
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (!sender.hasPermission("starchat.command.message")) {
