@@ -159,7 +159,9 @@ public class ChatChannel implements ChatSpace {
     
     @Override
     public void sendToConsole(String message) {
-        Bukkit.getServer().getLogger().info("[channel: " + getName() + "] " + StarColors.stripColor(message));
+        if (message != null && !message.isBlank()) {
+            Bukkit.getServer().getLogger().info("[channel: " + getName() + "] " + StarColors.stripColor(message));
+        }
     }
     
     public String getMuteFormat() {

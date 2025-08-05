@@ -235,7 +235,9 @@ public class ChatRoom implements ChatSpace {
     
     @Override
     public void sendToConsole(String message) {
-        Bukkit.getServer().getLogger().info("[room: " + getName() + "] " + StarColors.stripColor(message));
+        if (message != null && !message.isBlank()) {
+            Bukkit.getServer().getLogger().info("[room: " + getName() + "] " + StarColors.stripColor(message));
+        }
     }
     
     public boolean isOwner(UUID uuid) {
