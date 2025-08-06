@@ -38,7 +38,7 @@ publishing {
 }
 
 group 'com.stardevllc'
-version '0.5.0'
+version '0.5.1'
 
 processResources {
     filesMatching("*.yml") {
@@ -54,9 +54,9 @@ dependencies {
     compileOnly 'org.spigotmc:spigot-api:1.21.7-R0.1-SNAPSHOT'
     compileOnly 'com.github.MilkBowl:VaultAPI:1.7.1'
     compileOnly 'me.clip:placeholderapi:2.11.6'
-    compileOnly 'com.stardevllc:StarLib:0.12.0'
-    compileOnly 'com.stardevllc:StarMCLib:0.3.0'
-    compileOnly 'com.stardevllc:StarCore:0.9.0'
+    compileOnly 'com.stardevllc:StarLib:0.13.0'
+    compileOnly 'com.stardevllc:StarMCLib:0.5.0'
+    compileOnly 'com.stardevllc:StarCore:0.11.0'
     compileOnly 'com.stardevllc:config:0.1.4'
 }
 

@@ -2,6 +2,7 @@ package com.stardevllc.starchat.registry;
 
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.channels.ChatChannel;
+import com.stardevllc.starlib.registry.RegistryObject;
 import com.stardevllc.starlib.registry.StringRegistry;
 import org.bukkit.ChatColor;
 
@@ -15,10 +16,9 @@ public class ChannelRegistry extends StringRegistry<ChatChannel> {
     }
 
     @Override
-    public ChatChannel register(String key, ChatChannel object) {
-        super.register(key, object);
+    public RegistryObject<String, ChatChannel> register(String key, ChatChannel object) {
         plugin.getSpaceRegistry().register(key, object);
-        return object;
+        return super.register(key, object);
     }
 
     @Override
