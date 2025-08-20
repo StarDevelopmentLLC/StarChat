@@ -9,14 +9,10 @@ import com.stardevllc.starmclib.actors.Actor;
 import com.stardevllc.starmclib.cmdflags.*;
 import com.stardevllc.starmclib.cmdflags.type.PresenceFlag;
 import org.bukkit.Bukkit;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabExecutor;
+import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class MessageCmd implements TabExecutor {
     
@@ -28,7 +24,7 @@ public class MessageCmd implements TabExecutor {
     
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (!sender.hasPermission("starchat.command.message")) {
-            StarColors.coloredMessage(sender, plugin.getMainConfig().getString("messages.command.nopermission"));
+            StarColors.coloredMessage(sender, plugin.getMainConfig().get("messages.command.nopermission"));
             return true;
         }
         
@@ -44,13 +40,13 @@ public class MessageCmd implements TabExecutor {
         Actor targetActor = Actor.create(args[0]);
         
         if (targetActor == null || !senderActor.canSee(targetActor) && !senderActor.hasPermission("starchat.privatemessage.visibility.bypass")) {
-            sender.sendMessage(StarColors.color(plugin.getMainConfig().getString("messages.command.invalidtarget")));
+            sender.sendMessage(StarColors.color(plugin.getMainConfig().get("messages.command.invalidtarget")));
             return true;
         }
         
         PrivateMessage privateMessage = plugin.getPrivateMessage(senderActor, targetActor);
         if (privateMessage == null) {
-            privateMessage = new PrivateMessage(plugin, senderActor, targetActor, plugin.getMainConfig().getString("private-msg-format"));
+            privateMessage = new PrivateMessage(plugin, senderActor, targetActor, plugin.getMainConfig().get("private-msg-format"));
             plugin.addPrivateMessage(privateMessage);
         }
         

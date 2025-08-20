@@ -20,12 +20,12 @@ public class MuteChat {
     private final ObservableSet<String> spacesToMute = new ObservableHashSet<>();
     
     public MuteChat(StarChat plugin) {
-        List<String> spacesFromConfig = plugin.getMainConfig().getStringList("globalmute.spaces");
+        List<String> spacesFromConfig = plugin.getMainConfig().get("globalmute.spaces");
         this.spacesToMute.addAll(spacesFromConfig);
         
-        this.muted = new BooleanProperty(this, "muted", plugin.getMainConfig().getBoolean("globalmute.enabled"));
+        this.muted = new BooleanProperty(this, "muted", plugin.getMainConfig().get("globalmute.enabled"));
         this.muted.addListener(new ConfigChangeListener<>(plugin.getMainConfig(), "globalmute.enabled"));
-        this.actor = new ObjectProperty<>(Actor.class, this, "actor", Actor.create(plugin.getMainConfig().getString("globalmute.actor")));
+        this.actor = new ObjectProperty<>(Actor.class, this, "actor", Actor.create(plugin.getMainConfig().get("globalmute.actor")));
         this.actor.addListener(changeEvent -> {
             if (changeEvent.newValue() == null) {
                 plugin.getMainConfig().set("globalmute.actor", "");
@@ -35,7 +35,7 @@ public class MuteChat {
             
             plugin.saveMainConfig();
         });
-        this.reason = new StringProperty(this, "reason", plugin.getMainConfig().getString("globalmute.reason"));
+        this.reason = new StringProperty(this, "reason", plugin.getMainConfig().get("globalmute.reason"));
         this.reason.addListener(new ConfigChangeListener<>(plugin.getMainConfig(), "globalmute.reason"));
 
         muted.addListener(e -> {
@@ -59,9 +59,9 @@ public class MuteChat {
             
             String format;
             if (e.newValue()) {
-                format = plugin.getMainConfig().getString("globalmute.format.mute");
+                format = plugin.getMainConfig().get("globalmute.format.mute");
             } else {
-                format = plugin.getMainConfig().getString("globalmute.format.unmute");
+                format = plugin.getMainConfig().get("globalmute.format.unmute");
             }
 
             format = format.replace("{actor}", actor.get().getName());

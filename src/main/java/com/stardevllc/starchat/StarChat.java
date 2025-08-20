@@ -1,5 +1,6 @@
 package com.stardevllc.starchat;
 
+import com.electronwill.nightconfig.core.file.FileConfig;
 import com.stardevllc.config.file.yaml.YamlConfig;
 import com.stardevllc.starchat.channels.*;
 import com.stardevllc.starchat.commands.*;
@@ -53,7 +54,7 @@ public class StarChat extends ExtendedJavaPlugin implements Listener {
         StarMCLib.registerPluginEventBus(getEventBus());
         StarMCLib.registerPluginInjector(this, getInjector());
         
-        this.mainConfig = new Configuration(new File(getDataFolder(), "config.yml"));
+        this.mainConfig = new Configuration(FileConfig.of(new File(getDataFolder(), "config.toml")));
         getLogger().info("Initialized main config file");
         
         Plugin vaultPlugin = getServer().getPluginManager().getPlugin("Vault");
@@ -222,7 +223,7 @@ public class StarChat extends ExtendedJavaPlugin implements Listener {
     }
     
     private void determinePlaceholderHandler() {
-        setUsePlaceholderAPI(getMainConfig().getBoolean("use-placeholderapi"));
+        setUsePlaceholderAPI(getMainConfig().get("use-placeholderapi"));
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null && isUsePlaceholderAPI()) {
             placeholderHandler = new PAPIPlaceholders();
             this.papiExpansion = new PAPIExpansion(this);
@@ -255,17 +256,17 @@ public class StarChat extends ExtendedJavaPlugin implements Listener {
     }
     
     private void loadDefaultChannels() {
-        if (mainConfig.getBoolean("use-global-channel")) {
+        if (mainConfig.get("use-global-channel")) {
             loadGlobalChannel();
         }
         
-        if (mainConfig.getBoolean("use-staff-channel")) {
+        if (mainConfig.get("use-staff-channel")) {
             loadStaffChannel();
         }
     }
     
     public void loadGlobalChannel() {
-        globalChannel = new GlobalChannel(this, mainConfig.getString("global-channel-name"), new File(getDataFolder() + File.separator + "channels", mainConfig.getString("global-channel-name") + ".yml"));
+        globalChannel = new GlobalChannel(this, mainConfig.get("global-channel-name"), new File(getDataFolder() + File.separator + "channels", mainConfig.get("global-channel-name") + ".toml"));
         this.channelRegistry.register(globalChannel.getName(), globalChannel);
     }
     
@@ -380,15 +381,15 @@ public class StarChat extends ExtendedJavaPlugin implements Listener {
     }
     
     public String getConsoleNameFormat() {
-        return mainConfig.getString("console-name-format");
+        return mainConfig.get("console-name-format");
     }
     
     public String getPrivateMessageFormat() {
-        return mainConfig.getString("private-msg-format");
+        return mainConfig.get("private-msg-format");
     }
     
     public boolean isUsePlaceholderAPI() {
-        return mainConfig.getBoolean("use-placeholder-api");
+        return mainConfig.get("use-placeholder-api");
     }
     
     public void setUsePlaceholderAPI(boolean usePlaceholderAPI) {
@@ -408,7 +409,7 @@ public class StarChat extends ExtendedJavaPlugin implements Listener {
     }
     
     public boolean isUseColorPermissions() {
-        return mainConfig.getBoolean("use-color-permissions");
+        return mainConfig.get("use-color-permissions");
     }
     
     public void addPrivateMessage(PrivateMessage privateMessage) {

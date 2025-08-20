@@ -25,7 +25,7 @@ public class ReplyCmd implements TabExecutor {
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (!sender.hasPermission("starchat.command.reply")) {
-            StarColors.coloredMessage(sender, plugin.getMainConfig().getString("messages.command.nopermission"));
+            StarColors.coloredMessage(sender, plugin.getMainConfig().get("messages.command.nopermission"));
             return true;
         }
 
@@ -42,7 +42,7 @@ public class ReplyCmd implements TabExecutor {
         Actor targetActor = Actor.create(args[0]);
         
         if (targetActor != null && !senderActor.canSee(targetActor) && !senderActor.hasPermission("starchat.privatemessage.visibility.bypass")) {
-            sender.sendMessage(StarColors.color(plugin.getMainConfig().getString("messages.command.invalidtarget")));
+            sender.sendMessage(StarColors.color(plugin.getMainConfig().get("messages.command.invalidtarget")));
             return true;
         }
 
@@ -64,7 +64,7 @@ public class ReplyCmd implements TabExecutor {
             }
 
             if (privateMessage == null) {
-                StarColors.coloredMessage(sender, plugin.getMainConfig().getString("messages.command.reply.noactiveconversations"));
+                StarColors.coloredMessage(sender, plugin.getMainConfig().get("messages.command.reply.noactiveconversations"));
                 return true;
             }
 
@@ -76,7 +76,7 @@ public class ReplyCmd implements TabExecutor {
             }
             
             if (!senderActor.canSee(targetActor) && !senderActor.hasPermission("starchat.privatemessage.visibility.bypass")) {
-                StarColors.coloredMessage(sender, plugin.getMainConfig().getString("messages.command.invalidtarget"));
+                StarColors.coloredMessage(sender, plugin.getMainConfig().get("messages.command.invalidtarget"));
                 return true;
             }
 

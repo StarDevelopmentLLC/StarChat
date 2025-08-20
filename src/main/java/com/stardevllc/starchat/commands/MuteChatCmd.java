@@ -15,7 +15,7 @@ public class MuteChatCmd implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (!sender.hasPermission("starchat.mutechat")) {
-            StarColors.coloredMessage(sender, plugin.getMainConfig().getString("messages.command.nopermission"));
+            StarColors.coloredMessage(sender, plugin.getMainConfig().get("messages.command.nopermission"));
             return true;
         }
 

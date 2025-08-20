@@ -169,7 +169,7 @@ public class StarChatAdminCmd implements TabExecutor {
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         Configuration pluginConfig = plugin.getMainConfig();
         if (!sender.hasPermission("starchat.command.admin")) {
-            StarColors.coloredMessage(sender, pluginConfig.getString("messages.command.nopermission"));
+            StarColors.coloredMessage(sender, pluginConfig.get("messages.command.nopermission"));
             return true;
         }
 
@@ -180,22 +180,22 @@ public class StarChatAdminCmd implements TabExecutor {
 
         if (args[0].equalsIgnoreCase("save")) {
             if (!sender.hasPermission("starchat.command.admin.save")) {
-                StarColors.coloredMessage(sender, pluginConfig.getString("messages.command.nopermission"));
+                StarColors.coloredMessage(sender, pluginConfig.get("messages.command.nopermission"));
                 return true;
             }
             plugin.saveMainConfig();
-            StarColors.coloredMessage(sender, pluginConfig.getString("messages.command.admin.savesuccess"));
+            StarColors.coloredMessage(sender, pluginConfig.get("messages.command.admin.savesuccess"));
         } else if (args[0].equalsIgnoreCase("reload")) {
             if (!sender.hasPermission("starchat.command.admin.reload")) {
-                StarColors.coloredMessage(sender, pluginConfig.getString("messages.command.nopermission"));
+                StarColors.coloredMessage(sender, pluginConfig.get("messages.command.nopermission"));
                 return true;
             }
 
             plugin.reload(false);
-            StarColors.coloredMessage(sender, pluginConfig.getString("messages.command.admin.reloadsuccess"));
+            StarColors.coloredMessage(sender, pluginConfig.get("messages.command.admin.reloadsuccess"));
         } else if (args[0].equalsIgnoreCase("setconsolenameformat") || args[0].equalsIgnoreCase("setcnf")) {
             if (!sender.hasPermission("starchat.command.admin.setconsolenameformat")) {
-                StarColors.coloredMessage(sender, pluginConfig.getString("messages.command.nopermission"));
+                StarColors.coloredMessage(sender, pluginConfig.get("messages.command.nopermission"));
                 return true;
             }
             if (!(args.length > 1)) {
@@ -213,7 +213,7 @@ public class StarChatAdminCmd implements TabExecutor {
             StarColors.coloredMessage(sender, pluginConfig.getString("messages.command.admin.setconsolename").replace("{NEWNAME}", consoleName));
         } else if (args[0].equalsIgnoreCase("setprivatemessageformat") || args[0].equalsIgnoreCase("setpmf")) {
             if (!sender.hasPermission("starchat.command.admin.setprivatemessageformat")) {
-                StarColors.coloredMessage(sender, pluginConfig.getString("messages.command.nopermission"));
+                StarColors.coloredMessage(sender, pluginConfig.get("messages.command.nopermission"));
                 return true;
             }
             if (!(args.length > 1)) {
@@ -231,7 +231,7 @@ public class StarChatAdminCmd implements TabExecutor {
             sender.sendMessage(StarColors.color("&aSet the new private message format to &r") + privateMessageFormat);
         } else if (args[0].equalsIgnoreCase("setuseplaceholderapi") || args[0].equalsIgnoreCase("setupapi")) {
             if (!sender.hasPermission("starchat.command.admin.setuseplaceholderapi")) {
-                StarColors.coloredMessage(sender, pluginConfig.getString("messages.command.nopermission"));
+                StarColors.coloredMessage(sender, pluginConfig.get("messages.command.nopermission"));
                 return true;
             }
             if (!(args.length > 1)) {
@@ -242,7 +242,7 @@ public class StarChatAdminCmd implements TabExecutor {
             if (args[1].equalsIgnoreCase("true") || args[1].equalsIgnoreCase("yes")) {
                 if (plugin.isUsePlaceholderAPI()) {
                     if (plugin.getPapiExpansion() != null && plugin.getPapiExpansion().isRegistered()) {
-                        StarColors.coloredMessage(sender, pluginConfig.getString("messages.command.admin.setusepapi.alreadyconfigandenabled"));
+                        StarColors.coloredMessage(sender, pluginConfig.get("messages.command.admin.setusepapi.alreadyconfigandenabled"));
                         return true;
                     } else {
                         Plugin papi = Bukkit.getPluginManager().getPlugin("PlaceholderAPI");
@@ -250,9 +250,9 @@ public class StarChatAdminCmd implements TabExecutor {
                             plugin.setPapiExpansion(new PAPIExpansion(plugin));
                             plugin.getPapiExpansion().register();
                             plugin.setPlaceholderHandler(new PAPIPlaceholders());
-                            StarColors.coloredMessage(sender, pluginConfig.getString("messages.command.admin.setusepapi.configbutnotenabled"));
+                            StarColors.coloredMessage(sender, pluginConfig.get("messages.command.admin.setusepapi.configbutnotenabled"));
                         } else {
-                            StarColors.coloredMessage(sender, pluginConfig.getString("messages.command.admin.setusepapi.configbutnotdetected"));
+                            StarColors.coloredMessage(sender, pluginConfig.get("messages.command.admin.setusepapi.configbutnotdetected"));
                         }
                     }
                 } else {
@@ -263,14 +263,14 @@ public class StarChatAdminCmd implements TabExecutor {
                         plugin.setPlaceholderHandler(new PAPIPlaceholders());
                         plugin.getMainConfig().set("use-placeholderapi", true);
                         plugin.setUsePlaceholderAPI(true);
-                        StarColors.coloredMessage(sender, pluginConfig.getString("messages.command.admin.setusepapi.detectedandenabled"));
+                        StarColors.coloredMessage(sender, pluginConfig.get("messages.command.admin.setusepapi.detectedandenabled"));
                     } else {
-                        StarColors.coloredMessage(sender, pluginConfig.getString("messages.command.admin.setusepapi.notdetectednotenabled"));
+                        StarColors.coloredMessage(sender, pluginConfig.get("messages.command.admin.setusepapi.notdetectednotenabled"));
                     }
                 }
             } else if (args[1].equalsIgnoreCase("false") || args[1].equalsIgnoreCase("no")) {
                 if (plugin.getPapiExpansion() == null || !plugin.getPapiExpansion().isRegistered()) {
-                    StarColors.coloredMessage(sender, pluginConfig.getString("messages.command.admin.setuseapi.alreadydisabled"));
+                    StarColors.coloredMessage(sender, pluginConfig.get("messages.command.admin.setuseapi.alreadydisabled"));
                     return true;
                 }
 
@@ -278,14 +278,14 @@ public class StarChatAdminCmd implements TabExecutor {
                 plugin.setPapiExpansion(null);
                 plugin.setPlaceholderHandler(new DefaultPlaceholders());
                 plugin.getMainConfig().set("use-placeholderapi", false);
-                StarColors.coloredMessage(sender, pluginConfig.getString("messages.command.admin.setusepapi.disabledsuccess"));
+                StarColors.coloredMessage(sender, pluginConfig.get("messages.command.admin.setusepapi.disabledsuccess"));
             } else {
                 StarColors.coloredMessage(sender, "&cYou must provide true, yes, false, or no.");
                 return true;
             }
         } else if (args[0].equalsIgnoreCase("setusecolorpermissions") || args[0].equalsIgnoreCase("setucp")) {
             if (!sender.hasPermission("starchat.command.admin.setusecolorpermissions")) {
-                StarColors.coloredMessage(sender, pluginConfig.getString("messages.command.nopermission"));
+                StarColors.coloredMessage(sender, pluginConfig.get("messages.command.nopermission"));
                 return true;
             }
             if (!(args.length > 1)) {
@@ -295,25 +295,25 @@ public class StarChatAdminCmd implements TabExecutor {
 
             if (args[1].equalsIgnoreCase("true") || args[1].equalsIgnoreCase("yes")) {
                 if (plugin.isUseColorPermissions()) {
-                    StarColors.coloredMessage(sender, pluginConfig.getString("messages.command.admin.setusecolorperms.alreadyenabled"));
+                    StarColors.coloredMessage(sender, pluginConfig.get("messages.command.admin.setusecolorperms.alreadyenabled"));
                     return true;
                 }
                 plugin.setUseColorPermissions(true);
-                StarColors.coloredMessage(sender, pluginConfig.getString("messages.command.admin.setusecolorperms.enabled"));
+                StarColors.coloredMessage(sender, pluginConfig.get("messages.command.admin.setusecolorperms.enabled"));
             } else if (args[1].equalsIgnoreCase("false") || args[1].equalsIgnoreCase("no")) {
                 if (!plugin.isUseColorPermissions()) {
-                    StarColors.coloredMessage(sender, pluginConfig.getString("messages.command.admin.setusecolorperms.alreadydisabled"));
+                    StarColors.coloredMessage(sender, pluginConfig.get("messages.command.admin.setusecolorperms.alreadydisabled"));
                     return true;
                 }
                 plugin.setUseColorPermissions(false);
-                StarColors.coloredMessage(sender, pluginConfig.getString("messages.command.admin.setusecolorperms.disabled"));
+                StarColors.coloredMessage(sender, pluginConfig.get("messages.command.admin.setusecolorperms.disabled"));
             } else {
                 StarColors.coloredMessage(sender, "&cYou must provide true, yes, false, or no.");
                 return true;
             }
         } else if (args[0].equalsIgnoreCase("list")) {
             if (!sender.hasPermission("starchat.command.admin.list")) {
-                StarColors.coloredMessage(sender, pluginConfig.getString("messages.command.nopermission"));
+                StarColors.coloredMessage(sender, pluginConfig.get("messages.command.nopermission"));
                 return true;
             }
             if (!(args.length > 1)) {
@@ -323,10 +323,10 @@ public class StarChatAdminCmd implements TabExecutor {
 
             if (args[1].equalsIgnoreCase("all")) {
                 if (!sender.hasPermission("starchat.command.admin.list.all")) {
-                    StarColors.coloredMessage(sender, pluginConfig.getString("messages.command.nopermission"));
+                    StarColors.coloredMessage(sender, pluginConfig.get("messages.command.nopermission"));
                     return true;
                 }
-                StarColors.coloredMessage(sender, pluginConfig.getString("messages.command.admin.list.all.header"));
+                StarColors.coloredMessage(sender, pluginConfig.get("messages.command.admin.list.all.header"));
                 if (sender.hasPermission("starchat.command.admin.list.channels")) {
                     listChannels(sender);
                 }
@@ -340,29 +340,29 @@ public class StarChatAdminCmd implements TabExecutor {
                 }
             } else if (args[1].equalsIgnoreCase("channels")) {
                 if (!(sender.hasPermission("starchat.command.admin.list.channels") || sender.hasPermission("starchat.command.admin.list.all"))) {
-                    StarColors.coloredMessage(sender, pluginConfig.getString("messages.command.nopermission"));
+                    StarColors.coloredMessage(sender, pluginConfig.get("messages.command.nopermission"));
                     return true;
                 }
-                StarColors.coloredMessage(sender, pluginConfig.getString("messages.command.admin.list.channels.header"));
+                StarColors.coloredMessage(sender, pluginConfig.get("messages.command.admin.list.channels.header"));
                 listChannels(sender);
             } else if (args[1].equalsIgnoreCase("rooms")) {
                 if (!(sender.hasPermission("starchat.command.admin.list.rooms") || sender.hasPermission("starchat.command.admin.list.all"))) {
-                    StarColors.coloredMessage(sender, pluginConfig.getString("messages.command.nopermission"));
+                    StarColors.coloredMessage(sender, pluginConfig.get("messages.command.nopermission"));
                     return true;
                 }
-                StarColors.coloredMessage(sender, pluginConfig.getString("messages.command.admin.list.rooms.header"));
+                StarColors.coloredMessage(sender, pluginConfig.get("messages.command.admin.list.rooms.header"));
                 listRooms(sender);
             } else if (args[1].equalsIgnoreCase("conversations")) {
                 if (!(sender.hasPermission("starchat.command.admin.list.conversations") || sender.hasPermission("starchat.command.admin.list.all"))) {
-                    StarColors.coloredMessage(sender, pluginConfig.getString("messages.command.nopermission"));
+                    StarColors.coloredMessage(sender, pluginConfig.get("messages.command.nopermission"));
                     return true;
                 }
-                StarColors.coloredMessage(sender, pluginConfig.getString("messages.command.admin.list.conversations.header"));
+                StarColors.coloredMessage(sender, pluginConfig.get("messages.command.admin.list.conversations.header"));
                 listConversations(sender);
             }
         } else if (Stream.of("setplayerchatfocus", "setplayerfocus", "setfocus").anyMatch(string -> args[0].equalsIgnoreCase(string))) {
             if (!sender.hasPermission("starchat.command.admin.setplayerchatfocus")) {
-                StarColors.coloredMessage(sender, pluginConfig.getString("messages.command.nopermission"));
+                StarColors.coloredMessage(sender, pluginConfig.get("messages.command.nopermission"));
                 return true;
             }
 
@@ -400,7 +400,7 @@ public class StarChatAdminCmd implements TabExecutor {
             StarColors.coloredMessage(targetPlayer, "&eYour chat focus was changed to &d" + chatChannel.getName() + " &eby &b" + Actor.create(sender).getName());
         } else if (args[0].equalsIgnoreCase("channel")) {
             if (!sender.hasPermission("starchat.command.admin.channel")) {
-                StarColors.coloredMessage(sender, pluginConfig.getString("messages.command.nopermission"));
+                StarColors.coloredMessage(sender, pluginConfig.get("messages.command.nopermission"));
                 return true;
             }
 
@@ -411,7 +411,7 @@ public class StarChatAdminCmd implements TabExecutor {
 
             if (args[1].equalsIgnoreCase("create")) {
                 if (!sender.hasPermission("starchat.command.admin.channel.create")) {
-                    StarColors.coloredMessage(sender, pluginConfig.getString("messages.command.nopermission"));
+                    StarColors.coloredMessage(sender, pluginConfig.get("messages.command.nopermission"));
                     return true;
                 }
 
@@ -437,7 +437,7 @@ public class StarChatAdminCmd implements TabExecutor {
             
             if (args[2].equalsIgnoreCase("delete")) {
                 if (!sender.hasPermission("starchat.command.admin.channel.delete")) {
-                    StarColors.coloredMessage(sender, pluginConfig.getString("messages.command.nopermission"));
+                    StarColors.coloredMessage(sender, pluginConfig.get("messages.command.nopermission"));
                     return true;
                 }
 
@@ -489,7 +489,7 @@ public class StarChatAdminCmd implements TabExecutor {
                 }
 
                 if (!sender.hasPermission("starchat.command.admin.channel.set." + property.getName().toLowerCase().replace(" ", "_"))) {
-                    StarColors.coloredMessage(sender, pluginConfig.getString("messages.command.nopermission"));
+                    StarColors.coloredMessage(sender, pluginConfig.get("messages.command.nopermission"));
                     return true;
                 }
 
@@ -567,7 +567,7 @@ public class StarChatAdminCmd implements TabExecutor {
                 return true;
             }
             
-            boolean current = plugin.getMainConfig().getBoolean("use-staff-channel");
+            boolean current = plugin.getMainConfig().get("use-staff-channel");
             boolean value = Boolean.parseBoolean(args[1]);
             
             if (value) {

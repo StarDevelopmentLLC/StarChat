@@ -71,10 +71,10 @@ public class ClearChatCmd implements CommandExecutor {
                 randomizeChar = true;
             } else {
                 StarColors.coloredMessage(sender, noFlagPermMessage.replace("{flag}", RANDOMIZE.id()));
-                randomizeChar = plugin.getMainConfig().getBoolean("clearchat.randomize-character-count");
+                randomizeChar = plugin.getMainConfig().get("clearchat.randomize-character-count");
             }
         } else {
-            randomizeChar = plugin.getMainConfig().getBoolean("clearchat.randomize-character-count");
+            randomizeChar = plugin.getMainConfig().get("clearchat.randomize-character-count");
         }
 
         List<String> lines = new ArrayList<>(lineAmount);

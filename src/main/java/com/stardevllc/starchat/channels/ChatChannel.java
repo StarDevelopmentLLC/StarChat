@@ -1,5 +1,6 @@
 package com.stardevllc.starchat.channels;
 
+import com.electronwill.nightconfig.core.file.FileConfig;
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.api.SpaceChatEvent;
 import com.stardevllc.starchat.context.ChatContext;
@@ -52,7 +53,7 @@ public class ChatChannel implements ChatSpace {
     
     public ChatChannel(JavaPlugin plugin, String name, Path filePath) {
         this.plugin = plugin;
-        this.config = new Configuration(new File(filePath.toFile().getAbsolutePath()));
+        this.config = new Configuration(FileConfig.of(new File(filePath.toFile().getAbsolutePath())));
         
         this.id = new LongProperty(this, "id", 0);
         this.name = new StringProperty(this, "name", name);
@@ -68,11 +69,11 @@ public class ChatChannel implements ChatSpace {
         this.senderFormat.addListener(new ConfigChangeListener<>(config, "formats.sender"));
         this.systemFormat = new StringProperty(this, "systemFormat", this.config.getString("formats.system"));
         this.systemFormat.addListener(new ConfigChangeListener<>(config, "formats.system"));
-        this.useColorPermissions = new BooleanProperty(this, "useColorPermissions", config.getBoolean("settings.usecolorpermissions"));
+        this.useColorPermissions = new BooleanProperty(this, "useColorPermissions", config.get("settings.usecolorpermissions"));
         this.useColorPermissions.addListener(new ConfigChangeListener<>(config, "settings.usecolorpermissions"));
         this.cooldownLength = new LongProperty(this, "cooldownLength", new TimeParser().parseTime(config.getString("settings.cooldownlength")));
         this.cooldownLength.addListener(e -> new ConfigChangeListener<>(config, "settings.cooldownlength"));
-        this.muted = new BooleanProperty(this, "muted", this.config.getBoolean("mute.enabled"));
+        this.muted = new BooleanProperty(this, "muted", this.config.get("mute.enabled"));
         this.muted.addListener(new ConfigChangeListener<>(config, "mute.enabled"));
         this.mutedBy = new ObjectProperty<>(Actor.class, this, "mutedby", Actor.create(this.config.getString("mute.actor")));
         this.mutedBy.addListener(changeEvent -> {
@@ -364,6 +365,6 @@ public class ChatChannel implements ChatSpace {
     }
     
     public void setFile(File newFile) {
-        this.config = new Configuration(newFile);
+        this.config = new Configuration(FileConfig.of(newFile));
     }
 }
