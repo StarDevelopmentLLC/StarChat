@@ -1,6 +1,6 @@
 package com.stardevllc.starchat;
 
-import com.electronwill.nightconfig.core.file.FileConfig;
+import com.stardevllc.nightconfig.core.file.FileConfig;
 import com.stardevllc.config.file.yaml.YamlConfig;
 import com.stardevllc.starchat.channels.*;
 import com.stardevllc.starchat.commands.*;

@@ -1,6 +1,6 @@
 package com.stardevllc.starchat.channels;
 
-import com.electronwill.nightconfig.core.file.FileConfig;
+import com.stardevllc.nightconfig.core.file.FileConfig;
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.api.SpaceChatEvent;
 import com.stardevllc.starchat.context.ChatContext;
