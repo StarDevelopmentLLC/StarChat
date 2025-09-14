@@ -1,5 +1,6 @@
 package com.stardevllc.starchat.commands;
 
+import com.stardevllc.config.file.FileConfig;
 import com.stardevllc.starchat.ChatSelector;
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.channels.ChatChannel;
@@ -7,7 +8,6 @@ import com.stardevllc.starchat.registry.ChannelRegistry;
 import com.stardevllc.starchat.rooms.ChatRoom;
 import com.stardevllc.starchat.space.ChatSpace;
 import com.stardevllc.starcore.api.StarColors;
-import com.stardevllc.starcore.config.Configuration;
 import com.stardevllc.starlib.dependency.Inject;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -24,7 +24,7 @@ public class ChatCmd implements TabExecutor {
     private StarChat plugin;
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        Configuration pluginConfig = plugin.getMainConfig();
+        FileConfig pluginConfig = plugin.getMainConfig();
         if (!sender.hasPermission("starchat.command.chat")) {
             StarColors.coloredMessage(sender, pluginConfig.getString("messages.command.nopermission"));
             return true;

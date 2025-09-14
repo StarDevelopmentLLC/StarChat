@@ -4,8 +4,7 @@ import com.stardevllc.starchat.ChatSelector;
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.space.ChatSpace;
 import com.stardevllc.starcore.api.StarColors;
-import com.stardevllc.starmclib.actors.Actor;
-import com.stardevllc.starmclib.actors.PlayerActor;
+import com.stardevllc.starmclib.actors.*;
 import org.bukkit.entity.Player;
 
 public class PrivateChatSelector extends ChatSelector {
@@ -19,7 +18,7 @@ public class PrivateChatSelector extends ChatSelector {
         String nameOverride;
         Actor senderActor = new PlayerActor(player);
         if (args.length >= 2) {
-            Actor targetActor = Actor.create(args[1]);
+            Actor targetActor = Actors.create(args[1]);
             if (targetActor == null) {
                 player.sendMessage(StarColors.color("&cInvalid target."));
                 return null;

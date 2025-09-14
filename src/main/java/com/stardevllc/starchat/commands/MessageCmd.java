@@ -6,6 +6,7 @@ import com.stardevllc.starchat.pm.PrivateMessage;
 import com.stardevllc.starcore.api.StarColors;
 import com.stardevllc.starlib.dependency.Inject;
 import com.stardevllc.starmclib.actors.Actor;
+import com.stardevllc.starmclib.actors.Actors;
 import com.stardevllc.starmclib.cmdflags.*;
 import com.stardevllc.starmclib.cmdflags.type.PresenceFlag;
 import org.bukkit.Bukkit;
@@ -24,7 +25,7 @@ public class MessageCmd implements TabExecutor {
     
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (!sender.hasPermission("starchat.command.message")) {
-            StarColors.coloredMessage(sender, plugin.getMainConfig().get("messages.command.nopermission"));
+            StarColors.coloredMessage(sender, plugin.getMainConfig().getString("messages.command.nopermission"));
             return true;
         }
         
@@ -36,17 +37,17 @@ public class MessageCmd implements TabExecutor {
             return true;
         }
         
-        Actor senderActor = Actor.create(sender);
-        Actor targetActor = Actor.create(args[0]);
+        Actor senderActor = Actors.create(sender);
+        Actor targetActor = Actors.create(args[0]);
         
         if (targetActor == null || !senderActor.canSee(targetActor) && !senderActor.hasPermission("starchat.privatemessage.visibility.bypass")) {
-            sender.sendMessage(StarColors.color(plugin.getMainConfig().get("messages.command.invalidtarget")));
+            sender.sendMessage(StarColors.color(plugin.getMainConfig().getString("messages.command.invalidtarget")));
             return true;
         }
         
         PrivateMessage privateMessage = plugin.getPrivateMessage(senderActor, targetActor);
         if (privateMessage == null) {
-            privateMessage = new PrivateMessage(plugin, senderActor, targetActor, plugin.getMainConfig().get("private-msg-format"));
+            privateMessage = new PrivateMessage(plugin, senderActor, targetActor, plugin.getMainConfig().getString("private-msg-format"));
             plugin.addPrivateMessage(privateMessage);
         }
         

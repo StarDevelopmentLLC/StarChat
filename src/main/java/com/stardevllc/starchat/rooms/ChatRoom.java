@@ -6,8 +6,9 @@ import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.handler.DisplayNameHandler;
 import com.stardevllc.starchat.space.ChatSpace;
 import com.stardevllc.starcore.api.StarColors;
-import com.stardevllc.starlib.observable.property.*;
+import com.stardevllc.starlib.observable.property.readwrite.*;
 import com.stardevllc.starmclib.actors.Actor;
+import com.stardevllc.starmclib.actors.Actors;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
@@ -21,17 +22,17 @@ public class ChatRoom implements ChatSpace {
     protected long id;
     protected JavaPlugin plugin;
     
-    protected final StringProperty name;
-    protected final BooleanProperty useColorPermissions;
-    protected final StringProperty senderFormat;
-    protected final StringProperty systemFormat;
+    protected final ReadWriteStringProperty name;
+    protected final ReadWriteBooleanProperty useColorPermissions;
+    protected final ReadWriteStringProperty senderFormat;
+    protected final ReadWriteStringProperty systemFormat;
     
-    protected final BooleanProperty muted;
-    protected final ObjectProperty<Actor> mutedBy;
-    protected final StringProperty muteReason;
-    protected final StringProperty muteFormat;
-    protected final StringProperty unmuteFormat;
-    protected final StringProperty muteErrorFormat;
+    protected final ReadWriteBooleanProperty muted;
+    protected final ReadWriteObjectProperty<Actor> mutedBy;
+    protected final ReadWriteStringProperty muteReason;
+    protected final ReadWriteStringProperty muteFormat;
+    protected final ReadWriteStringProperty unmuteFormat;
+    protected final ReadWriteStringProperty muteErrorFormat;
     
     protected DisplayNameHandler displayNameHandler;
     
@@ -41,20 +42,20 @@ public class ChatRoom implements ChatSpace {
     public ChatRoom(JavaPlugin plugin, Actor owner, String name) {
         this.plugin = plugin;
         this.owner = owner;
-        this.name = new StringProperty(this, "name", name);
-        this.useColorPermissions = new BooleanProperty(this, "useColorPermissions", false);
-        this.senderFormat = new StringProperty(this, "senderFormat", "");
-        this.systemFormat = new StringProperty(this, "systemFormat", "");
-        this.muted = new BooleanProperty(this, "muted", false);
-        this.mutedBy = new ObjectProperty<>(Actor.class, this, "mutedby", null);
-        this.muteReason = new StringProperty(this, "muteReason", "");
-        this.muteFormat = new StringProperty(this, "muteFormat", "");
-        this.unmuteFormat = new StringProperty(this, "unmuteFormat", "");
-        this.muteErrorFormat = new StringProperty(this, "muteErrorFormat", "");
+        this.name = new ReadWriteStringProperty(this, "name", name);
+        this.useColorPermissions = new ReadWriteBooleanProperty(this, "useColorPermissions", false);
+        this.senderFormat = new ReadWriteStringProperty(this, "senderFormat", "");
+        this.systemFormat = new ReadWriteStringProperty(this, "systemFormat", "");
+        this.muted = new ReadWriteBooleanProperty(this, "muted", false);
+        this.mutedBy = new ReadWriteObjectProperty<>(this, "mutedby", Actor.class);
+        this.muteReason = new ReadWriteStringProperty(this, "muteReason", "");
+        this.muteFormat = new ReadWriteStringProperty(this, "muteFormat", "");
+        this.unmuteFormat = new ReadWriteStringProperty(this, "unmuteFormat", "");
+        this.muteErrorFormat = new ReadWriteStringProperty(this, "muteErrorFormat", "");
     }
     
     public ChatRoom(JavaPlugin plugin, String name) {
-        this(plugin, Actor.of(plugin), name);
+        this(plugin, Actors.of(plugin), name);
     }
     
     @Override
@@ -226,7 +227,7 @@ public class ChatRoom implements ChatSpace {
         for (UUID uuid : this.members.keySet()) {
             Player player = Bukkit.getPlayer(uuid);
             if (player != null) {
-                members.add(Actor.of(player));
+                members.add(Actors.of(player));
             }
         }
         

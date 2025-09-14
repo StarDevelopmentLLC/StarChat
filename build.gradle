@@ -38,7 +38,7 @@ publishing {
 }
 
 group 'com.stardevllc'
-version '0.5.1'
+version '0.5.2'
 
 processResources {
     filesMatching("*.yml") {
@@ -57,8 +57,7 @@ dependencies {
     compileOnly 'com.stardevllc:StarLib:0.13.0'
     compileOnly 'com.stardevllc:StarMCLib:0.5.0'
     compileOnly 'com.stardevllc:StarCore:0.11.0'
-    compileOnly 'com.stardevllc:config:0.1.4'
-//    compileOnly 'com.stardevllc.night-config:toml:3.8.2'
+    compileOnly 'com.stardevllc:config:0.2.0'
 }
 
 java {

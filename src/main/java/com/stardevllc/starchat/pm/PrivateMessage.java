@@ -4,29 +4,31 @@ import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.handler.DisplayNameHandler;
 import com.stardevllc.starchat.space.ChatSpace;
 import com.stardevllc.starcore.api.StarColors;
-import com.stardevllc.starlib.observable.property.StringProperty;
+import com.stardevllc.starlib.observable.property.readwrite.ReadWriteStringProperty;
 import com.stardevllc.starmclib.actors.Actor;
+import com.stardevllc.starmclib.actors.Actors;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.*;
+import java.util.Objects;
+import java.util.Set;
 
 public class PrivateMessage implements ChatSpace {
 
     protected long id;
     protected JavaPlugin plugin;
 
-    protected final StringProperty name;
-    protected final StringProperty senderFormat;
+    protected final ReadWriteStringProperty name;
+    protected final ReadWriteStringProperty senderFormat;
     protected DisplayNameHandler displayNameHandler;
 
     private Actor actor1, actor2;
 
     public PrivateMessage(JavaPlugin plugin, Actor actor1, Actor actor2, String format) {
         this.plugin = plugin;
-        this.name = new StringProperty(this, "name", "pm-" + actor1.getName() + "-" + actor2.getName());
-        this.senderFormat = new StringProperty(this, "senderFormat", format);
+        this.name = new ReadWriteStringProperty(this, "name", "pm-" + actor1.getName() + "-" + actor2.getName());
+        this.senderFormat = new ReadWriteStringProperty(this, "senderFormat", format);
         this.actor1 = actor1;
         this.actor2 = actor2;
     }
@@ -68,7 +70,7 @@ public class PrivateMessage implements ChatSpace {
 
     @Override
     public boolean canSendMessages(CommandSender sender) {
-        Actor senderActor = Actor.create(sender);
+        Actor senderActor = Actors.create(sender);
         return !(senderActor.equals(actor1) || senderActor.equals(actor2));
     }
 
@@ -127,12 +129,18 @@ public class PrivateMessage implements ChatSpace {
 
     @Override
     public boolean equals(Object object) {
-        if (this == object) return true;
-        if (object == null || getClass() != object.getClass()) return false;
+        if (this == object) {
+            return true;
+        }
+        if (object == null || getClass() != object.getClass()) {
+            return false;
+        }
 
         PrivateMessage that = (PrivateMessage) object;
 
-        if (!Objects.equals(actor1, that.actor1)) return false;
+        if (!Objects.equals(actor1, that.actor1)) {
+            return false;
+        }
         return Objects.equals(actor2, that.actor2);
     }
 
