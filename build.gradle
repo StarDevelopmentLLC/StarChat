@@ -9,7 +9,7 @@ repositories {
     maven {
         url = 'https://repo.stardevllc.com/releases'
     }
-    maven { url 'https://jitpack.io' }
+    maven { url = 'https://jitpack.io' }
     maven {
         url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
     }
@@ -37,8 +37,8 @@ publishing {
     }
 }
 
-group 'com.stardevllc'
-version '0.5.1'
+group ='com.stardevllc'
+version = '0.5.1'
 
 processResources {
     filesMatching("*.yml") {
