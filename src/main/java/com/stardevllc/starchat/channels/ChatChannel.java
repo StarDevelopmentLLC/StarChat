@@ -1,6 +1,5 @@
 package com.stardevllc.starchat.channels;
 
-import com.mysql.cj.conf.*;
 import com.stardevllc.config.file.FileConfig;
 import com.stardevllc.config.file.yaml.YamlConfig;
 import com.stardevllc.starchat.StarChat;
