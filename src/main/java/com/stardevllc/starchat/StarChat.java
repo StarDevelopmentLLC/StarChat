@@ -265,7 +265,7 @@ public class StarChat extends ExtendedJavaPlugin implements Listener {
     }
     
     public void loadGlobalChannel() {
-        globalChannel = new GlobalChannel(this, mainConfig.getString("global-channel-name"), new File(getDataFolder() + File.separator + "channels", mainConfig.get("global-channel-name") + ".toml"));
+        globalChannel = new GlobalChannel(this, mainConfig.getString("global-channel-name"), new File(getDataFolder() + File.separator + "channels", mainConfig.get("global-channel-name") + ".yml"));
         this.channelRegistry.register(globalChannel.getName(), globalChannel);
     }
     
