@@ -142,7 +142,7 @@ public class StarChatAdminCmd implements TabExecutor {
                     // /starchat channel <name> set <property> <value>
                     
                     if (args.length == 4) {
-                        for (Field field : ReflectionHelper.getClassFields(chatChannel.getClass())) {
+                        for (Field field : ReflectionHelper.getClassFields(chatChannel.getClass()).values()) {
                             if (Property.class.isAssignableFrom(field.getType())) {
                                 completions.add(field.getName().toLowerCase());
                             }
@@ -472,9 +472,8 @@ public class StarChatAdminCmd implements TabExecutor {
                 ReadOnlyProperty<?> property;
                 try {
                     Field classField = null;
-                    Set<Field> classFields = ReflectionHelper.getClassFields(chatChannel.getClass());
 
-                    for (Field field : classFields) {
+                    for (Field field : ReflectionHelper.getClassFields(chatChannel.getClass()).values()) {
                         if (field.getName().equalsIgnoreCase(args[3])) {
                             classField = field;
                             break;
