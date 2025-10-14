@@ -6,6 +6,7 @@ import com.stardevllc.starchat.channels.*;
 import com.stardevllc.starchat.commands.*;
 import com.stardevllc.starchat.handler.DisplayNameHandler;
 import com.stardevllc.starchat.handler.VaultDisplayNameHandler;
+import com.stardevllc.starchat.hooks.StarEventsHook;
 import com.stardevllc.starchat.hooks.VaultHook;
 import com.stardevllc.starchat.listener.PlayerListener;
 import com.stardevllc.starchat.mutechat.MuteChat;
@@ -14,6 +15,7 @@ import com.stardevllc.starchat.pm.PrivateChatSelector;
 import com.stardevllc.starchat.pm.PrivateMessage;
 import com.stardevllc.starchat.registry.*;
 import com.stardevllc.starchat.space.ChatSpace;
+import com.stardevllc.starevents.StarEvents;
 import com.stardevllc.starmclib.StarMCLib;
 import com.stardevllc.starmclib.actors.*;
 import com.stardevllc.starmclib.plugin.ExtendedJavaPlugin;
@@ -52,6 +54,8 @@ public class StarChat extends ExtendedJavaPlugin implements Listener {
         instance = this;
         StarMCLib.registerPluginEventBus(getEventBus());
         StarMCLib.registerPluginInjector(this, getInjector());
+        
+        StarEvents.addEventListener(new StarEventsHook());
         
         this.mainConfig = new YamlConfig(new File(getDataFolder(), "config.yml"));
         getLogger().info("Initialized main config file");
