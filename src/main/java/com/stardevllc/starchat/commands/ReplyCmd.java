@@ -4,7 +4,7 @@ import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.pm.PrivateMessage;
 import com.stardevllc.starcore.api.StarColors;
-import com.stardevllc.starlib.dependency.Inject;
+import com.stardevllc.starlib.injector.Inject;
 import com.stardevllc.starmclib.actors.*;
 import com.stardevllc.starmclib.cmdflags.FlagResult;
 import org.bukkit.command.Command;

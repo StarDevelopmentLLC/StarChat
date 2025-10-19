@@ -62,7 +62,7 @@ public class ChatChannel implements ChatSpace {
         
         createDefaults();
         
-        this.name.addListener(e -> config.set("name", e.newValue()));
+        this.name.addListener((observable, oldValue, newValue) -> config.set("name", newValue));
         this.viewPermission = new ReadWriteStringProperty(this, "viewPermission", this.config.getString("permissions.view"));
         this.viewPermission.addListener(new ConfigChangeListener<>(config, "permissions.view"));
         this.sendPermission = new ReadWriteStringProperty(this, "sendPermission", this.config.getString("permissions.send"));
@@ -74,16 +74,16 @@ public class ChatChannel implements ChatSpace {
         this.useColorPermissions = new ReadWriteBooleanProperty(this, "useColorPermissions", config.getBoolean("settings.usecolorpermissions"));
         this.useColorPermissions.addListener(new ConfigChangeListener<>(config, "settings.usecolorpermissions"));
         this.cooldownLength = new ReadWriteLongProperty(this, "cooldownLength", new TimeParser().parseTime(config.getString("settings.cooldownlength")));
-        this.cooldownLength.addListener(e -> new ConfigChangeListener<>(config, "settings.cooldownlength"));
+        this.cooldownLength.addListener((observable, oldvalue, newValue) -> new ConfigChangeListener<>(config, "settings.cooldownlength"));
         this.muted = new ReadWriteBooleanProperty(this, "muted", this.config.getBoolean("mute.enabled"));
         this.muted.addListener(new ConfigChangeListener<>(config, "mute.enabled"));
         this.mutedBy = new ReadWriteObjectProperty<>(this, "mutedby", Actor.class);
         this.mutedBy.set(Actors.create(this.config.getString("mute.actor")));
-        this.mutedBy.addListener(changeEvent -> {
-            if (changeEvent.newValue() == null) {
+        this.mutedBy.addListener((observable, oldValue, newValue) -> {
+            if (newValue == null) {
                 config.set("mute.actor", "");
             } else {
-                config.set("mute.actor", changeEvent.newValue().getConfigString());
+                config.set("mute.actor", newValue.getConfigString());
             }
         });
         this.muteReason = new ReadWriteStringProperty(this, "muteReason", this.config.getString("mute.reason"));

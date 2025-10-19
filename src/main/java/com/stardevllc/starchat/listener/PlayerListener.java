@@ -3,7 +3,7 @@ package com.stardevllc.starchat.listener;
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.space.ChatSpace;
-import com.stardevllc.starlib.dependency.Inject;
+import com.stardevllc.starlib.injector.Inject;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.*;
