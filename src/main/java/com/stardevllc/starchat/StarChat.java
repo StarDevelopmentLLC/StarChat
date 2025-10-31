@@ -52,9 +52,6 @@ public class StarChat extends ExtendedJavaPlugin implements Listener {
     @Override
     public void onEnable() {
         instance = this;
-        StarMCLib.registerPluginEventBus(getEventBus());
-        StarMCLib.registerPluginInjector(this, getInjector());
-        
         StarEvents.addEventListener(new StarEventsHook());
         
         this.mainConfig = new YamlConfig(new File(getDataFolder(), "config.yml"));
@@ -77,16 +74,16 @@ public class StarChat extends ExtendedJavaPlugin implements Listener {
         }
         
         spaceRegistry = new SpaceRegistry();
-        StarMCLib.GLOBAL_INJECTOR.setInstance(spaceRegistry);
+        StarMCLib.GLOBAL_INJECTOR.set(spaceRegistry);
         getLogger().info("Initialized the SpaceRegistry");
         channelRegistry = new ChannelRegistry(this);
-        StarMCLib.GLOBAL_INJECTOR.setInstance(channelRegistry);
+        StarMCLib.GLOBAL_INJECTOR.set(channelRegistry);
         getLogger().info("Initialized the ChannelRegistry");
         roomRegistry = new RoomRegistry(this);
-        StarMCLib.GLOBAL_INJECTOR.setInstance(roomRegistry);
+        StarMCLib.GLOBAL_INJECTOR.set(roomRegistry);
         getLogger().info("Initialized the RoomRegistry");
         playerChatSelection = new FocusRegistry();
-        StarMCLib.GLOBAL_INJECTOR.setInstance(playerChatSelection);
+        StarMCLib.GLOBAL_INJECTOR.set(playerChatSelection);
         getLogger().info("Initialized the FocusRegistry");
         
         generateDefaultConfigOptions();
