@@ -6,7 +6,6 @@ import com.stardevllc.starchat.channels.*;
 import com.stardevllc.starchat.commands.*;
 import com.stardevllc.starchat.handler.DisplayNameHandler;
 import com.stardevllc.starchat.handler.VaultDisplayNameHandler;
-import com.stardevllc.starchat.hooks.StarEventsHook;
 import com.stardevllc.starchat.hooks.VaultHook;
 import com.stardevllc.starchat.listener.PlayerListener;
 import com.stardevllc.starchat.mutechat.MuteChat;
@@ -15,7 +14,6 @@ import com.stardevllc.starchat.pm.PrivateChatSelector;
 import com.stardevllc.starchat.pm.PrivateMessage;
 import com.stardevllc.starchat.registry.*;
 import com.stardevllc.starchat.space.ChatSpace;
-import com.stardevllc.starevents.StarEvents;
 import com.stardevllc.starmclib.StarMCLib;
 import com.stardevllc.starmclib.actors.*;
 import com.stardevllc.starmclib.plugin.ExtendedJavaPlugin;
@@ -51,8 +49,8 @@ public class StarChat extends ExtendedJavaPlugin implements Listener {
     
     @Override
     public void onEnable() {
+        super.onEnable();
         instance = this;
-        StarEvents.addEventListener(new StarEventsHook());
         
         this.mainConfig = new YamlConfig(new File(getDataFolder(), "config.yml"));
         getLogger().info("Initialized main config file");
@@ -217,7 +215,6 @@ public class StarChat extends ExtendedJavaPlugin implements Listener {
         mainConfig.addDefault("messages.command.clearchat.noflagpermission", "&cYou do not have permission to use the -{flag} flag, defaulting to config value");
         mainConfig.addDefault("messages.command.reply.noopenconversation", "&cYou do not have a conversation open with {target}");
         mainConfig.addDefault("messages.command.reply.noactiveconversations", "&cYou do not have any active conversations.");
-        
         
         this.saveMainConfig();
     }
