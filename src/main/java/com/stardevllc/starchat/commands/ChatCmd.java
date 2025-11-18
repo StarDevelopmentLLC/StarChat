@@ -106,7 +106,7 @@ public class ChatCmd implements TabExecutor {
         String name = args[0].toLowerCase();
 
         ChannelRegistry channelRegistry = plugin.getChannelRegistry();
-        for (ChatChannel chatChannel : channelRegistry) {
+        for (ChatChannel chatChannel : channelRegistry.values()) {
             if (chatChannel.canSendMessages(sender)) {
                 if (chatChannel.getName().startsWith(name)) {
                     channels.add(chatChannel.getName());

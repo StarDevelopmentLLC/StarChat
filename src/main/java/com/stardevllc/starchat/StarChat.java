@@ -140,7 +140,7 @@ public class StarChat extends ExtendedJavaPlugin implements Listener {
     public void reload(boolean save) {
         if (save) {
             saveMainConfig();
-            for (ChatChannel channel : this.channelRegistry.getObjects().values()) {
+            for (ChatChannel channel : this.channelRegistry.values()) {
                 channel.getConfig().save();
             }
         }
@@ -148,7 +148,7 @@ public class StarChat extends ExtendedJavaPlugin implements Listener {
         mainConfig.reload(false);
         
         Set<String> spacesToRemove = new HashSet<>();
-        for (ChatSpace space : this.channelRegistry.getObjects().values()) {
+        for (ChatSpace space : this.channelRegistry.values()) {
             if (space.getPlugin().getName().equalsIgnoreCase(this.getName())) {
                 spacesToRemove.add(space.getName());
             }

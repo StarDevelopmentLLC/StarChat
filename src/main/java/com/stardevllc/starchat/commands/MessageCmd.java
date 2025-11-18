@@ -85,7 +85,7 @@ public class MessageCmd implements TabExecutor {
             List<String> players = new LinkedList<>();
             for (Player p : Bukkit.getOnlinePlayers()) {
                 if (!p.getUniqueId().equals(player.getUniqueId())) {
-                    if (!player.canSee(p) && !player.hasPermission("starchat.privatemessage.visibility.bypass")) {
+                    if (player.canSee(p) || player.hasPermission("starchat.privatemssage.visibility.bypass")) {
                         players.add(p.getName());
                     }
                 }

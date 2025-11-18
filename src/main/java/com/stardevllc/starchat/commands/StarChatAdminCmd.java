@@ -99,7 +99,7 @@ public class StarChatAdminCmd implements TabExecutor {
                 }
                 arg = args[1].toLowerCase();
             } else if (args.length == 3) {
-                for (ChatChannel chatChannel : plugin.getChannelRegistry()) {
+                for (ChatChannel chatChannel : plugin.getChannelRegistry().values()) {
                     completions.add(chatChannel.getName());
                 }
                 arg = args[2].toLowerCase();
@@ -111,7 +111,7 @@ public class StarChatAdminCmd implements TabExecutor {
 
             if (args.length == 2) {
                 completions.add("create");
-                for (ChatChannel chatChannel : plugin.getChannelRegistry()) {
+                for (ChatChannel chatChannel : plugin.getChannelRegistry().values()) {
                     if (chatChannel.getPlugin().getName().equalsIgnoreCase(this.plugin.getName())) {
                         completions.add(chatChannel.getName());
                     }
@@ -629,13 +629,13 @@ public class StarChatAdminCmd implements TabExecutor {
     }
 
     private void listChannels(CommandSender sender) {
-        for (ChatChannel chatChannel : plugin.getChannelRegistry()) {
+        for (ChatChannel chatChannel : plugin.getChannelRegistry().values()) {
             StarColors.coloredMessage(sender, " &8- &eChannel &b" + chatChannel.getName() + " &eowned by the plugin &d" + chatChannel.getPlugin().getName());
         }
     }
 
     private void listRooms(CommandSender sender) {
-        for (ChatRoom chatRoom : plugin.getRoomRegistry()) {
+        for (ChatRoom chatRoom : plugin.getRoomRegistry().values()) {
             StarColors.coloredMessage(sender, " &8- &eRoom &b" + chatRoom.getName() + " &eowned by the plugin &d" + chatRoom.getPlugin().getName());
         }
     }

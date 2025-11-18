@@ -2,11 +2,11 @@ package com.stardevllc.starchat.registry;
 
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.rooms.ChatRoom;
-import com.stardevllc.starlib.registry.RegistryObject;
-import com.stardevllc.starlib.registry.StringRegistry;
+import com.stardevllc.starlib.objects.registry.Registry;
+import com.stardevllc.starlib.objects.registry.RegistryObject;
 import org.bukkit.ChatColor;
 
-public class RoomRegistry extends StringRegistry<ChatRoom> {
+public class RoomRegistry extends Registry<String, ChatRoom> {
     
     private StarChat plugin;
     
@@ -22,7 +22,7 @@ public class RoomRegistry extends StringRegistry<ChatRoom> {
     }
 
     @Override
-    public ChatRoom unregister(String key) {
+    public boolean unregister(String key) {
         this.plugin.getSpaceRegistry().unregister(key);
         return super.unregister(key);
     }

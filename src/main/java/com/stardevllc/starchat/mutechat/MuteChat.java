@@ -28,11 +28,11 @@ public class MuteChat {
         this.muted.addListener(new ConfigChangeListener<>(plugin.getMainConfig(), "globalmute.enabled"));
         this.actor = new ReadWriteObjectProperty<>(this, "actor", Actor.class);
         this.actor.set(Actors.create(plugin.getMainConfig().get("globalmute.actor")));
-        this.actor.addListener((observable, oldValue, newValue) -> {
-            if (newValue == null) {
+        this.actor.addListener(c -> {
+            if (c.newValue() == null) {
                 plugin.getMainConfig().set("globalmute.actor", "");
             } else {
-                plugin.getMainConfig().set("globalmute.actor", newValue.getConfigString());
+                plugin.getMainConfig().set("globalmute.actor", c.newValue().getConfigString());
             }
             
             plugin.saveMainConfig();
@@ -40,7 +40,7 @@ public class MuteChat {
         this.reason = new ReadWriteStringProperty(this, "reason", plugin.getMainConfig().getString("globalmute.reason"));
         this.reason.addListener(new ConfigChangeListener<>(plugin.getMainConfig(), "globalmute.reason"));
         
-        muted.addListener((source, oldValue, newValue) -> {
+        muted.addListener(c -> {
             Iterator<String> iterator = spacesToMute.iterator();
             Set<Actor> members = new HashSet<>();
             while (iterator.hasNext()) {
@@ -51,7 +51,7 @@ public class MuteChat {
                 } else {
                     members.addAll(chatSpace.getMembers());
                     
-                    if (newValue) {
+                    if (c.newValue()) {
                         chatSpace.mute(actor.get(), reason.get());
                     } else {
                         chatSpace.unmute(null);
@@ -60,7 +60,7 @@ public class MuteChat {
             }
             
             String format;
-            if (newValue) {
+            if (c.newValue()) {
                 format = plugin.getMainConfig().getString("globalmute.format.mute");
             } else {
                 format = plugin.getMainConfig().getString("globalmute.format.unmute");
@@ -80,9 +80,9 @@ public class MuteChat {
             }
         });
         
-        this.spacesToMute.addListener((source, added, removed) -> {
-            if (added != null) {
-                ChatSpace chatSpace = plugin.getSpaceRegistry().get(added);
+        this.spacesToMute.addListener(c -> {
+            if (c.added() != null) {
+                ChatSpace chatSpace = plugin.getSpaceRegistry().get(c.added());
                 if (chatSpace == null) {
                     return;
                 }
@@ -90,8 +90,8 @@ public class MuteChat {
                 if (this.isMuted()) {
                     chatSpace.mute(actor.get(), reason.get());
                 }
-            } else if (removed != null) {
-                ChatSpace chatSpace = plugin.getSpaceRegistry().get(removed);
+            } else if (c.removed() != null) {
+                ChatSpace chatSpace = plugin.getSpaceRegistry().get(c.removed());
                 if (chatSpace == null) {
                     return;
                 }

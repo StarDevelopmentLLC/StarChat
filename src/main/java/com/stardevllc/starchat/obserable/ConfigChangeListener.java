@@ -2,7 +2,6 @@ package com.stardevllc.starchat.obserable;
 
 import com.stardevllc.config.file.FileConfig;
 import com.stardevllc.starlib.observable.ChangeListener;
-import com.stardevllc.starlib.observable.ObservableValue;
 
 public class ConfigChangeListener<T> implements ChangeListener<T> {
     private final FileConfig configuration;
@@ -14,8 +13,8 @@ public class ConfigChangeListener<T> implements ChangeListener<T> {
     }
     
     @Override
-    public void changed(ObservableValue<T> observableValue, T oldValue, T newValue) {
-        configuration.set(path, newValue);
+    public void changed(Change<T> change) {
+        configuration.set(path, change.newValue());
         configuration.save();
     }
 }

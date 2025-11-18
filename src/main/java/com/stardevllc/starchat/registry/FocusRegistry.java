@@ -2,12 +2,12 @@ package com.stardevllc.starchat.registry;
 
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.space.ChatSpace;
-import com.stardevllc.starlib.registry.UUIDRegistry;
+import com.stardevllc.starlib.objects.registry.Registry;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
 
-public class FocusRegistry extends UUIDRegistry<ChatSpace> {
+public class FocusRegistry extends Registry<UUID, ChatSpace> {
     
     public void setPlayerFocus(UUID uuid, ChatSpace chatSpace) {
         if (chatSpace == null) {
