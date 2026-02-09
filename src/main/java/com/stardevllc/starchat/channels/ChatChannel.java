@@ -73,7 +73,7 @@ public class ChatChannel implements ChatSpace {
         this.systemFormat.addListener(new ConfigChangeListener<>(config, "formats.system"));
         this.useColorPermissions = new ReadWriteBooleanProperty(this, "useColorPermissions", config.getBoolean("settings.usecolorpermissions"));
         this.useColorPermissions.addListener(new ConfigChangeListener<>(config, "settings.usecolorpermissions"));
-        this.cooldownLength = new ReadWriteLongProperty(this, "cooldownLength", new TimeParser().parseTime(config.getString("settings.cooldownlength")));
+        this.cooldownLength = new ReadWriteLongProperty(this, "cooldownLength", TimeParser.parseTime(config.getString("settings.cooldownlength")));
         this.cooldownLength.addListener(c -> new ConfigChangeListener<>(config, "settings.cooldownlength"));
         this.muted = new ReadWriteBooleanProperty(this, "muted", this.config.getBoolean("mute.enabled"));
         this.muted.addListener(new ConfigChangeListener<>(config, "mute.enabled"));
