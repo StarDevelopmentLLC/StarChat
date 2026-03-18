@@ -4,7 +4,7 @@ import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.handler.DisplayNameHandler;
 import com.stardevllc.starchat.space.ChatSpace;
 import com.stardevllc.starcore.api.StarColors;
-import com.stardevllc.starlib.observable.property.readwrite.ReadWriteStringProperty;
+import com.stardevllc.starlib.values.property.StringProperty;
 import com.stardevllc.starmclib.actors.Actor;
 import com.stardevllc.starmclib.actors.Actors;
 import org.bukkit.Bukkit;
@@ -19,16 +19,16 @@ public class PrivateMessage implements ChatSpace {
     protected long id;
     protected JavaPlugin plugin;
 
-    protected final ReadWriteStringProperty name;
-    protected final ReadWriteStringProperty senderFormat;
+    protected final StringProperty name;
+    protected final StringProperty senderFormat;
     protected DisplayNameHandler displayNameHandler;
 
     private Actor actor1, actor2;
 
     public PrivateMessage(JavaPlugin plugin, Actor actor1, Actor actor2, String format) {
         this.plugin = plugin;
-        this.name = new ReadWriteStringProperty(this, "name", "pm-" + actor1.getName() + "-" + actor2.getName());
-        this.senderFormat = new ReadWriteStringProperty(this, "senderFormat", format);
+        this.name = new StringProperty(this, "name", "pm-" + actor1.getName() + "-" + actor2.getName());
+        this.senderFormat = new StringProperty(this, "senderFormat", format);
         this.actor1 = actor1;
         this.actor2 = actor2;
     }

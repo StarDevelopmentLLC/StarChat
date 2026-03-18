@@ -4,9 +4,9 @@ import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.obserable.ConfigChangeListener;
 import com.stardevllc.starchat.space.ChatSpace;
 import com.stardevllc.starcore.api.StarColors;
-import com.stardevllc.starlib.observable.collections.set.ObservableHashSet;
-import com.stardevllc.starlib.observable.collections.set.ObservableSet;
-import com.stardevllc.starlib.observable.property.readwrite.*;
+import com.stardevllc.starlib.collections.observable.set.ObservableHashSet;
+import com.stardevllc.starlib.collections.observable.set.ObservableSet;
+import com.stardevllc.starlib.values.property.*;
 import com.stardevllc.starmclib.actors.Actor;
 import com.stardevllc.starmclib.actors.Actors;
 
@@ -14,9 +14,9 @@ import java.util.*;
 
 public class MuteChat {
     
-    private final ReadWriteBooleanProperty muted;
-    private final ReadWriteObjectProperty<Actor> actor;
-    private final ReadWriteStringProperty reason;
+    private final BooleanProperty muted;
+    private final ObjectProperty<Actor> actor;
+    private final StringProperty reason;
     
     private final ObservableSet<String> spacesToMute = new ObservableHashSet<>();
     
@@ -24,23 +24,23 @@ public class MuteChat {
         List<String> spacesFromConfig = plugin.getMainConfig().getStringList("globalmute.spaces");
         this.spacesToMute.addAll(spacesFromConfig);
         
-        this.muted = new ReadWriteBooleanProperty(this, "muted", plugin.getMainConfig().getBoolean("globalmute.enabled"));
-        this.muted.addListener(new ConfigChangeListener<>(plugin.getMainConfig(), "globalmute.enabled"));
-        this.actor = new ReadWriteObjectProperty<>(this, "actor", Actor.class);
+        this.muted = new BooleanProperty(this, "muted", plugin.getMainConfig().getBoolean("globalmute.enabled"));
+        this.muted.addChangeListener(new ConfigChangeListener<>(plugin.getMainConfig(), "globalmute.enabled"));
+        this.actor = new ObjectProperty<>(this, "actor", Actor.class);
         this.actor.set(Actors.create(plugin.getMainConfig().get("globalmute.actor")));
-        this.actor.addListener(c -> {
-            if (c.newValue() == null) {
+        this.actor.addChangeListener((v, o, n) -> {
+            if (n == null) {
                 plugin.getMainConfig().set("globalmute.actor", "");
             } else {
-                plugin.getMainConfig().set("globalmute.actor", c.newValue().getConfigString());
+                plugin.getMainConfig().set("globalmute.actor", n.getConfigString());
             }
             
             plugin.saveMainConfig();
         });
-        this.reason = new ReadWriteStringProperty(this, "reason", plugin.getMainConfig().getString("globalmute.reason"));
-        this.reason.addListener(new ConfigChangeListener<>(plugin.getMainConfig(), "globalmute.reason"));
+        this.reason = new StringProperty(this, "reason", plugin.getMainConfig().getString("globalmute.reason"));
+        this.reason.addChangeListener(new ConfigChangeListener<>(plugin.getMainConfig(), "globalmute.reason"));
         
-        muted.addListener(c -> {
+        muted.addChangeListener((v, o, n) -> {
             Iterator<String> iterator = spacesToMute.iterator();
             Set<Actor> members = new HashSet<>();
             while (iterator.hasNext()) {
@@ -51,7 +51,7 @@ public class MuteChat {
                 } else {
                     members.addAll(chatSpace.getMembers());
                     
-                    if (c.newValue()) {
+                    if (n) {
                         chatSpace.mute(actor.get(), reason.get());
                     } else {
                         chatSpace.unmute(null);
@@ -60,7 +60,7 @@ public class MuteChat {
             }
             
             String format;
-            if (c.newValue()) {
+            if (n) {
                 format = plugin.getMainConfig().getString("globalmute.format.mute");
             } else {
                 format = plugin.getMainConfig().getString("globalmute.format.unmute");

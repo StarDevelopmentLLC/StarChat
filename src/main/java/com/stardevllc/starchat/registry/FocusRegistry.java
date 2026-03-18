@@ -2,18 +2,19 @@ package com.stardevllc.starchat.registry;
 
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.space.ChatSpace;
-import com.stardevllc.starlib.objects.registry.Registry;
 import org.bukkit.entity.Player;
 
-import java.util.UUID;
+import java.util.*;
 
-public class FocusRegistry extends Registry<UUID, ChatSpace> {
+public class FocusRegistry {
+    
+    private final Map<UUID, ChatSpace> map = new HashMap<>();
     
     public void setPlayerFocus(UUID uuid, ChatSpace chatSpace) {
         if (chatSpace == null) {
-            this.unregister(uuid);
+            map.remove(uuid);
         } else {
-            this.register(uuid, chatSpace);
+            map.put(uuid, chatSpace);
         }
     }
 
@@ -26,7 +27,7 @@ public class FocusRegistry extends Registry<UUID, ChatSpace> {
             defaultSpace = StarChat.getInstance().getGlobalChannel();
         }
         
-        ChatSpace focus = get(player.getUniqueId());
+        ChatSpace focus = map.get(player.getUniqueId());
         if (focus == null) {
             focus = defaultSpace;
         }

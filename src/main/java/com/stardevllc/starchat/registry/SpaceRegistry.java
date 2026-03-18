@@ -1,11 +1,14 @@
 package com.stardevllc.starchat.registry;
 
 import com.stardevllc.starchat.space.ChatSpace;
-import com.stardevllc.starlib.objects.registry.Registry;
-import org.bukkit.ChatColor;
+import com.stardevllc.starlib.registry.AbstractRegistry;
+import com.stardevllc.starlib.registry.RegistryKey;
 
-public class SpaceRegistry extends Registry<String, ChatSpace> {
+import java.util.HashMap;
+import java.util.Set;
+
+public class SpaceRegistry extends AbstractRegistry<ChatSpace> {
     public SpaceRegistry() {
-        super(null, string -> ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', string.toLowerCase().replace(" ", "_"))), ChatSpace::getName, null, null);
+        super(ChatSpace.class, RegistryKey.of("spaces"), "Spaces", new HashMap<>(), null, false, null, Set.of());
     }
 }

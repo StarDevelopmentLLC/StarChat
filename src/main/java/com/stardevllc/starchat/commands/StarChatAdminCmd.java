@@ -11,10 +11,9 @@ import com.stardevllc.starcore.api.StarColors;
 import com.stardevllc.starcore.api.colors.ColorHandler;
 import com.stardevllc.starlib.converter.string.StringConverters;
 import com.stardevllc.starlib.injector.Inject;
-import com.stardevllc.starlib.observable.Property;
-import com.stardevllc.starlib.observable.ReadOnlyProperty;
-import com.stardevllc.starlib.observable.property.readwrite.*;
 import com.stardevllc.starlib.reflection.ReflectionHelper;
+import com.stardevllc.starlib.values.Property;
+import com.stardevllc.starlib.values.property.*;
 import com.stardevllc.starmclib.actors.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -447,7 +446,7 @@ public class StarChatAdminCmd implements TabExecutor {
                 }
 
                 chatChannel.getConfig().delete();
-                plugin.getChannelRegistry().unregister(chatChannel.getName());
+                plugin.getChannelRegistry().remove(chatChannel.getName());
                 StarColors.coloredMessage(sender, "&eYou deleted the chat channel &b" + chatChannel.getName());
             }
 
@@ -469,7 +468,7 @@ public class StarChatAdminCmd implements TabExecutor {
 
                 String value = sb.toString().trim();
                 
-                ReadOnlyProperty<?> property;
+                Property<?> property;
                 try {
                     Field classField = null;
 
@@ -481,7 +480,7 @@ public class StarChatAdminCmd implements TabExecutor {
                     }
                     
                     classField.setAccessible(true);
-                    property = (ReadOnlyProperty<?>) classField.get(chatChannel);
+                    property = (Property<?>) classField.get(chatChannel);
                 } catch (IllegalAccessException | NullPointerException e) {
                     StarColors.coloredMessage(sender, "&cYou provided an invalid setting name.");
                     return true;
@@ -493,12 +492,12 @@ public class StarChatAdminCmd implements TabExecutor {
                 }
 
                 switch (property) {
-                    case ReadWriteStringProperty stringProperty -> stringProperty.set(value);
-                    case ReadWriteBooleanProperty booleanProperty ->
+                    case StringProperty stringProperty -> stringProperty.set(value);
+                    case BooleanProperty booleanProperty ->
                             booleanProperty.set(StringConverters.getConverter(boolean.class).convertTo(value));
-                    case ReadWriteObjectProperty<?> objectProperty -> {
+                    case ObjectProperty<?> objectProperty -> {
                         if (objectProperty.getName().equalsIgnoreCase("mutedBy")) {
-                            ((ReadWriteObjectProperty<Actor>) objectProperty).set(Actors.create(value));
+                            ((ObjectProperty<Actor>) objectProperty).set(Actors.create(value));
                         }
                     }
                     default -> {
@@ -614,7 +613,7 @@ public class StarChatAdminCmd implements TabExecutor {
                 return true;
             }
             
-            plugin.getChannelRegistry().unregister(oldName);
+            plugin.getChannelRegistry().remove(oldName);
             plugin.getGlobalChannel().getConfig().renameFile(newName);
             plugin.getGlobalChannel().setName(newName);
             plugin.getGlobalChannel().saveConfig();

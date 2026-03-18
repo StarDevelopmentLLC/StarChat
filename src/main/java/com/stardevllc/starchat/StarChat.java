@@ -47,6 +47,9 @@ public class StarChat extends ExtendedJavaPlugin implements Listener {
     private PrivateMessage consoleLastMessage;
     private MuteChat muteChat;
     
+    private String globalChannelName, staffChannelName;
+    private File globalChannelPath, staffChannelPath;
+    
     @Override
     public void onEnable() {
         super.onEnable();
@@ -74,10 +77,10 @@ public class StarChat extends ExtendedJavaPlugin implements Listener {
         spaceRegistry = new SpaceRegistry();
         StarMCLib.GLOBAL_INJECTOR.set(spaceRegistry);
         getLogger().info("Initialized the SpaceRegistry");
-        channelRegistry = new ChannelRegistry(this);
+        channelRegistry = new ChannelRegistry(spaceRegistry);
         StarMCLib.GLOBAL_INJECTOR.set(channelRegistry);
         getLogger().info("Initialized the ChannelRegistry");
-        roomRegistry = new RoomRegistry(this);
+        roomRegistry = new RoomRegistry(spaceRegistry);
         StarMCLib.GLOBAL_INJECTOR.set(roomRegistry);
         getLogger().info("Initialized the RoomRegistry");
         playerChatSelection = new FocusRegistry();
@@ -154,7 +157,7 @@ public class StarChat extends ExtendedJavaPlugin implements Listener {
             }
         }
         
-        spacesToRemove.forEach(c -> this.channelRegistry.unregister(c));
+        spacesToRemove.forEach(c -> this.channelRegistry.remove(c));
         
         generateDefaultConfigOptions();
         loadDefaultChannels();
@@ -254,34 +257,38 @@ public class StarChat extends ExtendedJavaPlugin implements Listener {
     
     private void loadDefaultChannels() {
         if (mainConfig.getBoolean("use-global-channel")) {
+            this.globalChannelName = mainConfig.getString("global-channel-name");
+            this.globalChannelPath = new File(getDataFolder() + File.separator + "channels", mainConfig.get("global-channel-name") + ".yml");
             loadGlobalChannel();
         }
         
         if (mainConfig.getBoolean("use-staff-channel")) {
+            this.staffChannelName = "staff";
+            this.staffChannelPath = new File(getDataFolder() + File.separator + "channels", "staff.yml");
             loadStaffChannel();
         }
     }
     
     public void loadGlobalChannel() {
-        globalChannel = new GlobalChannel(this, mainConfig.getString("global-channel-name"), new File(getDataFolder() + File.separator + "channels", mainConfig.get("global-channel-name") + ".yml"));
+        globalChannel = new GlobalChannel(mainConfig.getString("global-channel-name"), new File(getDataFolder() + File.separator + "channels", mainConfig.get("global-channel-name") + ".yml"));
         this.channelRegistry.register(globalChannel.getName(), globalChannel);
     }
     
     public void loadStaffChannel() {
-        staffChannel = new StaffChannel(this, new File(getDataFolder() + File.separator + "channels", "staff.yml"));
+        staffChannel = new StaffChannel("staff", new File(getDataFolder() + File.separator + "channels", "staff.yml"));
         this.channelRegistry.register(staffChannel.getName(), staffChannel);
     }
     
     public void unloadGlobalChannel() {
         if (globalChannel != null) {
-            this.channelRegistry.unregister(globalChannel.getName());
+            this.channelRegistry.remove(globalChannel.getName());
             this.globalChannel = null;
         }
     }
     
     public void unloadStaffChannel() {
         if (staffChannel != null) {
-            this.channelRegistry.unregister(staffChannel.getName());
+            this.channelRegistry.remove(staffChannel.getName());
             this.staffChannel = null;
         }
     }
@@ -435,5 +442,21 @@ public class StarChat extends ExtendedJavaPlugin implements Listener {
     
     public static StarChat getInstance() {
         return instance;
+    }
+    
+    public String getGlobalChannelName() {
+        return globalChannelName;
+    }
+    
+    public String getStaffChannelName() {
+        return staffChannelName;
+    }
+    
+    public File getGlobalChannelPath() {
+        return globalChannelPath;
+    }
+    
+    public File getStaffChannelPath() {
+        return staffChannelPath;
     }
 }

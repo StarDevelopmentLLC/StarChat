@@ -4,19 +4,14 @@ import com.stardevllc.config.file.FileConfig;
 import com.stardevllc.starchat.ChatSelector;
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.channels.ChatChannel;
-import com.stardevllc.starchat.registry.ChannelRegistry;
 import com.stardevllc.starchat.rooms.ChatRoom;
 import com.stardevllc.starchat.space.ChatSpace;
 import com.stardevllc.starcore.api.StarColors;
 import com.stardevllc.starlib.injector.Inject;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabExecutor;
+import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class ChatCmd implements TabExecutor {
 
@@ -34,12 +29,12 @@ public class ChatCmd implements TabExecutor {
             sender.sendMessage(StarColors.color(pluginConfig.getString("messages.command.onlyplayers")));
             return true;
         }
-
+        
         if (!(args.length > 0)) {
             sender.sendMessage(StarColors.color("&cUsage: /" + label + " <channelName>"));
             return true;
         }
-
+        
         String channelName = args[0].toLowerCase();
         
         String nameOverride = "";
@@ -64,6 +59,7 @@ public class ChatCmd implements TabExecutor {
             sender.sendMessage(StarColors.color(pluginConfig.getString("messages.chatspace.notexist").replace("{PROVIDED}", channelName)));
             return true;
         }
+        
 
         if (chatSpace instanceof ChatChannel chatChannel) {
             String sendPermission = chatChannel.getSendPermission();
@@ -92,30 +88,21 @@ public class ChatCmd implements TabExecutor {
         if (!sender.hasPermission("starchat.command.chat")) {
             return null;
         }
-
+        
         if (!(sender instanceof Player)) {
             return null;
         }
-
-        if (!(args.length > 0)) {
+        
+        if (args.length != 1) {
             return null;
         }
         
         List<String> channels = new LinkedList<>();
+        channels.addAll(plugin.getChannelRegistry().keySet().stream().map(k -> k.toString().toLowerCase()).toList());
+        channels.addAll(plugin.getChatSelectors().keySet().stream().map(String::toLowerCase).toList());
         
         String name = args[0].toLowerCase();
-
-        ChannelRegistry channelRegistry = plugin.getChannelRegistry();
-        for (ChatChannel chatChannel : channelRegistry.values()) {
-            if (chatChannel.canSendMessages(sender)) {
-                if (chatChannel.getName().startsWith(name)) {
-                    channels.add(chatChannel.getName());
-                }
-            }
-        }
-        
-        channels.addAll(plugin.getChatSelectors().keySet());
-
+        channels.removeIf(s -> !s.startsWith(name));
         Collections.sort(channels);
         return channels;
     }
