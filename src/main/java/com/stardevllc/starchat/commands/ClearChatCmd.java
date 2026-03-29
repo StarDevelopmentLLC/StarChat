@@ -1,11 +1,11 @@
 package com.stardevllc.starchat.commands;
 
+import com.stardevllc.StarColors;
 import com.stardevllc.starchat.StarChat;
-import com.stardevllc.starcore.api.StarColors;
 import com.stardevllc.starlib.injector.Inject;
-import com.stardevllc.starmclib.command.flags.*;
-import com.stardevllc.starmclib.command.flags.type.ComplexFlag;
-import com.stardevllc.starmclib.command.flags.type.PresenceFlag;
+import com.stardevllc.command.flags.*;
+import com.stardevllc.command.flags.type.ComplexFlag;
+import com.stardevllc.command.flags.type.PresenceFlag;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;

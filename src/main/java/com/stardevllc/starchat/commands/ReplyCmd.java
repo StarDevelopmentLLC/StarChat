@@ -1,12 +1,12 @@
 package com.stardevllc.starchat.commands;
 
+import com.stardevllc.StarColors;
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.pm.PrivateMessage;
-import com.stardevllc.starcore.api.StarColors;
 import com.stardevllc.starlib.injector.Inject;
-import com.stardevllc.starmclib.actors.*;
-import com.stardevllc.starmclib.command.flags.FlagResult;
+import com.stardevllc.actors.*;
+import com.stardevllc.command.flags.FlagResult;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;

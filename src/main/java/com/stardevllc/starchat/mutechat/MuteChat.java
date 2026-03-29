@@ -1,14 +1,14 @@
 package com.stardevllc.starchat.mutechat;
 
+import com.stardevllc.StarColors;
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.obserable.ConfigChangeListener;
 import com.stardevllc.starchat.space.ChatSpace;
-import com.stardevllc.starcore.api.StarColors;
 import com.stardevllc.starlib.collections.observable.set.ObservableHashSet;
 import com.stardevllc.starlib.collections.observable.set.ObservableSet;
 import com.stardevllc.starlib.values.property.*;
-import com.stardevllc.starmclib.actors.Actor;
-import com.stardevllc.starmclib.actors.Actors;
+import com.stardevllc.actors.Actor;
+import com.stardevllc.actors.Actors;
 
 import java.util.*;
 
