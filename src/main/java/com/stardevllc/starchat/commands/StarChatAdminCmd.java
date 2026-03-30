@@ -11,6 +11,7 @@ import com.stardevllc.starchat.pm.PrivateMessage;
 import com.stardevllc.starchat.rooms.ChatRoom;
 import com.stardevllc.starlib.converter.string.StringConverters;
 import com.stardevllc.starlib.injector.Inject;
+import com.stardevllc.starlib.objects.key.Keys;
 import com.stardevllc.starlib.reflection.ReflectionHelper;
 import com.stardevllc.starlib.values.Property;
 import com.stardevllc.starlib.values.property.*;
