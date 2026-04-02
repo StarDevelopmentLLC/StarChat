@@ -1,7 +1,10 @@
 package com.stardevllc.starchat;
 
+import com.stardevllc.StarMCLib;
+import com.stardevllc.actors.*;
 import com.stardevllc.config.file.FileConfig;
 import com.stardevllc.config.file.yaml.YamlConfig;
+import com.stardevllc.plugin.ExtendedJavaPlugin;
 import com.stardevllc.starchat.channels.*;
 import com.stardevllc.starchat.commands.*;
 import com.stardevllc.starchat.handler.DisplayNameHandler;
@@ -14,10 +17,6 @@ import com.stardevllc.starchat.pm.PrivateChatSelector;
 import com.stardevllc.starchat.pm.PrivateMessage;
 import com.stardevllc.starchat.registry.*;
 import com.stardevllc.starchat.space.ChatSpace;
-import com.stardevllc.StarMCLib;
-import com.stardevllc.actors.*;
-import com.stardevllc.plugin.ExtendedJavaPlugin;
-import com.stardevllc.starlib.objects.key.Keys;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
