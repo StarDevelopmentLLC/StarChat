@@ -1,10 +1,10 @@
 package com.stardevllc.starchat.channels;
 
-import com.stardevllc.StarColors;
-import com.stardevllc.actors.Actor;
-import com.stardevllc.actors.Actors;
 import com.stardevllc.config.file.FileConfig;
 import com.stardevllc.config.file.yaml.YamlConfig;
+import com.stardevllc.minecraft.StarColors;
+import com.stardevllc.minecraft.actors.Actor;
+import com.stardevllc.minecraft.actors.Actors;
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.api.SpaceChatEvent;
 import com.stardevllc.starchat.context.ChatContext;

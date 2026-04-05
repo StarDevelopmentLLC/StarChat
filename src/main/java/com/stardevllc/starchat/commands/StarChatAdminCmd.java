@@ -1,7 +1,7 @@
 package com.stardevllc.starchat.commands;
 
-import com.stardevllc.StarColors;
-import com.stardevllc.colors.ColorHandler;
+import com.stardevllc.minecraft.StarColors;
+import com.stardevllc.minecraft.colors.ColorHandler;
 import com.stardevllc.config.file.FileConfig;
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.channels.ChatChannel;
@@ -11,11 +11,10 @@ import com.stardevllc.starchat.pm.PrivateMessage;
 import com.stardevllc.starchat.rooms.ChatRoom;
 import com.stardevllc.starlib.converter.string.StringConverters;
 import com.stardevllc.starlib.injector.Inject;
-import com.stardevllc.starlib.objects.key.Keys;
 import com.stardevllc.starlib.reflection.ReflectionHelper;
 import com.stardevllc.starlib.values.Property;
 import com.stardevllc.starlib.values.property.*;
-import com.stardevllc.actors.*;
+import com.stardevllc.minecraft.actors.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.*;

@@ -1,10 +1,10 @@
 package com.stardevllc.starchat;
 
-import com.stardevllc.StarMCLib;
-import com.stardevllc.actors.*;
+import com.stardevllc.minecraft.StarMCLib;
+import com.stardevllc.minecraft.actors.*;
 import com.stardevllc.config.file.FileConfig;
 import com.stardevllc.config.file.yaml.YamlConfig;
-import com.stardevllc.plugin.ExtendedJavaPlugin;
+import com.stardevllc.minecraft.plugin.ExtendedJavaPlugin;
 import com.stardevllc.starchat.channels.*;
 import com.stardevllc.starchat.commands.*;
 import com.stardevllc.starchat.handler.DisplayNameHandler;

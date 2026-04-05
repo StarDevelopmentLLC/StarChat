@@ -1,6 +1,6 @@
 package com.stardevllc.starchat.commands;
 
-import com.stardevllc.StarColors;
+import com.stardevllc.minecraft.StarColors;
 import com.stardevllc.config.file.FileConfig;
 import com.stardevllc.starchat.ChatSelector;
 import com.stardevllc.starchat.StarChat;
@@ -8,7 +8,6 @@ import com.stardevllc.starchat.channels.ChatChannel;
 import com.stardevllc.starchat.rooms.ChatRoom;
 import com.stardevllc.starchat.space.ChatSpace;
 import com.stardevllc.starlib.injector.Inject;
-import com.stardevllc.starlib.objects.key.Keys;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 

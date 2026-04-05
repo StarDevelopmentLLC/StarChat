@@ -1,10 +1,10 @@
 package com.stardevllc.starchat.pm;
 
-import com.stardevllc.StarColors;
+import com.stardevllc.minecraft.StarColors;
 import com.stardevllc.starchat.ChatSelector;
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.space.ChatSpace;
-import com.stardevllc.actors.*;
+import com.stardevllc.minecraft.actors.*;
 import org.bukkit.entity.Player;
 
 public class PrivateChatSelector extends ChatSelector {
